@@ -1,10 +1,10 @@
 <?php
 session_start();
-if (!isset($_SESSION['login_idusuario'])){
-  header('location:login.php');
-  exit();
+if (!isset($_SESSION['login_idusuario'])) {
+    header('location:login.php');
+    exit();
 }
- 
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -12,7 +12,7 @@ if (!isset($_SESSION['login_idusuario'])){
 <head>
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title>Punto de venta</title>
+    <title>systec POS</title>
     <script src="assets/vendor/jquery/jquery.min.js"></script>
     <script src="assets/DataTables/datatables.min.js"></script>
     <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
