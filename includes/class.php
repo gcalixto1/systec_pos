@@ -353,9 +353,6 @@ class Action
 	{
 		extract($_POST);
 		$targetFilePath = "";
-
-		// Manejo de archivo (imagen)
-
 		// Construye la cadena de datos para la consulta
 		$data = "descripcion = '$descripcion'";
 		$data .= ", proveedor = '$proveedor'";
@@ -369,29 +366,32 @@ class Action
 		$data .= ", prop3 = '$prop3'";
 		$data .= ", categoria = '$categoria'";
 		$data .= ", fecha_vencimiento = '$fecha_vencimiento'";
+		// Manejo de archivo (imagen)
+		if (isset($_FILES['imagen_producto']['name']) && !empty($_FILES['imagen_producto']['name'])) {
+			$targetDir = "img/productos/";
+			$fileName = uniqid() . "_" . basename($_FILES["imagen_producto"]["name"]);
+			$targetFilePath = $targetDir . $fileName;
+			$fileType = strtolower(pathinfo($targetFilePath, PATHINFO_EXTENSION));
 
-		// Evitar inyección SQL con consultas preparadas
-		if (empty($id)) {
-			if (isset($_FILES['imagen_producto']['name'])) {
-				$targetDir = "img/productos/";
-				$fileName = uniqid() . "_" . basename($_FILES["imagen_producto"]["name"]);
-				$targetFilePath = $targetDir . $fileName;
-				$fileType = strtolower(pathinfo($targetFilePath, PATHINFO_EXTENSION));
-
-				// Validar tipo de archivo
-				$allowedTypes = ['jpg', 'jpeg', 'png'];
-				if (in_array($fileType, $allowedTypes)) {
-					if (move_uploaded_file($_FILES["imagen_producto"]["tmp_name"], $targetFilePath)) {
-					} else {
-						echo "Error al subir la imagen.";
-						return 0;
-					}
+			// Validar tipo de archivo
+			$allowedTypes = ['jpg', 'jpeg', 'png'];
+			if (in_array($fileType, $allowedTypes)) {
+				if (move_uploaded_file($_FILES["imagen_producto"]["tmp_name"], $targetFilePath)) {
+					$data .= ", imagen_producto = '$targetFilePath'";
 				} else {
-					echo "Formato de imagen no permitido.";
+					echo "Error al subir la imagen.";
 					return 0;
 				}
+			} else {
+				echo "Formato de imagen no permitido.";
+				return 0;
 			}
-			$data .= ", imagen_producto = '$targetFilePath'";
+		} else {
+			$data .= ", imagen_producto = ''"; // Campo vacío si no hay imagen
+		}
+		// Evitar inyección SQL con consultas preparadas
+		if (empty($id)) {
+
 			// Inserción de un nuevo producto
 			$save = $this->dbh->query("INSERT INTO producto SET " . $data);
 			if ($save) {
