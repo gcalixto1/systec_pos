@@ -272,7 +272,7 @@ if (!empty($id)) {
                         <div class="form-group col-md-4 ">
                             <label for="name">Fecha Vencimiento</label>
                             <input type="date" name="fecha_vencimiento" id="fecha_vencimiento" class="form-control"
-                                value="<?php echo isset($meta['fecha_vencimiento']) ? htmlspecialchars($meta['fecha_vencimiento']) : ''; ?>"
+                                value="<?php echo isset($meta['fecha_vencimiento']) ? htmlspecialchars(date('Y-m-d', strtotime($meta['fecha_vencimiento']))) : ''; ?>"
                                 required>
                         </div>
                     </div>
