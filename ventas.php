@@ -22,8 +22,9 @@ if (!empty($id)) {
     <form class="form form-material" method="post" action="#" name="pagoForm" id="pagoForm">
         <div class="form-content">
             <div class="form-body">
-                <input type="hidden" name="id" id="id" value="<?php echo isset($_GET['idfactura']) ? $_GET['idfactura'] : '' ?>"">
-                <input type="hidden" name="montodevuelto" id="montodevuelto" value="0.00">
+                <input type="hidden" name="id" id="id"
+                    value="<?php echo isset($_GET['idfactura']) ? $_GET['idfactura'] : '' ?>"">
+                <input type=" hidden" name="montodevuelto" id="montodevuelto" value="0.00">
                 <input type="hidden" name="creditoinicial" id="creditoinicial" value="0.00">
                 <input type="hidden" name="creditodisponible" id="creditodisponible" value="0.00">
                 <input type="hidden" name="abonototal" id="abonototal" value="0.00">
@@ -31,7 +32,9 @@ if (!empty($id)) {
                 <div class="row">
                     <div class="col-md-4">
                         <h6 class="mb-0 font-light">Total a Pagar</h6>
-                        <h3 class="mb-0 font-medium"><label id="TextImporte" name="TextImporte"><?php echo isset($meta['totalpagar']) ? htmlspecialchars($meta['totalpagar']) : ''; ?></label></h3>
+                        <h3 class="mb-0 font-medium"><label id="TextImporte"
+                                name="TextImporte"><?php echo isset($meta['totalpagar']) ? htmlspecialchars($meta['totalpagar']) : ''; ?></label>
+                        </h3>
                     </div>
                     <div class="col-md-4">
                         <h6 class="mb-0 font-light">Total Recibido</h6>
@@ -46,7 +49,9 @@ if (!empty($id)) {
                 <div class="row">
                     <div class="col-md-12">
                         <h6 class="mb-0 font-light">Nombre del Cliente</h6>
-                        <h5 class="mb-0 font-medium"><label id="TextCliente" name="TextCliente"><?php echo isset($meta['nombre']) ? htmlspecialchars($meta['nombre']) : ''; ?></label></label></h5>
+                        <h5 class="mb-0 font-medium"><label id="TextCliente"
+                                name="TextCliente"><?php echo isset($meta['nombre']) ? htmlspecialchars($meta['nombre']) : ''; ?></label></label>
+                        </h5>
                     </div>
                 </div>
                 <hr>
@@ -62,7 +67,8 @@ if (!empty($id)) {
                                     $pago = new Action();
                                     $pago = $pago->ListarMediosPagos();
                                     for ($i = 0; $i < sizeof($pago); $i++) { ?>
-                                        <option value="<?php echo $pago[$i]['idmedio']; ?>"><?php echo $pago[$i]['medio_pago'] ?></option>
+                                        <option value="<?php echo $pago[$i]['idmedio']; ?>">
+                                            <?php echo $pago[$i]['medio_pago'] ?></option>
                                     <?php } ?>
                                 </select>
                             </div>
@@ -70,7 +76,9 @@ if (!empty($id)) {
                         <div class="col-md-6">
                             <div class="form-group has-feedback">
                                 <label class="control-label">Monto Recibido: </label>
-                                <input class="form-control" type="text" name="montopagado" id="montopagado" autocomplete="off" placeholder="Monto Recibido" step="0.01" value="0.00" oninput="calcularCambio()" aria-required="true">
+                                <input class="form-control" type="text" name="montopagado" id="montopagado"
+                                    autocomplete="off" placeholder="Monto Recibido" step="0.01" value="0.00"
+                                    oninput="calcularCambio()" aria-required="true">
                             </div>
                         </div>
                     </div>
@@ -82,7 +90,9 @@ if (!empty($id)) {
                     <div class="col-md-12">
                         <div class="form-group has-feedback">
                             <label class="control-label">Observaciones: </label>
-                            <input type="text" class="form-control" name="observaciones" id="observaciones" onkeyup="this.value=this.value.toUpperCase();" placeholder="Ingrese Observaciones en Venta" autocomplete="off" aria-required="true">
+                            <input type="text" class="form-control" name="observaciones" id="observaciones"
+                                onkeyup="this.value=this.value.toUpperCase();"
+                                placeholder="Ingrese Observaciones en Venta" autocomplete="off" aria-required="true">
                         </div>
                     </div>
                 </div>
@@ -106,46 +116,46 @@ if (!empty($id)) {
     }
 
     $('#pagoForm').submit(function(e) {
-    e.preventDefault();
-    start_load();
-    $.ajax({
-        url: 'ajax.php?action=save_venta_completa',
-        method: 'POST',
-        data: $(this).serialize(),
-        success: function(resp) {
-            resp = JSON.parse(resp);
-            if (resp.success) {
-                Swal.fire({
-                    title: '¡Éxito!',
-                    text: 'Venta Registrada',
-                    icon: 'success',
-                    confirmButtonColor: '#28a745',
-                    confirmButtonText: 'OK'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        window.open(resp.ticket_url, '_blank');
-                        location.reload();
-                    }
-                });
-            } else {
+        e.preventDefault();
+        start_load();
+        $.ajax({
+            url: 'ajax.php?action=save_venta_completa',
+            method: 'POST',
+            data: $(this).serialize(),
+            success: function(resp) {
+                resp = JSON.parse(resp);
+                if (resp.success) {
+                    Swal.fire({
+                        title: '¡Éxito!',
+                        text: 'Venta Registrada',
+                        icon: 'success',
+                        confirmButtonColor: '#28a745',
+                        confirmButtonText: 'OK'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.open(resp.ticket_url, '_blank');
+                            location.reload();
+                        }
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'Error',
+                        text: resp.message || 'Ocurrió un error al registrar la venta.',
+                        icon: 'error',
+                        confirmButtonColor: '#d33',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            },
+            error: function() {
                 Swal.fire({
                     title: 'Error',
-                    text: resp.message || 'Ocurrió un error al registrar la venta.',
+                    text: 'No se pudo conectar con el servidor.',
                     icon: 'error',
                     confirmButtonColor: '#d33',
                     confirmButtonText: 'OK'
                 });
             }
-        },
-        error: function() {
-            Swal.fire({
-                title: 'Error',
-                text: 'No se pudo conectar con el servidor.',
-                icon: 'error',
-                confirmButtonColor: '#d33',
-                confirmButtonText: 'OK'
-            });
-        }
+        });
     });
-});
 </script>

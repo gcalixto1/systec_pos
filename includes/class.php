@@ -82,6 +82,7 @@ class Action
 		$txtemail = $_POST['txtEmailEmpresa'];
 		$txtigv = $_POST['txtIgv'];
 		$txtimpresion = $_POST['impresion'];
+		$txtmoneda = $_POST['moneda'];
 
 		// Construye la cadena de datos correctamente
 		$data = " dni = '$txtdni'";
@@ -92,6 +93,7 @@ class Action
 		$data .= ", email = '$txtemail'";
 		$data .= ", igv = '$txtigv'";
 		$data .= ", impresion = '$txtimpresion'";
+		$data .= ", moneda = '$txtmoneda'";
 
 		// Evita inyección SQL usando consultas preparadas
 		$id = 1;
@@ -387,7 +389,7 @@ class Action
 				return 0;
 			}
 		} else {
-			$data .= ", imagen_producto = ''"; // Campo vacío si no hay imagen
+			// Campo vacío si no hay imagen
 		}
 		// Evitar inyección SQL con consultas preparadas
 		if (empty($id)) {
