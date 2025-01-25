@@ -1,68 +1,68 @@
 <style>
-.tooltip-suggestions {
-    position: absolute;
-    background-color: #fff;
-    border: 1px solid #ccc;
-    z-index: 1000;
-    width: 100%;
-    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-    max-height: 200px;
-    overflow-y: auto;
-    display: none;
-    /* Oculto por defecto */
-}
+    .tooltip-suggestions {
+        position: absolute;
+        background-color: #fff;
+        border: 1px solid #ccc;
+        z-index: 1000;
+        width: 100%;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+        max-height: 200px;
+        overflow-y: auto;
+        display: none;
+        /* Oculto por defecto */
+    }
 
-.tooltip-suggestions div {
-    padding: 8px;
-    cursor: pointer;
-}
+    .tooltip-suggestions div {
+        padding: 8px;
+        cursor: pointer;
+    }
 
-.tooltip-suggestions div:hover {
-    background-color: #f4f4f4;
-}
+    .tooltip-suggestions div:hover {
+        background-color: #f4f4f4;
+    }
 
-.table {
-    border-collapse: collapse;
-    margin-top: 20px;
-}
+    .table {
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
 
-.table th,
-.table td {
-    border: 1px solid #fff;
-    padding: 8px;
-}
+    .table th,
+    .table td {
+        border: 1px solid #fff;
+        padding: 8px;
+    }
 
-.table th {
-    background-color: #272727;
-    text-align: center;
-}
+    .table th {
+        background-color: #272727;
+        text-align: center;
+    }
 
-.centrarcelda {
-    text-align: center;
-}
+    .centrarcelda {
+        text-align: center;
+    }
 
-.cantidad-control {
-    align-content: center;
-}
+    .cantidad-control {
+        align-content: center;
+    }
 
-.cantidad-control button {
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-    padding: 5px;
-    cursor: pointer;
-}
+    .cantidad-control button {
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        padding: 5px;
+        cursor: pointer;
+    }
 
-.cantidad-control button:disabled {
-    background-color: #ccc;
-    cursor: not-allowed;
-}
+    .cantidad-control button:disabled {
+        background-color: #ccc;
+        cursor: not-allowed;
+    }
 
-.cantidad-control span {
-    margin: 0 10px;
-    font-size: 14px;
-    font-weight: bold;
-}
+    .cantidad-control span {
+        margin: 0 10px;
+        font-size: 14px;
+        font-weight: bold;
+    }
 </style>
 <div class="container-fluid">
     <div class="col-lg-12">
@@ -70,7 +70,7 @@
             <div class="card-header">
                 <h4 class="card-title text-black"><i class="fa fa-cash-register"></i> POS de Ventas</h4>
             </div>
-         <form class="form form-material" method="post" action="#" name="saveventa" id="saveventa">
+            <form class="form form-material" method="post" action="#" name="saveventa" id="saveventa">
                 <div id="save">
                 </div>
                 <div class="form-body">
@@ -104,8 +104,8 @@
                                         $consecutivo = new Action();
                                         $consecutivo = $consecutivo->Listarconsecutivos();
                                         for ($i = 0; $i < sizeof($consecutivo); $i++) { ?>
-                                        <option value="<?php echo $consecutivo[$i]['codigo_consecutivo']; ?>">
-                                            <?php echo $consecutivo[$i]['descripcionconse'] ?></option>
+                                            <option value="<?php echo $consecutivo[$i]['codigo_consecutivo']; ?>">
+                                                <?php echo $consecutivo[$i]['descripcionconse'] ?></option>
                                         <?php } ?>
                                     </select>
                                 </div>
@@ -222,9 +222,9 @@
 
 <script src="assets/script/autocompleto.js"></script>
 <script>
-$('#new_cliente').click(function() {
-    uni_modal("Gestion de Clientes", "manage_clientes.php")
-})
+    $('#new_cliente').click(function() {
+        uni_modal("Gestion de Clientes", "manage_clientes.php")
+    })
 </script>
 </body>
 
