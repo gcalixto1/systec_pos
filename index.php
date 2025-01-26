@@ -34,19 +34,19 @@ if (!isset($_SESSION['login_idusuario'])) {
 
 </head>
 <style>
-body {
-    background: #80808045;
-}
+    body {
+        background: #80808045;
+    }
 
-.modal-dialog.large {
-    width: 80% !important;
-    max-width: unset;
-}
+    .modal-dialog.large {
+        width: 80% !important;
+        max-width: unset;
+    }
 
-.modal-dialog.mid-large {
-    width: 50% !important;
-    max-width: unset;
-}
+    .modal-dialog.mid-large {
+        width: 50% !important;
+        max-width: unset;
+    }
 </style>
 
 <body>
@@ -150,138 +150,138 @@ body {
     </div>
 </body>
 <script>
-window.start_load = function() {
-    $('body').prepend('<di id="preloader2"></di>')
-}
-window.end_load = function() {
-    $('#preloader2').fadeOut('fast', function() {
-        $(this).remove();
-    })
-}
+    window.start_load = function() {
+        $('body').prepend('<di id="preloader2"></di>')
+    }
+    window.end_load = function() {
+        $('#preloader2').fadeOut('fast', function() {
+            $(this).remove();
+        })
+    }
 
-window.uni_modal = function($title = '', $url = '', $size = "") {
-    start_load()
-    $.ajax({
-        url: $url,
-        error: err => {
-            console.log()
-            alert("An error occured")
-        },
-        success: function(resp) {
-            if (resp) {
-                $('#uni_modal .modal-title').html($title)
-                $('#uni_modal .modal-body').html(resp)
-                if ($size != '') {
-                    $('#uni_modal .modal-dialog').addClass($size)
-                } else {
-                    $('#uni_modal .modal-dialog').removeAttr("class").addClass("modal-dialog modal-lg")
+    window.uni_modal = function($title = '', $url = '', $size = "") {
+        start_load()
+        $.ajax({
+            url: $url,
+            error: err => {
+                console.log()
+                alert("An error occured")
+            },
+            success: function(resp) {
+                if (resp) {
+                    $('#uni_modal .modal-title').html($title)
+                    $('#uni_modal .modal-body').html(resp)
+                    if ($size != '') {
+                        $('#uni_modal .modal-dialog').addClass($size)
+                    } else {
+                        $('#uni_modal .modal-dialog').removeAttr("class").addClass("modal-dialog modal-lg")
+                    }
+                    $('#uni_modal').modal('show')
+                    end_load()
                 }
-                $('#uni_modal').modal('show')
-                end_load()
             }
-        }
-    })
-}
-window.uni_modal_caja = function($title = '', $url = '', $size = "") {
-    start_load()
-    $.ajax({
-        url: $url,
-        error: err => {
-            console.log()
-            alert("An error occured")
-        },
-        success: function(resp) {
-            if (resp) {
-                $('#uni_modal .modal-title').html($title)
-                $('#uni_modal .modal-body').html(resp)
-                if ($size != '') {
-                    $('#uni_modal .modal-dialog').addClass($size)
-                } else {
-                    $('#uni_modal .modal-dialog').removeAttr("class").addClass("modal-dialog modal-lg")
+        })
+    }
+    window.uni_modal_caja = function($title = '', $url = '', $size = "") {
+        start_load()
+        $.ajax({
+            url: $url,
+            error: err => {
+                console.log()
+                alert("An error occured")
+            },
+            success: function(resp) {
+                if (resp) {
+                    $('#uni_modal .modal-title').html($title)
+                    $('#uni_modal .modal-body').html(resp)
+                    if ($size != '') {
+                        $('#uni_modal .modal-dialog').addClass($size)
+                    } else {
+                        $('#uni_modal .modal-dialog').removeAttr("class").addClass("modal-dialog modal-lg")
+                    }
+                    $('#uni_modal').modal('show')
+                    end_load()
                 }
-                $('#uni_modal').modal('show')
-                end_load()
             }
-        }
-    })
-}
-window.uni_modal_documentos = function($title1 = '', $url1 = '', $size1 = "") {
-    start_load()
-    $.ajax({
-        url: $url1,
-        error: err => {
-            console.log()
-            alert("An error occured")
-        },
-        success: function(resp1) {
-            if (resp1) {
-                $('#uni_modal_documentos .modal-title').html($title1)
-                $('#uni_modal_documentos .modal-body').html(resp1)
-                if ($size1 != '') {
-                    $('#uni_modal_documentos .modal-dialog').addClass($size1)
-                } else {
-                    $('#uni_modal_documentos .modal-dialog').removeAttr("class").addClass(
-                        "modal-dialog modal-xl")
+        })
+    }
+    window.uni_modal_documentos = function($title1 = '', $url1 = '', $size1 = "") {
+        start_load()
+        $.ajax({
+            url: $url1,
+            error: err => {
+                console.log()
+                alert("An error occured")
+            },
+            success: function(resp1) {
+                if (resp1) {
+                    $('#uni_modal_documentos .modal-title').html($title1)
+                    $('#uni_modal_documentos .modal-body').html(resp1)
+                    if ($size1 != '') {
+                        $('#uni_modal_documentos .modal-dialog').addClass($size1)
+                    } else {
+                        $('#uni_modal_documentos .modal-dialog').removeAttr("class").addClass(
+                            "modal-dialog modal-xl")
+                    }
+                    $('#uni_modal_documentos').modal('show')
+                    end_load()
                 }
-                $('#uni_modal_documentos').modal('show')
-                end_load()
             }
-        }
-    })
-}
-window.uni_modal_generador = function($title1 = '', $url1 = '', $size1 = "") {
-    start_load()
-    $.ajax({
-        url: $url1,
-        error: err => {
-            console.log()
-            alert("An error occured")
-        },
-        success: function(resp1) {
-            if (resp1) {
-                $('#uni_modal_generador .modal-title').html($title1)
-                $('#uni_modal_generador .modal-body').html(resp1)
-                if ($size1 != '') {
-                    $('#uni_modal_generador .modal-dialog').addClass($size1)
-                } else {
-                    $('#uni_modal_generador .modal-dialog').removeAttr("class").addClass(
-                        "col-lg.12 modal-dialog modal-md")
+        })
+    }
+    window.uni_modal_generador = function($title1 = '', $url1 = '', $size1 = "") {
+        start_load()
+        $.ajax({
+            url: $url1,
+            error: err => {
+                console.log()
+                alert("An error occured")
+            },
+            success: function(resp1) {
+                if (resp1) {
+                    $('#uni_modal_generador .modal-title').html($title1)
+                    $('#uni_modal_generador .modal-body').html(resp1)
+                    if ($size1 != '') {
+                        $('#uni_modal_generador .modal-dialog').addClass($size1)
+                    } else {
+                        $('#uni_modal_generador .modal-dialog').removeAttr("class").addClass(
+                            "col-lg.12 modal-dialog modal-md")
+                    }
+                    $('#uni_modal_generador').modal('show')
+                    end_load()
                 }
-                $('#uni_modal_generador').modal('show')
-                end_load()
             }
-        }
-    })
-}
-window._conf = function($msg = '', $func = '', $params = []) {
-    $('#confirm_modal #confirm').attr('onclick', $func + "(" + $params.join(',') + ")")
-    $('#confirm_modal .modal-body').html($msg)
-    $('#confirm_modal').modal('show')
-}
-window.alert_toast = function($msg = 'TEST', $bg = 'success') {
-    $('#alert_toast').removeClass('bg-success')
-    $('#alert_toast').removeClass('bg-danger')
-    $('#alert_toast').removeClass('bg-info')
-    $('#alert_toast').removeClass('bg-warning')
+        })
+    }
+    window._conf = function($msg = '', $func = '', $params = []) {
+        $('#confirm_modal #confirm').attr('onclick', $func + "(" + $params.join(',') + ")")
+        $('#confirm_modal .modal-body').html($msg)
+        $('#confirm_modal').modal('show')
+    }
+    window.alert_toast = function($msg = 'TEST', $bg = 'success') {
+        $('#alert_toast').removeClass('bg-success')
+        $('#alert_toast').removeClass('bg-danger')
+        $('#alert_toast').removeClass('bg-info')
+        $('#alert_toast').removeClass('bg-warning')
 
-    if ($bg == 'success')
-        $('#alert_toast').addClass('bg-success')
-    if ($bg == 'danger')
-        $('#alert_toast').addClass('bg-danger')
-    if ($bg == 'info')
-        $('#alert_toast').addClass('bg-info')
-    if ($bg == 'warning')
-        $('#alert_toast').addClass('bg-warning')
-    $('#alert_toast .toast-body').html($msg)
-    $('#alert_toast').toast({
-        delay: 3000
-    }).toast('show');
-}
-$(document).ready(function() {
-    $('#preloader').fadeOut('fast', function() {
-        $(this).remove();
+        if ($bg == 'success')
+            $('#alert_toast').addClass('bg-success')
+        if ($bg == 'danger')
+            $('#alert_toast').addClass('bg-danger')
+        if ($bg == 'info')
+            $('#alert_toast').addClass('bg-info')
+        if ($bg == 'warning')
+            $('#alert_toast').addClass('bg-warning')
+        $('#alert_toast .toast-body').html($msg)
+        $('#alert_toast').toast({
+            delay: 3000
+        }).toast('show');
+    }
+    $(document).ready(function() {
+        $('#preloader').fadeOut('fast', function() {
+            $(this).remove();
+        })
     })
-})
 </script>
 
 </html>
