@@ -9,17 +9,17 @@ if ($query) {
 }
 ?>
 <style>
-.boton_add {
-    margin-top: -4%;
-    margin-left: 75%;
-    width: 25%;
-}
+    .boton_add {
+        margin-top: -4%;
+        margin-left: 75%;
+        width: 25%;
+    }
 
-.boton_add2 {
-    margin-top: -4%;
-    margin-left: 75%;
-    width: 25%;
-}
+    .boton_add2 {
+        margin-top: -4%;
+        margin-left: 75%;
+        width: 25%;
+    }
 </style>
 
 <div class="container-fluid">
@@ -30,8 +30,8 @@ if ($query) {
     <div class="col-lg-12">
 
         <?php if ($_SESSION['login_rol'] == 1) : ?>
-        <div class="text-right">
-            <?php
+            <div class="text-right">
+                <?php
                 $qry = $conexion->query("SELECT * FROM apertura_caja");
                 if ($qry->num_rows > 0) { // Verifica si hay registros
                     $hayCajaAbierta = false;
@@ -53,10 +53,10 @@ if ($query) {
                     echo '<button class="btn btn-success btn-lg" type="button" id="apertura"><i class="fa fa-cash-register"></i> Apertura de Caja</button>';
                 }
                 ?>
-            <button class="btn btn-danger btn-lg" type="button" id="cierre"><i class="fa fa-columns"></i> Cierre de
-                Caja</button>
-        </div>
-        <br />
+                <button class="btn btn-danger btn-lg" type="button" id="cierre"><i class="fa fa-columns"></i> Cierre de
+                    Caja</button>
+            </div>
+            <br />
         <?php endif; ?>
         <input hidden name="idcajaA" id="idcajaA" class="form-control"
             value="<?php echo isset($meta['idcaja']) ? htmlspecialchars($meta['idcaja']) : ''; ?>">
@@ -88,34 +88,36 @@ if ($query) {
                 while ($row = $qry->fetch_assoc()) :
 
                 ?>
-                <tr>
-                    <td style="font-size: 12px;" class="">
-                        <?php echo $i++ ?>
-                    </td>
-                    <td style="font-size: 12px;" class="">
-                        <?php echo $row['num_apertura'] ?>
-                    </td>
-                    <td style="font-size: 12px;" class="">
-                        <?php echo $row['fch_hora_apertura'] ?>
-                    </td>
-                    <td style="font-size: 12px;" class="">
-                        <?php echo $row['saldo_inicial'] ?>
-                    </td>
-                    <td style="font-size: 12px;" class="">
-                        <?php echo $row['saldo_venta_total'] ?>
-                    </td>
-                    <td style="font-size: 12px;" class="">
-                        <?php echo $row['gasto'] ?>
-                    </td>
+                    <tr>
+                        <td>
+                            <?php echo $i++ ?>
+                        </td>
+                        <td>
+                            <?php echo $row['num_apertura'] ?>
+                        </td>
+                        <td>
+                            <?php echo $row['fch_hora_apertura'] ?>
+                        </td>
+                        <td>
+                            <?php echo $row['saldo_inicial'] ?>
+                        </td>
+                        <td>
+                            <?php echo $row['saldo_venta_total'] ?>
+                        </td>
+                        <td>
+                            <?php echo $row['gasto'] ?>
+                        </td>
 
-                    <td style="white-space: nowrap;">
-                        <button class="btn btn-success btn-md edit_borrower" type="button"
-                            data-id="<?php echo $row['idcaja'] ?>">
-                            <i class="fa fa-eye"></i> ver detalle
-                        </button>
-                    </td>
+                        <td style="white-space: nowrap;">
+                            <center>
+                                <button class="btn btn-default btn-md edit_borrower" type="button"
+                                    data-id="<?php echo $row['idcaja'] ?>">
+                                    <i class="fa fa-list"></i>
+                                </button>
+                            </center>
+                        </td>
 
-                </tr>
+                    </tr>
                 <?php endwhile; ?>
             </tbody>
         </table>
@@ -124,15 +126,15 @@ if ($query) {
 </div>
 
 <script>
-var id_caja = document.getElementById("idcajaA").value;
-$('#borrower-list').dataTable()
-$('#apertura').click(function() {
-    uni_modal("Apertura de Caja", "apertura_caja.php")
-})
-$('#cierre').click(function() {
-    uni_modal_caja("Cierre de Caja", "cierre_caja.php?idcaja=" + id_caja)
-})
-$('#borrower-list').on('click', '.edit_borrower', function() {
-    uni_modal_documentos("Detalle de caja", "detalle_caja.php?idcaja=" + $(this).attr('data-id'))
-})
+    var id_caja = document.getElementById("idcajaA").value;
+    $('#borrower-list').dataTable()
+    $('#apertura').click(function() {
+        uni_modal("Apertura de Caja", "apertura_caja.php")
+    })
+    $('#cierre').click(function() {
+        uni_modal_caja("Cierre de Caja", "cierre_caja.php?idcaja=" + id_caja)
+    })
+    $('#borrower-list').on('click', '.edit_borrower', function() {
+        uni_modal_documentos("Detalle de caja", "detalle_caja.php?idcaja=" + $(this).attr('data-id'))
+    })
 </script>
