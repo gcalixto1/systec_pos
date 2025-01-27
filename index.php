@@ -118,13 +118,10 @@ if (!isset($_SESSION['login_idusuario'])) {
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title"></h5>
+                    <button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i>
+                        Cerrar</button>
                 </div>
                 <div class="modal-body">
-                </div>
-                <div class="modal-footer">
-                    <!-- <button type="button" class="btn btn-success" id='submit' onclick="$('#uni_modal_documentos form').submit()"><i class="fa fa-save"></i> Guardar</button>
-          <button type="button" class="btn btn-danger" data-dismiss="modal"><i class="fa fa-times"></i>
-            Cancelar</button> -->
                 </div>
             </div>
         </div>

@@ -1,5 +1,5 @@
 <?php
-include ('conexionfin.php');
+include('conexionfin.php');
 
 $id = isset($_GET['idcaja']) ? intval($_GET['idcaja']) : 0;
 if ($id > 0) {
@@ -36,24 +36,13 @@ if ($id > 0) {
                                 WHERE a.idcaja = ?");
     $stmt->bind_param("i", $id);
     $stmt->execute();
-    $stmt->bind_result($SALDO_INICIALES, $CAJAACTIVA, $NUMEROCAJA, $FECHAAPERTURA, $FECHACIERRE, $OBSERVACIONES, $NOMBREREPONSABLE, $USUARIOREPONSABLE, $ESTADO,$INGRESOS_TOTALES,$SALIDAS,$TARJETAS);
+    $stmt->bind_result($SALDO_INICIALES, $CAJAACTIVA, $NUMEROCAJA, $FECHAAPERTURA, $FECHACIERRE, $OBSERVACIONES, $NOMBREREPONSABLE, $USUARIOREPONSABLE, $ESTADO, $INGRESOS_TOTALES, $SALIDAS, $TARJETAS);
     $stmt->fetch();
     $stmt->close();
 
     // Verifica si hay resultados y muestra la tabla
-    ?>
-    <style>
-        tr {
-            font-size: 18px;
-        }
-        td {
-            font-weight: bold;
-            color: #745127;
-        }
-        .info {
-            color: #023066;
-        }
-    </style>
+?>
+
     <div class="container-fluid">
         <div class="card">
             <form class="form form-material" method="post" action="#" name="savecliente" id="savecliente">
@@ -65,12 +54,12 @@ if ($id > 0) {
                                 <input type="hidden" name="id" value="<?php echo htmlspecialchars($id); ?>">
                             </div>
                             <h3><b> Estado de Caja : <?php
-                            if ($ESTADO == "A") {
-                                echo '<span class="badge" style ="color:white; background:#2F7C03;"><i class="fas fa-check" style ="color:white; background:#2F7C03;"></i> CAJA ABIERTA</span>'; // Check verde
-                            } else {
-                                echo '<span class="badge" style ="color:white; background:#900C3F;"><i class="fas fa-times" style ="color:white; background:#900C3F;"></i> CAJA CERRADA</span>'; // X roja
-                            }
-                            ?></b></h3>
+                                                        if ($ESTADO == "A") {
+                                                            echo '<span class="badge" style ="color:white; background:#2F7C03;"><i class="fas fa-check" style ="color:white; background:#2F7C03;"></i> CAJA ABIERTA</span>'; // Check verde
+                                                        } else {
+                                                            echo '<span class="badge" style ="color:white; background:#900C3F;"><i class="fas fa-times" style ="color:white; background:#900C3F;"></i> CAJA CERRADA</span>'; // X roja
+                                                        }
+                                                        ?></b></h3>
                             <table class="table table-bordered success">
                                 <colgroup>
                                     <col width="20%">
@@ -79,7 +68,8 @@ if ($id > 0) {
                                 <thead>
                                     <tr>
                                         <th class="info">Responsable</th>
-                                        <td><b><?php echo htmlspecialchars($NOMBREREPONSABLE); ?></b> (<?php echo htmlspecialchars($USUARIOREPONSABLE); ?>)</td>
+                                        <td><b><?php echo htmlspecialchars($NOMBREREPONSABLE); ?></b>
+                                            (<?php echo htmlspecialchars($USUARIOREPONSABLE); ?>)</td>
                                     </tr>
                                     <tr>
                                         <th class="info">Nombre Caja</th>
@@ -125,7 +115,7 @@ if ($id > 0) {
             </form>
         </div>
     </div>
-    <?php
+<?php
 } else {
     echo "ID de caja no válido.";
 }

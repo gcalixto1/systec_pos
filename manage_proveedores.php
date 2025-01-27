@@ -1,13 +1,11 @@
 <?php
-include ('conexionfin.php');
+include('conexionfin.php');
 
-$id = isset ($_GET['idproveedor']) ? $_GET['idproveedor'] : '';
+$id = isset($_GET['idproveedor']) ? $_GET['idproveedor'] : '';
 
 $meta = array();
 
-
-
-if (!empty ($id)) {
+if (!empty($id)) {
 
     $id = intval($id);
 
@@ -20,11 +18,8 @@ if (!empty ($id)) {
         if ($proveedor) {
 
             $meta = $proveedor;
-
         }
-
     }
-
 }
 ?>
 <div class="container-fluid">
@@ -37,30 +32,55 @@ if (!empty ($id)) {
                     <div class="row">
                         <div class="form-group has-feedback">
                             <input type="hidden" name="id"
-                                value="<?php echo isset ($_GET['idproveedor']) ? $_GET['idproveedor'] : '' ?>">
+                                value="<?php echo isset($_GET['idproveedor']) ? $_GET['idproveedor'] : '' ?>">
                         </div>
+                        <div class="form-group col-md-12">
+                            <label for="name">Tipo Contribuyente</label>
+                            <select name="tipoControbuyente" id="tipoControbuyente" class="form-control" required
+                                aria-required="true">
+                                <option value="0"
+                                    <?php echo isset($meta['tipoControbuyente']) && $meta['tipoControbuyente'] == 0 ? 'selected' : ''; ?>>
+                                    SELECCIONE
+                                </option>
+                                <option value="1"
+                                    <?php echo isset($meta['tipoControbuyente']) && $meta['tipoControbuyente'] == 1 ? 'selected' : ''; ?>>
+                                    PERSONA NATURAL
+                                </option>
+                                <option value="2"
+                                    <?php echo isset($meta['tipoControbuyente']) && $meta['tipoControbuyente'] == 2 ? 'selected' : ''; ?>>
+                                    PERSONA JURIDICA
+                                </option>
+                            </select>
+                        </div>
+
                         <div class="form-group col-md-12">
                             <label for="name">Nombre Completo</label>
                             <input type="text" name="proveedor" id="proveedor" class="form-control"
-                                value="<?php echo isset ($meta['proveedor']) ? htmlspecialchars($meta['proveedor']) : ''; ?>"
+                                value="<?php echo isset($meta['proveedor']) ? htmlspecialchars($meta['proveedor']) : ''; ?>"
                                 required>
                         </div>
-                        <div class="form-group col-md-6">
+                        <div class="form-group col-md-4">
                             <label for="name">Documento</label>
                             <input type="text" name="contacto" id="contacto" class="form-control"
-                                value="<?php echo isset ($meta['contacto']) ? htmlspecialchars($meta['contacto']) : ''; ?>"
+                                value="<?php echo isset($meta['contacto']) ? htmlspecialchars($meta['contacto']) : ''; ?>"
                                 required>
                         </div>
-                        <div class="form-group col-md-6">
+                        <div class="form-group col-md-3">
                             <label for="name">Telefono</label>
                             <input type="text" name="telefono" id="telefono" class="form-control"
-                                value="<?php echo isset ($meta['telefono']) ? htmlspecialchars($meta['telefono']) : ''; ?>"
+                                value="<?php echo isset($meta['telefono']) ? htmlspecialchars($meta['telefono']) : ''; ?>"
+                                required>
+                        </div>
+                        <div class="form-group col-md-5">
+                            <label for="name">Correo Electronico</label>
+                            <input type="text" name="correo" id="correo" class="form-control"
+                                value="<?php echo isset($meta['correo']) ? htmlspecialchars($meta['correo']) : ''; ?>"
                                 required>
                         </div>
                         <div class="form-group col-md-12">
                             <label for="name">Dirección</label>
                             <input type="text" name="direccion" id="direccion" class="form-control"
-                                value="<?php echo isset ($meta['direccion']) ? htmlspecialchars($meta['direccion']) : ''; ?>"
+                                value="<?php echo isset($meta['direccion']) ? htmlspecialchars($meta['direccion']) : ''; ?>"
                                 required>
                         </div>
                     </div>
@@ -71,11 +91,10 @@ if (!empty ($id)) {
 </div>
 
 <script>
-
-    $('#saveproveedor').submit(function (e) {
+    $('#saveproveedor').submit(function(e) {
         e.preventDefault();
         var isValid = true;
-        $('#saveproveedor input[required]').each(function () {
+        $('#saveproveedor input[required]').each(function() {
             if ($(this).val().trim() === '') {
                 isValid = false;
                 Swal.fire({
@@ -94,7 +113,7 @@ if (!empty ($id)) {
                 url: 'ajax.php?action=save_proveedores',
                 method: 'POST',
                 data: $(this).serialize(),
-                success: function (resp) {
+                success: function(resp) {
                     if (resp == 1) {
                         Swal.fire({
                             title: 'Éxito!',
@@ -112,6 +131,7 @@ if (!empty ($id)) {
             });
         }
     });
+
     function cargarMunicipios() {
         var id_provincia = document.getElementById("id_provincia").value;
 
