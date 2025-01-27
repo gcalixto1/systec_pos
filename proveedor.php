@@ -1,17 +1,4 @@
 <?php include('conexionfin.php'); ?>
-<style>
-    .boton_add {
-        margin-top: -4%;
-        margin-left: 75%;
-        width: 25%;
-    }
-
-    .boton_add2 {
-        margin-top: -4%;
-        margin-left: 75%;
-        width: 25%;
-    }
-</style>
 <div class="container-fluid">
     <div class="card-header">
         <h4 class="card-title text-black"><i class="fa fa-truck"></i> Gestion de Proveedores</h4>
@@ -20,17 +7,17 @@
     <div class="col-lg-12">
 
         <div class="col-sm-12 col-xs-12 text-right">
-            <button class="btn btn-success btn-lg" type="button" id="new_proveedor"><i class="fa fa-plus"></i> Nuevo Proveedor</button>
+            <button class="btn btn-success btn-lg" type="button" id="new_proveedor"><i class="fa fa-plus"></i>
+                Nuevo</button>
         </div>
         <br />
 
         <table class="table table-bordered table-responsive" id="borrower-list">
             <colgroup>
                 <col width="5%">
-                <col width="30%">
+                <col width="50%">
                 <col width="30%">
                 <col width="15%">
-                <col width="35%">
                 <col width="30%">
             </colgroup>
             <thead>
@@ -39,7 +26,6 @@
                     <th class="text-center">Nombre del Proveedor</th>
                     <th class="text-center">Documento</th>
                     <th class="text-center">Telefono</th>
-                    <th class="text-center">Direccion</th>
                     <th class="text-center">Accion</th>
                 </tr>
             </thead>
@@ -50,22 +36,18 @@
                 while ($row = $qry->fetch_assoc()):
                 ?>
                     <tr>
-                        <td style="font-size: 12px;" class="">
+                        <td>
                             <?php echo $i++ ?>
                         </td>
-                        <td style="font-size: 12px;" class="">
+                        <td>
                             <?php echo $row['proveedor'] ?>
                         </td>
-                        <td style="font-size: 12px;" class="">
+                        <td>
                             <?php echo $row['contacto'] ?>
                         </td>
-                        <td style="font-size: 12px;" class="">
+                        <td>
                             <?php echo $row['telefono'] ?>
                         </td>
-                        <td style="font-size: 12px;" class="">
-                            <?php echo $row['direccion'] ?>
-                        </td>
-
                         <td style="white-space: nowrap;">
                             <button class="btn btn-success btn-sm edit_borrower" type="button"
                                 data-id="<?php echo $row['idproveedor'] ?>">

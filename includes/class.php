@@ -314,6 +314,8 @@ class Action
 		$data .= ", contacto = '$contacto'";
 		$data .= ", telefono = '$telefono'";
 		$data .= ", direccion = '$direccion'";
+		$data .= ", tipoControbuyente = '$tipoControbuyente'";
+		$data .= ", correo = '$correo'";
 
 		// Evita inyección SQL usando consultas preparadas
 		if (empty($id)) {

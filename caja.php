@@ -8,20 +8,6 @@ if ($query) {
     }
 }
 ?>
-<style>
-    .boton_add {
-        margin-top: -4%;
-        margin-left: 75%;
-        width: 25%;
-    }
-
-    .boton_add2 {
-        margin-top: -4%;
-        margin-left: 75%;
-        width: 25%;
-    }
-</style>
-
 <div class="container-fluid">
     <div class="card-header">
         <h4 class="card-title text-black"><i class="fa fa-money-bill-wave"></i> Gestion de Caja</h4>
@@ -53,8 +39,8 @@ if ($query) {
                     echo '<button class="btn btn-success btn-lg" type="button" id="apertura"><i class="fa fa-cash-register"></i> Apertura de Caja</button>';
                 }
                 ?>
-                <button class="btn btn-danger btn-lg" type="button" id="cierre"><i class="fa fa-columns"></i> Cierre de
-                    Caja</button>
+                <!-- <button class="btn btn-danger btn-lg" type="button" id="cierre"><i class="fa fa-columns"></i> Cierre de
+                    Caja</button> -->
             </div>
             <br />
         <?php endif; ?>
@@ -110,9 +96,15 @@ if ($query) {
 
                         <td style="white-space: nowrap;">
                             <center>
-                                <button class="btn btn-default btn-md edit_borrower" type="button"
-                                    data-id="<?php echo $row['idcaja'] ?>">
-                                    <i class="fa fa-list"></i>
+                                <button class="btn btn-primary btn-ms edit_borrower" type="button"
+                                    data-id="<?php echo $row['idcaja'] ?>" data-bs-toggle="tooltip" data-bs-placement="top"
+                                    title="Ver Detalle">
+                                    <i class="fa fa-eye"></i>
+                                </button>
+                                <button class="btn btn-danger btn-ms" type="button" data-bs-toggle="tooltip"
+                                    data-bs-placement="top" data-id="<?php echo $row['idcaja'] ?>" title="Cerrar Caja"
+                                    id="cierre">
+                                    <i class="fa fa-lock"></i>
                                 </button>
                             </center>
                         </td>
@@ -132,7 +124,7 @@ if ($query) {
         uni_modal("Apertura de Caja", "apertura_caja.php")
     })
     $('#cierre').click(function() {
-        uni_modal_caja("Cierre de Caja", "cierre_caja.php?idcaja=" + id_caja)
+        uni_modal("Cierre de Caja", "cierre_caja.php?idcaja=" + $(this).attr('data-id'))
     })
     $('#borrower-list').on('click', '.edit_borrower', function() {
         uni_modal_documentos("Detalle de caja", "detalle_caja.php?idcaja=" + $(this).attr('data-id'))
