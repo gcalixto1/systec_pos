@@ -1,6 +1,6 @@
 <?php
 // Incluir el archivo de conexión a la base de datos
-include ('conexionfin.php');
+include('conexionfin.php');
 
 // Verificar si se ha proporcionado el código del producto
 if (isset($_GET['codBarra'])) {
@@ -51,7 +51,7 @@ if (isset($_GET['codBarra'])) {
         <span class='legend-item bg-salida'><i class='fa fa-minus-square'></i> Salida</span>
         <span class='legend-item bg-devolucion'>(<i class='fa fa-retweet'></i>) Devolución</span>
     </div>";
-        echo "<table class='table table-bordered table-responsive' id='borrower-list'>";
+        echo "<table class='table table-responsive' id='borrower-list'>";
         echo "<colgroup>
         <col width='5%'>
         <col width='20%'>
@@ -74,7 +74,7 @@ if (isset($_GET['codBarra'])) {
         // Iterar sobre los resultados y mostrar cada fila en la tabla
         $contador = 1;
         while ($row = $qry->fetch_assoc()) {
-            
+
             $entrada_class = ($row['entradas'] != 0) ? 'bg-entrada' : '';
             $salida_class = ($row['salidas'] != 0) ? 'bg-salida' : '';
             $devolucion_class = ($row['devolucion'] != 0) ? 'bg-devolucion' : '';
@@ -86,7 +86,7 @@ if (isset($_GET['codBarra'])) {
             echo "<td>" . $row['descripcion'] . "</td>";
             echo "<td>";
             echo ($row['entradas'] != 0 ? 'Entrada : ' . $row['entradas'] . ' <i class="fa fa-plus-square"></i>' : '');
-            echo ($row['salidas'] != 0 ? 'Salida : ' . $row['salidas'] . ' <i class="fa fa-minus-square"></i>': '');
+            echo ($row['salidas'] != 0 ? 'Salida : ' . $row['salidas'] . ' <i class="fa fa-minus-square"></i>' : '');
             echo ($row['devolucion'] != 0 ? 'Devolucion : ' . $row['devolucion'] . ' (<i class="fa fa-retweet"></i>)' : '');
             echo "</td>";
             echo "<td>" . $row['stock_actual'] . "</td>";
@@ -101,4 +101,3 @@ if (isset($_GET['codBarra'])) {
         echo "<p>No se encontraron resultados para el producto con código: $codproducto</p>";
     }
 }
-?>

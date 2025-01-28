@@ -1,7 +1,6 @@
 <meta content="" name="descriptison">
 <meta content="" name="keywords">
 
-<link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
 <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
 
 

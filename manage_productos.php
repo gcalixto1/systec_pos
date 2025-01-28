@@ -22,109 +22,109 @@ if (!empty($id)) {
 }
 ?>
 <style>
-.contenedor-imagen {
-    width: 135px;
-    height: 135px;
-    overflow: hidden;
-}
+    .contenedor-imagen {
+        width: 135px;
+        height: 135px;
+        overflow: hidden;
+    }
 
-.contenedor-imagen img {
-    width: 75%;
-    height: auto;
-}
+    .contenedor-imagen img {
+        width: 75%;
+        height: auto;
+    }
 
-.cont-imagen {
+    .cont-imagen {
 
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    width: 30%;
-    text-align: center;
-    margin-left: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        width: 30%;
+        text-align: center;
+        margin-left: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
 
-.image-card {
-    position: relative;
-}
+    .image-card {
+        position: relative;
+    }
 
-.image-preview {
-    width: 100px;
-    height: 100px;
-    object-fit: cover;
-    border-radius: 10px;
-    margin: 0 auto;
-}
+    .image-preview {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        border-radius: 10px;
+        margin: 0 auto;
+    }
 
-.image-name {
-    margin: 8px 0 4px;
-    font-size: 14px;
-    font-weight: bold;
-}
+    .image-name {
+        margin: 8px 0 4px;
+        font-size: 14px;
+        font-weight: bold;
+    }
 
-.image-size {
-    font-size: 8px;
-    color: #888;
-    margin-bottom: 8px;
-}
+    .image-size {
+        font-size: 8px;
+        color: #888;
+        margin-bottom: 8px;
+    }
 
-.image-actions {
-    display: flex;
-    justify-content: center;
-    gap: 8px;
-}
+    .image-actions {
+        display: flex;
+        justify-content: center;
+        gap: 8px;
+    }
 
-.action-button {
-    background-color: #007bff;
-    border: none;
-    color: #fff;
-    padding: 8px;
-    border-radius: 50%;
-    cursor: pointer;
-    font-size: 8px;
-}
+    .action-button {
+        background-color: #007bff;
+        border: none;
+        color: #fff;
+        padding: 8px;
+        border-radius: 50%;
+        cursor: pointer;
+        font-size: 8px;
+    }
 
-.action-button:hover {
-    background-color: #0056b3;
-}
+    .action-button:hover {
+        background-color: #0056b3;
+    }
 
-.controls {
-    margin-top: 16px;
-    display: flex;
-    gap: 8px;
-    align-items: center;
-}
+    .controls {
+        margin-top: 16px;
+        display: flex;
+        gap: 8px;
+        align-items: center;
+    }
 
-.image-input {
-    flex: 1;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    padding: 8px;
-}
+    .image-input {
+        flex: 1;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 8px;
+    }
 
-.control-button {
-    padding: 8px 8px 8px 8px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-}
+    .control-button {
+        padding: 8px 8px 8px 8px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
 
-.control-button.delete {
-    background-color: #dc3545;
-    color: #fff;
-}
+    .control-button.delete {
+        background-color: #dc3545;
+        color: #fff;
+    }
 
-.control-button.select {
-    background-color: #28a745;
-    color: #fff;
-}
+    .control-button.select {
+        background-color: #28a745;
+        color: #fff;
+    }
 
-.control-button:hover {
-    opacity: 0.9;
-}
+    .control-button:hover {
+        opacity: 0.9;
+    }
 
-.marform {
-    margin-left: 15px;
-}
+    .marform {
+        margin-left: 15px;
+    }
 </style>
 <div class="container-fluid">
     <div class="card">
@@ -157,9 +157,9 @@ if (!empty($id)) {
                                 foreach ($categoria as $prov) {
                                     $selected = isset($meta['prop2']) && $meta['prop2'] == $prov['presentacion'] ? 'selected' : '';
                                 ?>
-                                <option value="<?php echo $prov['presentacion']; ?>" <?php echo $selected; ?>>
-                                    <?php echo $prov['presentacion']; ?>
-                                </option>
+                                    <option value="<?php echo $prov['presentacion']; ?>" <?php echo $selected; ?>>
+                                        <?php echo $prov['presentacion']; ?>
+                                    </option>
                                 <?php } ?>
                             </select>
                         </div>
@@ -174,9 +174,9 @@ if (!empty($id)) {
                                 foreach ($categoria as $prov) {
                                     $selected = isset($meta['categoria']) && $meta['categoria'] == $prov['categoria_id'] ? 'selected' : '';
                                 ?>
-                                <option value="<?php echo $prov['categoria_id']; ?>" <?php echo $selected; ?>>
-                                    <?php echo $prov['categoria_des']; ?>
-                                </option>
+                                    <option value="<?php echo $prov['categoria_id']; ?>" <?php echo $selected; ?>>
+                                        <?php echo $prov['categoria_des']; ?>
+                                    </option>
                                 <?php } ?>
                             </select>
                         </div>
@@ -241,9 +241,9 @@ if (!empty($id)) {
                                 foreach ($categoria as $prov) {
                                     $selected = isset($meta['proveedor']) && $meta['proveedor'] == $prov['idproveedor'] ? 'selected' : '';
                                 ?>
-                                <option value="<?php echo $prov['idproveedor']; ?>" <?php echo $selected; ?>>
-                                    <?php echo $prov['proveedor']; ?>
-                                </option>
+                                    <option value="<?php echo $prov['idproveedor']; ?>" <?php echo $selected; ?>>
+                                        <?php echo $prov['proveedor']; ?>
+                                    </option>
                                 <?php } ?>
                             </select>
                         </div>
@@ -290,77 +290,77 @@ if (!empty($id)) {
 <script type="text/javascript" src="assets/script/validation.min.js"></script>
 <script src="assets/plugins/noty/packaged/jquery.noty.packaged.min.js"></script>
 <script>
-$('#saveproductos').submit(function(e) {
+    $('#saveproductos').submit(function(e) {
 
-    e.preventDefault();
-    var formData = new FormData(this);
-    var isValid = true;
-    $('#saveproductos input[required]').each(function() {
-        if ($(this).val().trim() === '') {
-            isValid = false;
-            Swal.fire({
-                title: 'Error!',
-                text: 'Todos los campos son obligatorios. Por favor, complete el campo vacio',
-                icon: 'error',
-                confirmButtonColor: '#d33',
-                confirmButtonText: 'OK'
-            });
-            return false;
-        }
-    });
-    if (isValid) {
-        start_load();
-        $.ajax({
-            url: 'ajax.php?action=save_productos',
-            method: 'POST',
-            data: formData,
-            contentType: false,
-            processData: false,
-            success: function(resp) {
-                if (resp == 1) {
-                    Swal.fire({
-                        title: 'Éxito!',
-                        text: 'El registro se guardó con éxito.',
-                        icon: 'success',
-                        confirmButtonColor: '#28a745',
-                        confirmButtonText: 'OK'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            location.reload();
-                        }
-                    });
-                }
+        e.preventDefault();
+        var formData = new FormData(this);
+        var isValid = true;
+        $('#saveproductos input[required]').each(function() {
+            if ($(this).val().trim() === '') {
+                isValid = false;
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Todos los campos son obligatorios. Por favor, complete el campo vacio',
+                    icon: 'error',
+                    confirmButtonColor: '#d33',
+                    confirmButtonText: 'OK'
+                });
+                return false;
             }
         });
+        if (isValid) {
+            start_load();
+            $.ajax({
+                url: 'ajax.php?action=save_productos',
+                method: 'POST',
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function(resp) {
+                    if (resp == 1) {
+                        Swal.fire({
+                            title: 'Éxito!',
+                            text: 'El registro se guardó con éxito.',
+                            icon: 'success',
+                            confirmButtonColor: '#28a745',
+                            confirmButtonText: 'OK'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                location.reload();
+                            }
+                        });
+                    }
+                }
+            });
+        }
+    });
+
+    function selectImage() {
+        const fileInput = document.getElementById('imagen_producto');
+        fileInput.click(); // Simula un clic en el input de archivo oculto
     }
-});
 
-function selectImage() {
-    const fileInput = document.getElementById('imagen_producto');
-    fileInput.click(); // Simula un clic en el input de archivo oculto
-}
-
-// Función para manejar la selección de archivo
-function handleFileSelect(event) {
-    const file = event.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            // Actualiza la vista previa de la imagen
-            document.getElementById('imagePreview').src = e.target.result;
-            document.getElementById('imageName').textContent = file.name;
-            document.getElementById('imageSize').textContent = `(${(file.size / 1024).toFixed(2)} KB)`;
-        };
-        reader.readAsDataURL(file);
+    // Función para manejar la selección de archivo
+    function handleFileSelect(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                // Actualiza la vista previa de la imagen
+                document.getElementById('imagePreview').src = e.target.result;
+                document.getElementById('imageName').textContent = file.name;
+                document.getElementById('imageSize').textContent = `(${(file.size / 1024).toFixed(2)} KB)`;
+            };
+            reader.readAsDataURL(file);
+        }
     }
-}
 
-// Función para borrar la imagen seleccionada
-function clearImage() {
-    document.getElementById('imagePreview').src = 'img/ninguna.png';
-    document.getElementById('imageName').textContent = 'No hay imagen';
-    document.getElementById('imageSize').textContent = '(0.00KB)';
-    document.getElementById('imagen_producto').value = ''; // Limpia el input de archivo
-    document.getElementById('imageInput').value = 'Seleccione imagen';
-}
+    // Función para borrar la imagen seleccionada
+    function clearImage() {
+        document.getElementById('imagePreview').src = 'img/ninguna.png';
+        document.getElementById('imageName').textContent = 'No hay imagen';
+        document.getElementById('imageSize').textContent = '(0.00KB)';
+        document.getElementById('imagen_producto').value = ''; // Limpia el input de archivo
+        document.getElementById('imageInput').value = 'Seleccione imagen';
+    }
 </script>

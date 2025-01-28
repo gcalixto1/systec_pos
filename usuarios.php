@@ -18,12 +18,13 @@
     </div>
     <br>
     <div class="col-lg-12">
-        
+
         <div class="col-sm-12 col-xs-12 text-right">
-            <button class="btn btn-success btn-lg" type="button" id="new_usuario"><i class="fa fa-plus"></i> Nuevo Usuario</button>
+            <button class="btn btn-success btn-lg" type="button" id="new_usuario"><i class="fa fa-plus"></i> Nuevo
+                Usuario</button>
         </div>
         <br />
-        <table class="table table-bordered table-responsive" id="borrower-list">
+        <table class="table table-responsive" id="borrower-list">
             <colgroup>
                 <col width="5%">
                 <col width="45%">

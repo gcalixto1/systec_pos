@@ -12,7 +12,7 @@
         </div>
         <br />
 
-        <table class="table table-bordered table-responsive" id="borrower-list">
+        <table class="table table-responsive" id="borrower-list">
             <colgroup>
                 <col width="5%">
                 <col width="50%">

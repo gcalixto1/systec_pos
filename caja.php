@@ -46,7 +46,7 @@ if ($query) {
         <?php endif; ?>
         <input hidden name="idcajaA" id="idcajaA" class="form-control"
             value="<?php echo isset($meta['idcaja']) ? htmlspecialchars($meta['idcaja']) : ''; ?>">
-        <table class="table table-bordered table-responsive" id="borrower-list">
+        <table class="table table-responsive" id="borrower-list">
             <colgroup>
                 <col width="5%">
                 <col width="10%">
