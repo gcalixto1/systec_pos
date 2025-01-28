@@ -3,7 +3,7 @@
 ob_start();
 include "conexionfin.php";
 
-if(empty($_REQUEST['id'])) {
+if (empty($_REQUEST['id'])) {
     echo "No es posible generar la factura.";
 } else {
     $id_factura = $_GET['id'];
@@ -17,7 +17,7 @@ if(empty($_REQUEST['id'])) {
     $productos = mysqli_query($conexion, "SELECT d.idfactura, d.cod_producto, d.cantidad, p.codBarra, p.descripcion, p.precio 
                                           FROM detallefactura d 
                                           INNER JOIN producto p ON d.idfactura = $id_factura 
-                                          WHERE d.cod_producto = p.codBarra");
+                                          WHERE d.cod_producto = p.codproducto");
     require_once 'factura/fpdf/fpdf.php';
     $pdf = new FPDF('P', 'mm', array(58, 150));
     $pdf->AddPage();
@@ -92,4 +92,3 @@ $pdf->Output('I', 'ticket.pdf');
 
 // Terminar el buffer de salida
 ob_end_flush();
-?>
