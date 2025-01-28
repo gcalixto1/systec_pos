@@ -6,7 +6,6 @@
 <link href="assets/vendor/icofont/icofont.min.css" rel="stylesheet">
 <link href="assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
 <link href="assets/DataTables/dataTables.min.css" rel="stylesheet">
-<link href="css/sb-admin-2.min.css" rel="stylesheet">
 <?php
 include('conexionfin.php');
 $rol_actual = $_SESSION['login_rol'];

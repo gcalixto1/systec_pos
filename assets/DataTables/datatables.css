@@ -15,7 +15,9 @@
     --dt-row-selected-text: 255, 255, 255;
     --dt-row-selected-link: 9, 10, 11
 }
-
+table thead{
+    background:#000;
+}
 table.dataTable td.dt-control {
     text-align: center;
     cursor: pointer

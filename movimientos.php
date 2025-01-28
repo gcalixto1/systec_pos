@@ -29,11 +29,13 @@ if ($query) {
     <br>
     <div class="col-lg-12">
         <div class="text-right">
-            <button class="btn btn-success btn-lg" type="button" id="cierre"><i class="fa fa-plus"></i> Nuevo Movimiento</button>
+            <button class="btn btn-success btn-lg" type="button" id="cierre"><i class="fa fa-plus"></i> Nuevo
+                Movimiento</button>
         </div>
         <br />
-        <input hidden name="idcajaA" id="idcajaA" class="form-control" value="<?php echo isset($meta['idcaja']) ? htmlspecialchars($meta['idcaja']) : ''; ?>">
-        <table class="table table-bordered table-responsive" id="borrower-list">
+        <input hidden name="idcajaA" id="idcajaA" class="form-control"
+            value="<?php echo isset($meta['idcaja']) ? htmlspecialchars($meta['idcaja']) : ''; ?>">
+        <table class="table table-responsive" id="borrower-list">
             <colgroup>
                 <col width="3%">
                 <col width="10%">
@@ -77,7 +79,8 @@ if ($query) {
                             <?php echo $tipoMovimiento; ?>
                         </td>
                         <td style="font-size: 12px;">
-                            <?php echo number_format($monto, 2); ?> <!-- Monto mostrado -->
+                            <?php echo number_format($monto, 2); ?>
+                            <!-- Monto mostrado -->
                         </td>
                         <td style="font-size: 12px;">
                             <?php echo $row['fecha'] ?>

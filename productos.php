@@ -20,10 +20,11 @@
     <div class="col-lg-12">
 
         <div class="col-sm-12 col-xs-12 text-right">
-            <button class="btn btn-success btn-lg" type="button" id="new_producto"><i class="fa fa-plus"></i> Nuevo Producto</button>
+            <button class="btn btn-success btn-lg" type="button" id="new_producto"><i class="fa fa-plus"></i> Nuevo
+                Producto</button>
         </div>
         <br />
-        <table class="table table-bordered table-responsive" id="borrower-list">
+        <table class="table table-responsive" id="borrower-list">
             <colgroup>
                 <col width="5%">
                 <col width="30%">
@@ -49,19 +50,19 @@
                 while ($row = $qry->fetch_assoc()):
                 ?>
                     <tr>
-                        <td style="font-size: 12px;" class="">
+                        <td>
                             <?php echo $i++ ?>
                         </td>
-                        <td style="font-size: 12px;" class="">
+                        <td>
                             <?php echo $row['descripcion'] ?>
                         </td>
-                        <td style="font-size: 12px;" class="">
+                        <td>
                             <?php echo $row['categoria_des'] ?>
                         </td>
-                        <td style="font-size: 12px;" class="">
+                        <td>
                             <?php echo $row['precio'] ?>
                         </td>
-                        <td style="font-size: 12px;" class="">
+                        <td>
                             <?php echo $row['existencia'] ?>
                         </td>
 
