@@ -1,0 +1,8 @@
+<?php
+define("MH_API_URL", "https://apitest.dtes.mh.gob.sv/seguridad/auth");
+define("MH_USER", "03011504761021");
+define("MH_PWD", "Oscarfuentes01*");
+define("MH_GRANT_TYPE", "password");
+define("TOKEN_CACHE_FILE", __DIR__ . '/../storage/token_cache.json');
+define("TOKEN_CACHE_MINUTES", 50);
+define("MH_ENVIO_DTE_URL", "https://apitest.dtes.mh.gob.sv/fesv/recepciondte");

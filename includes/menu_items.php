@@ -2,10 +2,21 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Punto de venta</title>
 <!-- Agrega tus enlaces CSS aquí -->
+<link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700,800,900" rel="stylesheet">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 <link rel="stylesheet" href="assets/css/style_Menu.css">
+<link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 <link href="assets/vendor/icofont/icofont.min.css" rel="stylesheet">
 <link href="assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+<link href="assets/vendor/venobox/venobox.css" rel="stylesheet">
+<link href="assets/vendor/animate.css/animate.min.css" rel="stylesheet">
+<link href="assets/vendor/remixicon/remixicon.css" rel="stylesheet">
+<link href="assets/vendor/owl.carousel/assets/owl.carousel.min.css" rel="stylesheet">
+<link href="assets/vendor/bootstrap-datepicker/css/bootstrap-datepicker.min.css" rel="stylesheet">
 <link href="assets/DataTables/dataTables.min.css" rel="stylesheet">
+<link href="assets/css/jquery.datetimepicker.min.css" rel="stylesheet">
+<link href="assets/css/select2.min.css" rel="stylesheet">
+<link href="css/sb-admin-2.min.css" rel="stylesheet">
 <?php
 include('conexionfin.php');
 $rol_actual = $_SESSION['login_rol'];
@@ -15,7 +26,7 @@ $sql = "
     SELECT m.idMenu, m.Menu, m.Url, m.Parent, m.icon 
     FROM menu m 
     INNER JOIN roles_menu rm ON m.idMenu = rm.idMenu 
-    WHERE rm.idrol = ? ORDER BY m.index asc";
+    WHERE rm.idrol = ? order by m.index asc";
 $stmt = $conexion->prepare($sql);
 $stmt->bind_param("i", $rol_actual);
 $stmt->execute();
@@ -66,6 +77,22 @@ function imprimirMenu($menu_arbol)
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Punto de venta</title>
+    <!-- Agrega tus enlaces CSS aquí -->
+    <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700,800,900" rel="stylesheet">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="assets/css/style_Menu.css">
+    <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="assets/vendor/icofont/icofont.min.css" rel="stylesheet">
+    <link href="assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
+    <link href="assets/vendor/venobox/venobox.css" rel="stylesheet">
+    <link href="assets/vendor/animate.css/animate.min.css" rel="stylesheet">
+    <link href="assets/vendor/remixicon/remixicon.css" rel="stylesheet">
+    <link href="assets/vendor/owl.carousel/assets/owl.carousel.min.css" rel="stylesheet">
+    <link href="assets/vendor/bootstrap-datepicker/css/bootstrap-datepicker.min.css" rel="stylesheet">
+    <link href="assets/DataTables/dataTables.min.css" rel="stylesheet">
+    <link href="assets/css/jquery.datetimepicker.min.css" rel="stylesheet">
+    <link href="assets/css/select2.min.css" rel="stylesheet">
+    <link href="css/sb-admin-2.min.css" rel="stylesheet">
 </head>
 
 <body>
@@ -89,7 +116,7 @@ function imprimirMenu($menu_arbol)
                 <div class="footer">
                     <p>&copy;
                         <script>
-                            document.write(new Date().getFullYear());
+                        document.write(new Date().getFullYear());
                         </script>
                     </p>
                 </div>
@@ -122,12 +149,12 @@ function imprimirMenu($menu_arbol)
     <script src="assets/js_Menu/bootstrap.min.js"></script>
     <script src="assets/js_Menu/main.js"></script>
     <script>
-        $(document).ready(function() {
-            $('.has-arrow').click(function() {
-                $(this).next('.collapse').slideToggle();
-            });
+    $(document).ready(function() {
+        $('.has-arrow').click(function() {
+            $(this).next('.collapse').slideToggle();
         });
-        $('.nav-<?php echo isset($_GET['page']) ? $_GET['page'] : '' ?>').addClass('active')
+    });
+    $('.nav-<?php echo isset($_GET['page']) ? $_GET['page'] : '' ?>').addClass('active')
     </script>
 </body>
 
