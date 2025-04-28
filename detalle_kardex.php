@@ -7,10 +7,10 @@ if (isset($_GET['codBarra'])) {
     $codproducto = $_GET['codBarra'];
 
     // Realizar la consulta SQL
-    $qry = $conexion->query("SELECT *,producto.descripcion as producto_nombre FROM (producto LEFT JOIN kardex_producto ON producto.codBarra=kardex_producto.producto) 
-    LEFT JOIN categoria ON producto.categoria=categoria.categoria_id 
-    LEFT JOIN proveedor ON producto.proveedor=proveedor.idproveedor 
-    WHERE producto.codBarra = '$codproducto' LIMIT 10");
+    $qry = $conexion->query("SELECT kp.fecha_trans,kp.descripcion,kp.movimiento,kp.entradas,kp.salidas,kp.devolucion,kp.stock_actual 
+                                    FROM kardex_producto kp 
+                                    INNER JOIN producto p ON p.codproducto = kp.producto 
+                                    where p.codBarra ='$codproducto'");
     echo "<style>
     .bg-entrada {
         background-color: #065000; /* Color mostaza */
@@ -44,6 +44,9 @@ if (isset($_GET['codBarra'])) {
         font-weight: bold;
     }
           </style>";
+    echo "<script>
+            $('#borrower-lista').dataTable()
+        </script>";
     // Verificar si se encontraron resultados
     if ($qry->num_rows > 0) {
         echo "<div class='legend'>
@@ -96,6 +99,7 @@ if (isset($_GET['codBarra'])) {
 
         echo "</tbody>";
         echo "</table>";
+
     } else {
         // Mostrar un mensaje si no se encontraron resultados
         echo "<p>No se encontraron resultados para el producto con código: $codproducto</p>";

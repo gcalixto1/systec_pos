@@ -17,6 +17,7 @@ if (!empty($id)) {
     }
 }
 ?>
+<?php include 'dte.php'; ?>
 <!-- Begin Page Content -->
 <div class="container-fluid">
     <form class="form form-material" method="post" action="#" name="pagoForm" id="pagoForm">
@@ -24,7 +25,7 @@ if (!empty($id)) {
             <div class="form-body">
                 <input type="hidden" name="id" id="id"
                     value="<?php echo isset($_GET['idfactura']) ? $_GET['idfactura'] : '' ?>"">
-                <input type=" hidden" name="montodevuelto" id="montodevuelto" value="0.00">
+                <input type=" hidden" name="montodevuelto" hidden id="montodevuelto" value="0.00">
                 <input type="hidden" name="creditoinicial" id="creditoinicial" value="0.00">
                 <input type="hidden" name="creditodisponible" id="creditodisponible" value="0.00">
                 <input type="hidden" name="abonototal" id="abonototal" value="0.00">
@@ -67,8 +68,9 @@ if (!empty($id)) {
                                     $pago = new Action();
                                     $pago = $pago->ListarMediosPagos();
                                     for ($i = 0; $i < sizeof($pago); $i++) { ?>
-                                        <option value="<?php echo $pago[$i]['idmedio']; ?>">
-                                            <?php echo $pago[$i]['medio_pago'] ?></option>
+                                    <option value="<?php echo $pago[$i]['idmedio']; ?>">
+                                        <?php echo $pago[$i]['medio_pago'] ?>
+                                    </option>
                                     <?php } ?>
                                 </select>
                             </div>
@@ -102,60 +104,60 @@ if (!empty($id)) {
 </div>
 
 <script>
-    function calcularCambio() {
-        // Obtener los valores de los campos
-        var importe = parseFloat(document.getElementById("TextImporte").textContent) || 0;
-        var pagado = parseFloat(document.getElementById("montopagado").value) || 0;
+function calcularCambio() {
+    // Obtener los valores de los campos
+    var importe = parseFloat(document.getElementById("TextImporte").textContent) || 0;
+    var pagado = parseFloat(document.getElementById("montopagado").value) || 0;
 
-        // Calcular la diferencia
-        var cambio = pagado - importe;
+    // Calcular la diferencia
+    var cambio = pagado - importe;
 
-        // Mostrar el resultado en el campo TextCambio y asegurarse de que los decimales sean siempre 2
-        document.getElementById("TextCambio").textContent = cambio.toFixed(2);
-        document.getElementById("TextPagado").textContent = pagado.toFixed(2);
-    }
+    // Mostrar el resultado en el campo TextCambio y asegurarse de que los decimales sean siempre 2
+    document.getElementById("TextCambio").textContent = cambio.toFixed(2);
+    document.getElementById("TextPagado").textContent = pagado.toFixed(2);
+}
 
-    $('#pagoForm').submit(function(e) {
-        e.preventDefault();
-        start_load();
-        $.ajax({
-            url: 'ajax.php?action=save_venta_completa',
-            method: 'POST',
-            data: $(this).serialize(),
-            success: function(resp) {
-                resp = JSON.parse(resp);
-                if (resp.success) {
-                    Swal.fire({
-                        title: '¡Éxito!',
-                        text: 'Venta Registrada',
-                        icon: 'success',
-                        confirmButtonColor: '#28a745',
-                        confirmButtonText: 'OK'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            window.open(resp.ticket_url, '_blank');
-                            location.reload();
-                        }
-                    });
-                } else {
-                    Swal.fire({
-                        title: 'Error',
-                        text: resp.message || 'Ocurrió un error al registrar la venta.',
-                        icon: 'error',
-                        confirmButtonColor: '#d33',
-                        confirmButtonText: 'OK'
-                    });
-                }
-            },
-            error: function() {
+$('#pagoForm').submit(function(e) {
+    e.preventDefault();
+    start_load();
+    $.ajax({
+        url: 'ajax.php?action=save_venta_completa',
+        method: 'POST',
+        data: $(this).serialize(),
+        success: function(resp) {
+            resp = JSON.parse(resp);
+            if (resp.success) {
+                Swal.fire({
+                    title: '¡Éxito!',
+                    text: 'Venta Registrada',
+                    icon: 'success',
+                    confirmButtonColor: '#28a745',
+                    confirmButtonText: 'OK'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.open(resp.ticket_url, '_blank');
+                        location.reload();
+                    }
+                });
+            } else {
                 Swal.fire({
                     title: 'Error',
-                    text: 'No se pudo conectar con el servidor.',
+                    text: resp.message || 'Ocurrió un error al registrar la venta.',
                     icon: 'error',
                     confirmButtonColor: '#d33',
                     confirmButtonText: 'OK'
                 });
             }
-        });
+        },
+        error: function() {
+            Swal.fire({
+                title: 'Error',
+                text: 'No se pudo conectar con el servidor.',
+                icon: 'error',
+                confirmButtonColor: '#d33',
+                confirmButtonText: 'OK'
+            });
+        }
     });
+});
 </script>
