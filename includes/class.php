@@ -109,7 +109,7 @@ class Action
 				$tipo_archivo = $_FILES['imagen']['type'];
 				$tamano_archivo = $_FILES['imagen']['size'];
 				if ((strpos($tipo_archivo, 'image/png') !== false) && $tamano_archivo < 60000000) {
-					if (move_uploaded_file($_FILES['imagen']['tmp_name'],  "img/" . $nombre_archivo) && rename("img/" . $nombre_archivo, "img/logo.png")) {
+					if (move_uploaded_file($_FILES['imagen']['tmp_name'], "img/" . $nombre_archivo) && rename("img/" . $nombre_archivo, "img/logo.png")) {
 						// Puedes mostrar un mensaje de éxito aquí
 					} else {
 						// Puedes manejar el error aquí
@@ -257,6 +257,7 @@ class Action
 		$data .= ", nombre = '$nombre'";
 		$data .= ", telefono = '$telefono'";
 		$data .= ", direccion = '$direccion'";
+		$data .= ", correo = '$correo'";
 
 		// Evita inyección SQL usando consultas preparadas
 		if (empty($id)) {
@@ -370,14 +371,13 @@ class Action
 		$data .= ", prop3 = '$prop3'";
 		$data .= ", categoria = '$categoria'";
 		$data .= ", fecha_vencimiento = '$fecha_vencimiento'";
-		// Manejo de archivo (imagen)
+
 		if (isset($_FILES['imagen_producto']['name']) && !empty($_FILES['imagen_producto']['name'])) {
 			$targetDir = "img/productos/";
 			$fileName = uniqid() . "_" . basename($_FILES["imagen_producto"]["name"]);
 			$targetFilePath = $targetDir . $fileName;
 			$fileType = strtolower(pathinfo($targetFilePath, PATHINFO_EXTENSION));
 
-			// Validar tipo de archivo
 			$allowedTypes = ['jpg', 'jpeg', 'png'];
 			if (in_array($fileType, $allowedTypes)) {
 				if (move_uploaded_file($_FILES["imagen_producto"]["tmp_name"], $targetFilePath)) {
@@ -391,7 +391,7 @@ class Action
 				return 0;
 			}
 		} else {
-			// Campo vacío si no hay imagen
+			$data .= ", imagen_producto = 'img/ninguna.png'";
 		}
 		// Evitar inyección SQL con consultas preparadas
 		if (empty($id)) {
@@ -734,7 +734,7 @@ class Action
 		$devolucionesP = 0;
 
 		// Obtener existencia actual del producto
-		$sql = "SELECT existencia FROM producto WHERE codBarra = ?";
+		$sql = "SELECT existencia FROM producto WHERE codProducto = ?";
 		$stmt = $this->dbh->prepare($sql);
 		$stmt->bind_param("s", $producto_id);
 		$stmt->execute();
@@ -755,7 +755,7 @@ class Action
 		}
 
 		// Actualizar existencia en producto
-		$sql = "UPDATE producto SET existencia = ? WHERE codBarra = ?";
+		$sql = "UPDATE producto SET existencia = ? WHERE codProducto = ?";
 		$stmt = $this->dbh->prepare($sql);
 		$stmt->bind_param("ds", $stock_actualP, $producto_id);
 		if (!$stmt->execute()) {
