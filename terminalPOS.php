@@ -159,11 +159,9 @@ body {
         <!-- Barra de búsqueda -->
         <div class="form-group has-feedback">
             <div class="input-group">
-                <span class="input-group-text" style="cursor: pointer;"><i class="fa fa-codebar"
-                        style="color:white;"></i>
-                </span>
                 <input type="text" class="search-bar" name="busquedaproductov" id="busquedaproductov" autocomplete="off"
-                    placeholder="Realice la Búsqueda por Código, Descripción o Nº de Barra" onkeyup="filterProducts()">
+                    placeholder="Realice la Búsqueda por Código de barra o Nombre del producto"
+                    onkeyup="filterProducts()">
             </div>
         </div>
         <div class="product-grid" id="productContainer">
@@ -214,9 +212,10 @@ body {
                         $consecutivo = $consecutivo->Listarconsecutivos();
                         for ($i = 0; $i < sizeof($consecutivo); $i++) { ?>
                         <option value="<?php echo $consecutivo[$i]['codigo_consecutivo']; ?>">
-                            <?php echo $consecutivo[$i]['descripcionconse'] ?></option>
+                            <?php echo $consecutivo[$i]['descripcionconse'] ?>
+                        </option>
                         <?php } ?>
-                    </select>
+                    </select> 
                 </div>
             </div>
             <table>
@@ -262,7 +261,8 @@ body {
                         echo '<button type="submit" id="idpagar" disabled class="btn btn-dark"><span class="fa fa-calculator"></span> Pagar</button>';
                     }
                     ?>
-                    <button type="button" class="btn btn-dark" id="vaciar"><span class="fa fa-trash"></span>
+                    <button type="button" class="btn btn-dark" id="vaciar" onclick="Refresh()"><span
+                            class="fa fa-trash"></span>
                         Cancelar</button>
                 </div>
             </div>
