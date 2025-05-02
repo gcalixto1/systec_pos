@@ -5,7 +5,7 @@ $id = isset($_GET['idcliente']) ? $_GET['idcliente'] : '';
 $meta = array();
 if (!empty($id)) {
     $id = intval($id);
-    $query = $conexion->query("SELECT * FROM cliente WHERE idcliente = $id");
+    $query = $conexion->query("SELECT * FROM cliente LEFT JOIN cliente_direccion ON cliente_direccion.cliente_dni = cliente.dni  WHERE idcliente = $id");
     if ($query) {
         $cliente = $query->fetch_assoc();
         if ($cliente) {
@@ -13,6 +13,16 @@ if (!empty($id)) {
         }
     }
 }
+
+require_once("includes/class.php");
+$pro = new Action();
+
+// Obtener valores actuales si los hay
+$departamentoSeleccionado = isset($_POST['departamento']) ? $_POST['departamento'] : (isset($meta['departamento']) ? $meta['departamento'] : '');
+$municipioSeleccionado = isset($_POST['municipio']) ? $_POST['municipio'] : (isset($meta['municipio']) ? $meta['municipio'] : '');
+
+$departamentos = $pro->ListarDepartamentos();
+$municipios = $departamentoSeleccionado ? $pro->ListarMunicipios($departamentoSeleccionado) : [];
 ?>
 <div class="container-fluid">
     <div class="card">
@@ -39,7 +49,7 @@ if (!empty($id)) {
                                 required>
                         </div>
                         <div class="form-group col-md-3">
-                            <label for="name">Telefono</label>
+                            <label>Telefono</label>
                             <input type="text" name="telefono" id="telefono" maxlength="12" class="form-control"
                                 value="<?php echo isset($meta['telefono']) ? htmlspecialchars($meta['telefono']) : ''; ?>"
                                 required>
@@ -50,19 +60,45 @@ if (!empty($id)) {
                                 value="<?php echo isset($meta['correo']) ? htmlspecialchars($meta['correo']) : ''; ?>"
                                 required>
                         </div>
+                        <div class="form-group col-md-6">
+                            <label for="departamento">Departamento</label>
+                            <select name="departamento" id="departamento" class="form-control" required>
+                                <option value="">-- SELECCIONE --</option>
+                                <?php foreach ($departamentos as $dep): ?>
+                                <option value="<?php echo $dep['codigo']; ?>"
+                                    <?php echo ($dep['codigo'] == $departamentoSeleccionado) ? 'selected' : ''; ?>>
+                                    <?php echo $dep['valor']; ?>
+                                </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+
+                        <div class="form-group col-md-6">
+                            <label for="municipio">Municipio</label>
+                            <select name="municipio" id="municipio" class="form-control" required>
+                                <option value="">-- SELECCIONE MUNICIPIO --</option>
+                                <?php foreach ($municipios as $mun): ?>
+                                <option value="<?php echo $mun['codigo']; ?>"
+                                    <?php echo ($mun['codigo'] == $municipioSeleccionado) ? 'selected' : ''; ?>>
+                                    <?php echo $mun['valor']; ?>
+                                </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+
                         <div class="form-group col-md-12">
                             <label for="name">Dirección</label>
                             <input type="text" name="direccion" id="direccion" class="form-control"
-                                value="<?php echo isset($meta['direccion']) ? htmlspecialchars($meta['direccion']) : ''; ?>"
+                                value="<?php echo isset($meta['complemento']) ? htmlspecialchars($meta['complemento']) : ''; ?>"
                                 required>
                         </div>
+
                     </div>
                 </div>
             </div>
         </form>
     </div>
 </div>
-
 <script>
 $('#savecliente').submit(function(e) {
     e.preventDefault();
@@ -104,25 +140,60 @@ $('#savecliente').submit(function(e) {
         });
     }
 });
+$(document).ready(function() {
+    $('#departamento').change(function() {
+        var idDepartamento = $(this).val();
 
-function cargarMunicipios() {
-    var id_provincia = document.getElementById("id_provincia").value;
+        if (idDepartamento !== '') {
+            $.ajax({
+                url: 'cargar_municipios.php?id_departamento=' + idDepartamento,
+                method: 'GET',
+                dataType: 'json',
+                success: function(response) {
+                    var municipioSelect = $('#municipio');
+                    municipioSelect.empty();
+                    municipioSelect.append(
+                        '<option value="">-- SELECCIONE MUNICIPIO --</option>');
 
-    // Realizar la solicitud AJAX para obtener los municipios
-    fetch('departamentos_vista.php?id_departamento=' + id_provincia)
-        .then(response => response.json())
-        .then(data => {
-            var selectMunicipios = document.getElementById("id_departamento");
-            // Limpiar las opciones anteriores
-            selectMunicipios.innerHTML = '<option value="0"> -- SELECCIONE -- </option>';
-            // Agregar las opciones de municipios correspondientes al departamento seleccionado
-            data.forEach(municipio => {
-                var option = document.createElement("option");
-                option.text = municipio.departamento;
-                option.value = municipio.id_departamento;
-                selectMunicipios.appendChild(option);
+                    $.each(response, function(index, municipio) {
+                        municipioSelect.append(
+                            $('<option>', {
+                                value: municipio.codigo,
+                                text: municipio.valor
+                            })
+                        );
+                    });
+                }
             });
-        })
-        .catch(error => console.error('Error:', error));
-}
+        }
+    });
+});
+<?php if (!empty($departamentoSeleccionado) && !empty($municipioSeleccionado)): ?>
+$(function() {
+    var idDepartamento = '<?php echo $departamentoSeleccionado; ?>';
+    var municipioSeleccionado = '<?php echo $municipioSeleccionado; ?>';
+
+    $.ajax({
+        url: 'ajax_municipios.php?id_departamento=' + idDepartamento,
+        method: 'GET',
+        dataType: 'json',
+        success: function(response) {
+            var municipioSelect = $('#municipio');
+            municipioSelect.empty();
+            municipioSelect.append('<option value="">-- SELECCIONE MUNICIPIO --</option>');
+
+            $.each(response, function(index, municipio) {
+                var selected = municipio.codigo === municipioSeleccionado ? 'selected' : '';
+                municipioSelect.append(
+                    $('<option>', {
+                        value: municipio.codigo,
+                        text: municipio.valor,
+                        selected: selected
+                    })
+                );
+            });
+        }
+    });
+});
+<?php endif; ?>
 </script>
