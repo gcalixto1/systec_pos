@@ -4,7 +4,7 @@ include 'conexionfin.php';
 $idfactura = intval($_GET['idfactura']);
 
 // OBTENER FACTURA
-$query = $conexion->query("SELECT factura.id, factura.tipofactura, factura.numerofactura, factura.subtotal, factura.iva_impuesto, factura.totalpagar, factura.letras, factura.forma_pago, factura.fechafactura, cliente.nombre, cliente.dni 
+$query = $conexion->query("SELECT factura.id, factura.tipofactura, factura.numerofactura, factura.subtotal, factura.iva_impuesto, factura.totalpagar, factura.letras, factura.forma_pago, factura.fechafactura, cliente.nombre, cliente.dni, cliente.telefono, cliente.correo FROM factura 
     FROM factura 
     INNER JOIN cliente ON cliente.idcliente = factura.idcliente 
     WHERE factura.id = $idfactura");
@@ -85,7 +85,7 @@ $facturaJson = [
             "codActividad" => "46632",
             "descActividad" => "venta al por mayor de articulos de ferreteria y pinturerias",
             "nombreComercial" => "FERRETERIA FUENTES",
-            "tipoEstablecimiento" => "01",
+            "tipoEstablecimiento" => "02",
             "direccion" => [
                 "departamento" => "03",
                 "municipio" => "20",

@@ -256,15 +256,39 @@ class Action
 		$data = " dni = '$dni'";
 		$data .= ", nombre = '$nombre'";
 		$data .= ", telefono = '$telefono'";
-		$data .= ", direccion = '$direccion'";
 		$data .= ", correo = '$correo'";
 
 		// Evita inyección SQL usando consultas preparadas
 		if (empty($id)) {
 			$save = $this->dbh->query("INSERT INTO cliente SET " . $data);
+			if ($save) {
+
+			}
 		} else {
 			$id = mysqli_real_escape_string($this->dbh, $id); // Escapa el valor de $id
 			$save = $this->dbh->query("UPDATE cliente SET " . $data . " WHERE idcliente = $id");
+		}
+
+		if ($save) {
+			$this->save_clienteDireccion(); // Llama a la función para guardar la dirección del cliente
+			return 1;
+		}
+	}
+	function save_clienteDireccion()
+	{
+		extract($_POST);
+		// Construye la cadena de datos correctamente
+		$data = " departamento = '$departamento'";
+		$data .= ", municipio = '$municipio'";
+		$data .= ", complemento = '$direccion'";
+		$data .= ", cliente_dni = '$dni'";
+
+		// Evita inyección SQL usando consultas preparadas
+		if (empty($id)) {
+			$save = $this->dbh->query("INSERT INTO cliente_direccion SET " . $data);
+		} else {
+			$id = mysqli_real_escape_string($this->dbh, $id); // Escapa el valor de $id
+			$save = $this->dbh->query("UPDATE cliente_direccion SET " . $data . " WHERE cliente_dni = '$dni'");
 		}
 
 		if ($save) {
@@ -305,6 +329,40 @@ class Action
 
 		return $clientes;
 	}
+	public function ListarDepartamentos()
+	{
+		$sql = "SELECT * FROM departamentos";
+
+		$result = mysqli_query($this->dbh, $sql);
+
+		$impuesto = array();
+		if ($result) {
+			while ($row = mysqli_fetch_assoc($result)) {
+				$impuesto[] = $row;
+			}
+		}
+		return $impuesto;
+	}
+	public function ListarMunicipios($departamento_id)
+	{
+		// Protección contra inyección SQL (cast explícito)
+		$departamento_id = intval($departamento_id);
+
+		$sql = "SELECT codigo, valor FROM municipios WHERE iddepartamento = $departamento_id";
+		$result = mysqli_query($this->dbh, $sql);
+
+		$municipios = array();
+		if ($result) {
+			while ($row = mysqli_fetch_assoc($result)) {
+				$municipios[] = [
+					'codigo' => $row['codigo'],
+					'valor' => $row['valor']
+				];
+			}
+		}
+		return $municipios;
+	}
+
 	#endregion
 	#region Proveedor
 	function save_proveedor()
