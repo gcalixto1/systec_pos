@@ -257,6 +257,7 @@ class Action
 		$data .= ", nombre = '$nombre'";
 		$data .= ", telefono = '$telefono'";
 		$data .= ", correo = '$correo'";
+		$data .= ", tipoDocumento = '$tipoDoc'";
 
 		// Evita inyección SQL usando consultas preparadas
 		if (empty($id)) {
@@ -332,6 +333,20 @@ class Action
 	public function ListarDepartamentos()
 	{
 		$sql = "SELECT * FROM departamentos";
+
+		$result = mysqli_query($this->dbh, $sql);
+
+		$impuesto = array();
+		if ($result) {
+			while ($row = mysqli_fetch_assoc($result)) {
+				$impuesto[] = $row;
+			}
+		}
+		return $impuesto;
+	}
+	public function ListarDocumentos()
+	{
+		$sql = "SELECT * FROM documentos";
 
 		$result = mysqli_query($this->dbh, $sql);
 
@@ -845,8 +860,10 @@ class Action
 		if ($save) {
 			// Construir la URL del ticket
 			$ticket_url = "ticket.php?id=" . $id;
+			$facturaElectronica = "facturaElectronica.php?id=" . $id;
 			// Devolver un JSON con success y la URL del ticket
 			echo json_encode(['success' => true, 'ticket_url' => $ticket_url]);
+			echo json_encode(['success' => true, 'facturaElectronica' => $facturaElectronica]);
 		} else {
 			// Devolver un JSON con success = false
 			echo json_encode(['success' => false, 'message' => 'Error al actualizar la factura.']);

@@ -1,13 +1,20 @@
 <?php
 include 'conexionfin.php';
+require_once 'config/config.php'; // Asegúrate de que este archivo tenga las constantes necesarias
 
 $idfactura = intval($_GET['idfactura']);
 
 // OBTENER FACTURA
-$query = $conexion->query("SELECT factura.id, factura.tipofactura, factura.numerofactura, factura.subtotal, factura.iva_impuesto, factura.totalpagar, factura.letras, factura.forma_pago, factura.fechafactura, cliente.nombre, cliente.dni, cliente.telefono, cliente.correo FROM factura 
-    FROM factura 
-    INNER JOIN cliente ON cliente.idcliente = factura.idcliente 
-    WHERE factura.id = $idfactura");
+$query = $conexion->query("SELECT factura.id, factura.tipofactura, factura.numerofactura, 
+                                         factura.subtotal, factura.iva_impuesto, factura.totalpagar, 
+                                         factura.letras, factura.forma_pago, factura.fechafactura, 
+                                         cliente.nombre, cliente.dni, cliente.telefono, cliente.correo,
+                                         cliente_direccion.departamento, cliente_direccion.municipio, 
+                                         cliente_direccion.complemento,cliente.tipoDocumento
+                                         FROM factura 
+                                         INNER JOIN cliente ON cliente.idcliente = factura.idcliente
+                                         INNER JOIN cliente_direccion ON cliente_direccion.cliente_dni = cliente.dni
+                                         WHERE factura.id = $idfactura");
 $factura = $query->fetch_assoc();
 
 // OBTENER DETALLE DE PRODUCTOS
@@ -59,9 +66,9 @@ $horaEmision = date("H:i:s");
 
 // ARMAR JSON PARA EL FIRMADOR
 $facturaJson = [
-    "nit" => "03011504761021",
+    "nit" => MH_USER,
     "activo" => "true",
-    "passwordPri" => "Oscar01*",
+    "passwordPri" => MH_PWD_DTE,
     "dteJson" => [
         "identificacion" => [
             "version" => 1,
@@ -89,10 +96,10 @@ $facturaJson = [
             "direccion" => [
                 "departamento" => "03",
                 "municipio" => "20",
-                "complemento" => "Carretera a los cobanos presa del venado"
+                "complemento" => "Canton Punta Remedios, Caserio Los Cobanos,Acajutla"
             ],
             "telefono" => "73999642",
-            "correo" => "alex.calix1992@gmail.com",
+            "correo" => "ferreteriafuentes@gmail.com",
             "codEstable" => null,
             "codPuntoVenta" => null,
             "codEstableMH" => null,
@@ -100,18 +107,18 @@ $facturaJson = [
         ],
         "receptor" => [
             "nrc" => null,
-            "tipoDocumento" => "13",
+            "tipoDocumento" => $factura['tipoDocumento'],
             "numDocumento" => $factura['dni'],
             "nombre" => $factura['nombre'],
             "codActividad" => null,
             "descActividad" => null,
             "direccion" => [
-                "departamento" => "03",
-                "municipio" => "18",
-                "complemento" => "Colonia Santa Marta"
+                "departamento" => $factura['departamento'],
+                "municipio" => $factura['municipio'],
+                "complemento" => $factura['complemento']
             ],
-            "telefono" => null,
-            "correo" => null,
+            "telefono" => $factura['telefono'],
+            "correo" => $factura['correo'],
         ],
         "otrosDocumentos" => null,
         "ventaTercero" => null,
@@ -156,7 +163,7 @@ curl_setopt_array($curl, [
         'Authorization: Bearer ' . $token
     ]
 ]);
-
+file_put_contents('cache_estructura.json', json_encode($facturaJson, JSON_UNESCAPED_UNICODE));
 $response = curl_exec($curl);
 
 if (curl_errno($curl)) {
