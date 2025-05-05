@@ -99,7 +99,7 @@ $facturaJson = [
                 "complemento" => "Canton Punta Remedios, Caserio Los Cobanos,Acajutla"
             ],
             "telefono" => "73999642",
-            "correo" => "ferreteriafuentes@gmail.com",
+            "correo" => "ferreteriafuentes019@gmail.com",
             "codEstable" => null,
             "codPuntoVenta" => null,
             "codEstableMH" => null,

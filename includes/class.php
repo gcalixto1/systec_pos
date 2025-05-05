@@ -861,9 +861,12 @@ class Action
 			// Construir la URL del ticket
 			$ticket_url = "ticket.php?id=" . $id;
 			$facturaElectronica = "facturaElectronica.php?id=" . $id;
-			// Devolver un JSON con success y la URL del ticket
-			echo json_encode(['success' => true, 'ticket_url' => $ticket_url]);
-			echo json_encode(['success' => true, 'facturaElectronica' => $facturaElectronica]);
+
+			echo json_encode([
+				'success' => true,
+				'ticket_url' => $ticket_url,
+				'facturaElectronica' => $facturaElectronica
+			]);
 		} else {
 			// Devolver un JSON con success = false
 			echo json_encode(['success' => false, 'message' => 'Error al actualizar la factura.']);

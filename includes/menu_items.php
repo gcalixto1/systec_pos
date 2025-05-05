@@ -15,7 +15,7 @@ $sql = "
     SELECT m.idMenu, m.Menu, m.Url, m.Parent, m.icon 
     FROM menu m 
     INNER JOIN roles_menu rm ON m.idMenu = rm.idMenu 
-    WHERE rm.idrol = ? order by m.index asc";
+    WHERE rm.idrol = ? AND rm.estado = 1 order by m.index asc";
 $stmt = $conexion->prepare($sql);
 $stmt->bind_param("i", $rol_actual);
 $stmt->execute();
