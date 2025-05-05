@@ -4,10 +4,8 @@ $url = "https://apitest.dtes.mh.gob.sv/fesv/recepciondte";
 
 // LEER JSON FIRMADO DEL ARCHIVO TEMPORAL
 $jsonFirmado = file_get_contents('cache_firmador.json');
-if (!$jsonFirmado) {
-    echo json_encode(['success' => false, 'origen' => 'php', 'message' => 'No se encontró el archivo cache_firmador.json']);
-    exit;
-}
+$jsonDTEFINAL = file_get_contents('cache_estructura.json');
+
 
 $dteFirmado = json_decode($jsonFirmado, true);
 if (!isset($dteFirmado['body'])) {
@@ -15,6 +13,16 @@ if (!isset($dteFirmado['body'])) {
     exit;
 }
 
+$JSONFinalArmado = json_decode($jsonDTEFINAL, true);
+if (!$JSONFinalArmado) {
+    echo json_encode(['success' => false, 'origen' => 'php', 'message' => 'No se encontró el archivo cache_firmador.json']);
+    exit;
+}
+
+if (!isset($JSONFinalArmado['dteJson'])) {
+    echo json_encode(['success' => false, 'origen' => 'php', 'message' => 'El documento firmado no contiene el campo dteJson']);
+    exit;
+}
 // LEER TOKEN DESDE CACHE
 $contenido = file_get_contents('storage/token_cache.json');
 $data = json_decode($contenido, true);
@@ -31,6 +39,7 @@ $codigoGeneracion = strtoupper(vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2he
 $token_hacienda = "Bearer " . $tokenHacienda;
 $documento_firmado = $dteFirmado['body']; // <-- AQUÍ ESTABA EL ERROR
 
+$json_DTE_Estructurado = $JSONFinalArmado['dteJson'];
 $data = [
     "ambiente" => "00",
     "idEnvio" => "1",
@@ -79,8 +88,8 @@ if (curl_errno($ch)) {
     // INSERTAR EN LA TABLA
     $stmt = $conexion->prepare("INSERT INTO respuestadte (
         id_factura, version, ambiente, versionApp, estado, codigoGeneracion, selloRecibido,
-        fhProcesamiento, clasificaMsg, codigoMsg, descripcionMsg, observaciones
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        fhProcesamiento, clasificaMsg, codigoMsg, descripcionMsg, observaciones,jsondte
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
     $version = $respuesta['version'] ?? null;
     $ambiente = $respuesta['ambiente'] ?? null;
@@ -92,9 +101,11 @@ if (curl_errno($ch)) {
     $codigoMsg = $respuesta['codigoMsg'] ?? null;
     $descripcionMsg = $respuesta['descripcionMsg'] ?? null;
     $observaciones = isset($respuesta['observaciones']) ? json_encode($respuesta['observaciones']) : null;
+    $jsondte = json_encode($json_DTE_Estructurado) ?? null;
+
 
     $stmt->bind_param(
-        "iissssssssss",
+        "iisssssssssss",
         $id_factura,
         $version,
         $ambiente,
@@ -106,7 +117,8 @@ if (curl_errno($ch)) {
         $clasificaMsg,
         $codigoMsg,
         $descripcionMsg,
-        $observaciones
+        $observaciones,
+        $jsondte
     );
 
     if ($stmt->execute()) {

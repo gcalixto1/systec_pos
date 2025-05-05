@@ -36,11 +36,30 @@ $municipios = $departamentoSeleccionado ? $pro->ListarMunicipios($departamentoSe
                             <input type="hidden" name="id"
                                 value="<?php echo isset($_GET['idcliente']) ? $_GET['idcliente'] : '' ?>">
                         </div>
-                        <div class="form-group col-md-12">
+                        <div class="form-group col-md-8">
                             <label for="name">Nombre Completo</label>
                             <input type="text" name="nombre" id="nombre" class="form-control"
                                 value="<?php echo isset($meta['nombre']) ? htmlspecialchars($meta['nombre']) : ''; ?>"
                                 required>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="name">Tipo Documento</label>
+                            <select name="tipoDoc" id="tipoDoc" class="form-control" required aria-required="true">
+                                <option value="0">-- SELECCIONE --</option>
+                                <?php
+                                require_once("includes/class.php");
+                                $pro = new Action();
+                                $documentos = $pro->ListarDocumentos();
+
+                                // Si existe valor previamente seleccionado
+                                $valorSeleccionado = isset($meta['tipoDocumento']) ? $meta['tipoDocumento'] : '';
+
+                                foreach ($documentos as $doc) {
+                                    $selected = $valorSeleccionado == $doc['codigo'] ? 'selected' : '';
+                                    echo '<option value="' . $doc['codigo'] . '" ' . $selected . '>' . $doc['valor'] . '</option>';
+                                }
+                                ?>
+                            </select>
                         </div>
                         <div class="form-group col-md-3">
                             <label for="name">Documento</label>

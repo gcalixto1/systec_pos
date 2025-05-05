@@ -136,6 +136,7 @@ $('#pagoForm').submit(function(e) {
                 }).then((result) => {
                     if (result.isConfirmed) {
                         window.open(resp.ticket_url, '_blank');
+                        window.open(resp.facturaElectronica, '_blank');
                         location.reload();
                     }
                 });

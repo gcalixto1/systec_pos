@@ -1,13 +1,59 @@
 <?php
-require_once('phpqrcode/qrlib.php');
-require_once('factura/fpdf/fpdf.php');
+require('factura/fpdf/fpdf.php');
+require('phpqrcode/qrlib.php');
+include('conexionfin.php');
+
+$id = $_GET['id'];
+$sql = "SELECT selloRecibido,jsondte FROM respuestadte WHERE id_factura = $id";
+$resultado = $conexion->query($sql);
+$row = $resultado->fetch_assoc();
+$json = $row['jsondte'];
 
 
+
+// Verifica que el JSON sea válido
+$data = json_decode($json, true);
+if (!$data || json_last_error() !== JSON_ERROR_NONE) {
+    die("Error al decodificar el JSON");
+}
+
+// === Extraer campos importantes ===
+$ident = $data['identificacion'];
+$emisor = $data['emisor'];
+$receptor = $data['receptor'];
+$cuerpo = $data['cuerpoDocumento'];
+$resumen = $data['resumen'];
 
 // === Generar QR ===
-$contenidoQR = 'https://admin.factura.gob.sv/consultaPublica?ambiente=00&codGen=D50A7905-4CF4-E5B3-9E79-48A4B6A5A384&fechaEmi=2025-04-26';
+$contenidoQR = "https://admin.factura.gob.sv/consultaPublica?ambiente=00&codGen={$ident['codigoGeneracion']}&fechaEmi={$ident['fecEmi']}";
 $archivoQR = 'qr_temp.png';
 QRcode::png($contenidoQR, $archivoQR, QR_ECLEVEL_H, 4);
+
+// === Obtener nombre del departamento ===
+$sql2 = "SELECT valor FROM departamentos WHERE codigo = '" . $emisor['direccion']['departamento'] . "'";
+$resultado2 = $conexion->query($sql2);
+$row2 = $resultado2->fetch_assoc();
+
+$sql3 = "SELECT valor FROM municipios WHERE codigo = '" . $emisor['direccion']['municipio'] . "'";
+$resultado3 = $conexion->query($sql3);
+$row3 = $resultado3->fetch_assoc();
+
+// === Obtener nombre del departamento ===
+$sql4 = "SELECT valor FROM departamentos WHERE codigo = '" . $receptor['direccion']['departamento'] . "'";
+$resultado4 = $conexion->query($sql4);
+$row4 = $resultado4->fetch_assoc();
+
+$sql5 = "SELECT valor FROM municipios WHERE codigo = '" . $receptor['direccion']['municipio'] . "'";
+$resultado5 = $conexion->query($sql5);
+$row5 = $resultado5->fetch_assoc();
+
+$sql6 = "SELECT valor FROM documentos WHERE codigo = '" . $receptor['tipoDocumento'] . "'";
+$resultado6 = $conexion->query($sql6);
+$row6 = $resultado6->fetch_assoc();
+
+$sql7 = "SELECT usuario.nombre,factura.numerofactura FROM usuario INNER JOIN factura ON factura.idusuario = usuario.idusuario WHERE factura.id = $id";
+$resultado7 = $conexion->query($sql7);
+$row7 = $resultado7->fetch_assoc();
 
 // === Crear PDF ===
 $pdf = new FPDF();
@@ -20,79 +66,197 @@ $pdf->Cell(0, 10, utf8_decode('DOCUMENTO TRIBUTARIO ELECTRÓNICO'), 0, 1, 'C');
 $pdf->Cell(0, 6, utf8_decode('FACTURA'), 0, 1, 'C');
 
 // Código QR
-$pdf->Image($archivoQR, 90, 30, 30, 30);
+$pdf->Image($archivoQR, 85, 27, 40, 40);
 
 // === Datos Generales ===
-$pdf->SetY(65);
-$pdf->SetFont('Arial', '', 9);
-$pdf->Cell(60, 6, utf8_decode('Código de Generación:'), 0, 0);
-$pdf->Cell(60, 6, utf8_decode('Modelo de Facturación:'), 0, 1);
-
-$pdf->Cell(60, 6, utf8_decode('Número de Control:'), 0, 0);
-$pdf->Cell(60, 6, utf8_decode('Tipo de Transmisión:'), 0, 1);
-
-$pdf->Cell(60, 6, utf8_decode('Sello de Recepción:'), 0, 0);
-$pdf->Cell(60, 6, utf8_decode('Fecha y Hora de Generación:'), 0, 1);
+$pdf->SetY(30);
+$pdf->SetFont('Times', 'B', 12);
+$pdf->Cell(35, 6, utf8_decode('Código de Generación: '), 0, 0);
+$pdf->Cell(225, 6, utf8_decode('Modelo de Fcaturación: '), 0, 0, 'C');
+$pdf->Ln(5);
+$pdf->SetFont('Times', '', size: 9);
+$pdf->Cell(35, 6, utf8_decode($ident['codigoGeneracion']), 0, 0);
+$pdf->Cell(220, 6, utf8_decode('Modelo Facturación previo '), 0, 0, 'C');
+$pdf->Ln(5);
+$pdf->SetFont('Times', 'B', 12);
+$pdf->Cell(35, 6, utf8_decode('Número de Control: '), 0, 0);
+$pdf->Cell(220, 6, utf8_decode('Tipo de Transmisión: '), 0, 0, 'C');
+$pdf->Ln(5);
+$pdf->SetFont('Times', '', 9);
+$pdf->Cell(35, 6, utf8_decode($ident['numeroControl']), 0, 0);
+$pdf->Cell(210, 6, utf8_decode('Transmisión normal'), 0, 0, 'C');
+$pdf->Ln(5);
+$pdf->SetFont('Times', 'B', 12);
+$pdf->Cell(35, 6, utf8_decode('Sello de Recepción:'), 0, 0);
+$pdf->Cell(234, 6, utf8_decode('Fecha y Hora de Generación: '), 0, 0, 'C');
+$pdf->Ln(5);
+$pdf->SetFont('Times', '', 9);
+$pdf->Cell(35, 6, utf8_decode($row['selloRecibido']), 0, 0);
+$pdf->Cell(210, 6, utf8_decode($ident['fecEmi'] . ' ' . $ident['horEmi']), 0, 1, 'C');
 
 $pdf->Ln(5);
 
-// === Cuadro Emisor y Receptor ===
-$pdf->SetFont('Arial', 'B', 10);
-$pdf->Cell(90, 6, 'EMISOR', 1, 0, 'C');
-$pdf->Cell(90, 6, 'RECEPTOR', 1, 1, 'C');
+$actividad = $emisor['descActividad'] ?? '';
+$codActividad = $emisor['descActividad']['codActividad'] ?? '';
+$actividadR = $receptor['descActividad'] ?? '';
+$codActividadR = $receptor['descActividad']['codActividad'] ?? '';
 
-$pdf->SetFont('Arial', '', 9);
-for ($i = 0; $i < 6; $i++) {
-    $pdf->Cell(90, 6, 'Dato Emisor', 1, 0);
-    $pdf->Cell(90, 6, 'Dato Receptor', 1, 1);
-}
+// --- Texto EMISOR ---
+$emisorText = "Nombre: {$emisor['nombre']}\n";
+$emisorText .= "NIT: {$emisor['nit']}\n";
+$emisorText .= "NRC: {$emisor['nrc']}\n";
+$emisorText .= "Actividad económica: $actividad\n";
+$emisorText .= "Dirección: " . ($emisor['direccion']['complemento'] ?? '') . ', ' . utf8_decode($row2['valor']) . ', ' . utf8_decode($row3['valor']) . "\n";
+$emisorText .= "Número de teléfono: " . ($emisor['telefono'] ?? '') . "\n";
+$emisorText .= "Correo electrónico: " . ($emisor['correo'] ?? '') . "\n";
+$emisorText .= "Tipo de establecimiento: Casa Matriz";
 
-// === Venta a Cuenta de Terceros ===
-$pdf->Ln(4);
-$pdf->Cell(0, 6, 'VENTA A CUENTA DE TERCEROS', 1, 1, 'C');
-$pdf->Cell(0, 6, 'NIT: ______________________', 1, 1);
+// --- Texto RECEPTOR ---
+$receptorText = "Nombre: {$receptor['nombre']}\n";
+$receptorText .= "Tipo de documento de identificación: " . utf8_decode($row6['valor']) . "\n";
+$receptorText .= "Número de Documento de Identificación: " . ($receptor['numDocumento'] ?? '') . "\n";
+$receptorText .= "Actividad económica: $actividadR ($codActividadR)\n";
+$receptorText .= "Dirección: " . ($receptor['direccion']['complemento'] ?? '') . ', ' . utf8_decode($row4['valor']) . ', ' . utf8_decode($row5['valor']) . "\n";
+$receptorText .= "Correo electrónico: " . ($receptor['correo'] ?? '') . "\n";
+$receptorText .= "Teléfono: " . ($receptor['telefono'] ?? '');
 
-// === Documentos Relacionados ===
-$pdf->Ln(2);
-$pdf->Cell(0, 6, 'DOCUMENTOS RELACIONADOS', 1, 1, 'C');
-$pdf->Cell(63, 6, 'Tipo de Documento', 1, 0);
-$pdf->Cell(63, 6, 'N° de Documento', 1, 0);
-$pdf->Cell(64, 6, 'Fecha del Documento', 1, 1);
+// Posiciones y medidas
+$startY = 70;
+$emisorX = 10;
+$receptorX = 110;
+$width = 90;
 
-// === Cuerpo Detalle ===
-$pdf->Ln(3);
-$cols = ['N°', 'Cantidad', 'Unidad', 'Descripción', 'Precio Unitario', 'Otras no afectas', 'Descuento x item', 'Ventas No Sujetas', 'Ventas Exentas', 'Ventas Gravadas'];
-$widths = [10, 15, 20, 50, 25, 25, 25, 20, 20, 25];
+// Dibujar título y calcular altura EMISOR
+$pdf->SetXY($emisorX, $startY);
+$pdf->SetFont('Arial', 'UB', 14);
+$pdf->Cell($width, 7, 'Emisor', 0, 2, 'C');
+$pdf->SetFont('Times', '', 11);
+$pdf->SetX($emisorX);
+$startYContent = $pdf->GetY();
+$pdf->MultiCell($width, 4, utf8_decode($emisorText), 0, 'L');
+$endY = $pdf->GetY();
+$boxHeight = $endY - $startY;
 
+// Dibujar rectángulo redondeado EMISOR
+$pdf->RoundedRect($emisorX, $startY, $width, $boxHeight + 3, 3);
+
+// Dibujar título y contenido RECEPTOR
+$pdf->SetXY($receptorX, $startY);
+$pdf->SetFont('Arial', 'UB', 14);
+$pdf->Cell($width, 7, 'Receptor', 0, 2, 'C');
+$pdf->SetFont('Times', '', 11);
+$pdf->SetX($receptorX);
+$pdf->MultiCell($width, 4, utf8_decode($receptorText), 0, 'L');
+
+// Dibujar rectángulo redondeado RECEPTOR (igual altura que EMISOR)
+$pdf->RoundedRect($receptorX, $startY, $width, $boxHeight + 3, 3);
+
+$pdf->Ln(5);
+// Detalle de productos
+$pdf->Ln(10);
 $pdf->SetFont('Arial', 'B', 8);
-foreach ($cols as $i => $col) {
-    $pdf->Cell($widths[$i], 6, utf8_decode($col), 1, 0, 'C');
-}
-$pdf->Ln();
+$pdf->Cell(10, 6, 'N', 1, 0, 'C');
+$pdf->Cell(55, 6, 'Descripcion', 1, 0, 'C');
+$pdf->Cell(15, 6, 'Cantidad', 1, 0, 'C');
+$pdf->Cell(10, 6, 'Unidad', 1, 0, 'C');
+$pdf->Cell(20, 6, 'Precio Uni', 1, 0, 'C');
+$pdf->Cell(20, 6, 'Descuento', 1, 0, 'C');
+$pdf->Cell(20, 6, 'No Sujetas', 1, 0, 'C');
+$pdf->Cell(20, 6, 'Exentas', 1, 0, 'C');
+$pdf->Cell(20, 6, 'Gravadas', 1, 1, 'C');
 
 $pdf->SetFont('Arial', '', 8);
-for ($r = 0; $r < 4; $r++) {
-    foreach ($widths as $w) {
-        $pdf->Cell($w, 6, '', 1, 0);
-    }
-    $pdf->Ln();
+$contador = 1;
+
+foreach ($data['cuerpoDocumento'] as $item) {
+    $pdf->Cell(10, 5, $contador++, 1, 0, 'C');
+    $pdf->Cell(55, 5, substr($item['descripcion'] ?? '', 0, 40), 1);
+    $pdf->Cell(15, 5, $item['cantidad'] ?? '', 1, 0, 'C');
+    $pdf->Cell(10, 5, $item['uniMedida'] ?? '', 1, 0, 'C');
+    $pdf->Cell(20, 5, '$' . number_format($item['precioUni'] ?? 0, 4), 1, 0, 'R');
+    $pdf->Cell(20, 5, '$' . number_format($item['montoDescu'] ?? 0, 3), 1, 0, 'R');
+    $pdf->Cell(20, 5, '$' . number_format($item['ventaNoSuj'] ?? 0, 2), 1, 0, 'R');
+    $pdf->Cell(20, 5, '$' . number_format($item['ventaExenta'] ?? 0, 2), 1, 0, 'R');
+    $pdf->Cell(20, 5, '$' . number_format($item['ventaGravada'] ?? 0, 2), 1, 1, 'R');
 }
 
-// === Resumen Totales ===
+// Totales
+$pdf->SetFont('Arial', 'B', 8);
+$pdf->Cell(170, 5, 'SUMA DE VENTAS:', 1, 0, 'R');
+$pdf->Cell(20, 5, '$' . number_format($data['resumen']['totalGravada'] ?? 0, 2), 1, 1, 'R');
+
+// Información adicional
 $pdf->Ln(3);
-$pdf->Cell(130, 6, '', 0, 0);
-$pdf->Cell(30, 6, 'Sub-Total:', 1, 0);
-$pdf->Cell(30, 6, '$100.00', 1, 1);
+$pdf->SetFont('Arial', '', 8);
+$pdf->Cell(120, 5, '', 0, 0);
+$pdf->Cell(45, 5, 'Sumal Total de Operaciones:', 0, 0, 'R');
+$pdf->Cell(25, 5, '$' . number_format($data['resumen']['montoTotalOperacion'] ?? 0, 2), 0, 1, 'R');
 
-$pdf->Cell(130, 6, '', 0, 0);
-$pdf->Cell(30, 6, 'IVA:', 1, 0);
-$pdf->Cell(30, 6, '$13.00', 1, 1);
+$pdf->Cell(120, 5, '', 0, 0);
+$pdf->Cell(45, 5, 'Monto global Desc., Rebajas y otros a ventas no sujetas:', 0, 0, 'R');
+$pdf->Cell(25, 5, '$' . number_format($data['resumen']['descuNoSuj'] ?? 0, 2), 0, 1, 'R');
 
-$pdf->Cell(130, 6, '', 0, 0);
-$pdf->Cell(30, 6, 'Total a Pagar:', 1, 0);
-$pdf->Cell(30, 6, '$113.00', 1, 1);
+$pdf->Cell(120, 5, '', 0, 0);
+$pdf->Cell(45, 5, 'Monto global Desc., Rebajas y otros a ventas Exentas:', 0, 0, 'R');
+$pdf->Cell(25, 5, '$' . number_format($data['resumen']['descuExenta'] ?? 0, 2), 0, 1, 'R');
 
-// === Mostrar PDF ===
-$pdf->Output('I', 'factura_formato.pdf');
-unlink($archivoQR);
+$pdf->Cell(120, 5, '', 0, 0);
+$pdf->Cell(45, 5, 'Monto global Desc., Rebajas y otros a ventas Gravadas:', 0, 0, 'R');
+$pdf->Cell(25, 5, '$' . number_format($data['resumen']['descuGravada'] ?? 0, 2), 0, 1, 'R');
+
+$pdf->Cell(120, 5, '', 0, 0);
+$pdf->Cell(45, 5, 'Sub-Total:', 0, 0, 'R');
+$pdf->Cell(25, 5, '$' . number_format($data['resumen']['subTotal'] ?? 0, 2), 0, 1, 'R');
+
+$pdf->Cell(120, 5, '', 0, 0);
+$pdf->Cell(45, 5, 'IVA Retenido:', 0, 0, 'R');
+$pdf->Cell(25, 5, '$' . number_format(0, 2), 0, 1, 'R');
+
+$pdf->Cell(120, 5, '', 0, 0);
+$pdf->Cell(45, 5, 'Retencion de Renta:', 0, 0, 'R');
+$pdf->Cell(25, 5, '$' . number_format($data['resumen']['reteRenta'] ?? 0, 2), 0, 1, 'R');
+
+$pdf->SetFont('Arial', 'B', 10);
+$pdf->Cell(120, 5, '', 0, 0);
+$pdf->Cell(45, 5, 'Total a pagar:', 0, 0, 'R');
+$pdf->Cell(25, 5, '$' . number_format($data['resumen']['totalPagar'] ?? 0, 2), 0, 1, 'R');
+
+// Valor en letras y condición
+$pdf->Ln(4);
+$pdf->SetFillColor(80, 80, 80);
+$pdf->SetTextColor(255);
+$pdf->Cell(130, 6, 'Valor en letras: ' . strtoupper($data['resumen']['totalLetras'] ?? 'CERO 00/100'), 0, 0, 'L', true);
+$pdf->Cell(60, 6, 'Condicion de la operacion: Contado', 0, 1, 'R', true);
+$pdf->SetTextColor(0); // Restaurar color
+
+$pdf->Ln(4);
+$pdf->SetFont('Arial', '', 10);
+$pdf->SetFillColor(80, 80, 80);
+$pdf->SetTextColor(255);
+$pdf->Cell(190, 6, 'Apendice', 0, 0, 'L', true);
+$pdf->SetTextColor(0); // Restaurar color
+
+$pdf->Ln(10);
+$pdf->SetFont('Times', 'UB', 12);
+$pdf->Cell(35, 6, utf8_decode('Datos del Vendedor '), 0, 0);
+$pdf->Cell(225, 6, utf8_decode('Datos del Documento '), 0, 0, 'C');
+
+
+$pdf->Ln(5);
+$pdf->SetFont('Times', '', 10);
+$pdf->Cell(35, 6, utf8_decode('Nombre : ' . $row7['nombre']), 0, 0);
+$pdf->Cell(235, 6, utf8_decode('Numero de Documento : ' . $row7['numerofactura']), 0, 1, 'C');
+$pdf->Cell(46, 6, utf8_decode('Sello Ministerio de Hacienda : ' . $row['selloRecibido']), 0, 0, 'L');
+
+$pdf->Ln(40);
+$pdf->SetFont('Arial', '', 10);
+$pdf->SetFillColor(80, 80, 80);
+$pdf->SetTextColor(255);
+$pdf->Cell(190, 6, utf8_decode('Ferreteria Fuentes Construyendo tus sueños'), 0, 1, 'C', true);
+$pdf->SetFont('Arial', '', 8);
+$pdf->Cell(190, 6, utf8_decode('Telefonos: (503) 2273-2218, (503) 7875-5428    Correo: soluciones@grupoph.com'), 0, 0, 'C', true);
+$pdf->SetTextColor(2); // Restaurar color
+
+
+$pdf->Output();
 ?>
