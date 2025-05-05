@@ -3,6 +3,10 @@ require('factura/fpdf/fpdf.php');
 require('phpqrcode/qrlib.php');
 include('conexionfin.php');
 
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+require 'vendor/autoload.php'; // Para PHPMailer con Composer
+
 $id = $_GET['id'];
 $sql = "SELECT selloRecibido,jsondte FROM respuestadte WHERE id_factura = $id";
 $resultado = $conexion->query($sql);
@@ -223,9 +227,10 @@ $pdf->Cell(25, 5, '$' . number_format($data['resumen']['totalPagar'] ?? 0, 2), 0
 
 // Valor en letras y condición
 $pdf->Ln(4);
+$pdf->SetFont('Arial', '', 7.5);
 $pdf->SetFillColor(80, 80, 80);
 $pdf->SetTextColor(255);
-$pdf->Cell(130, 6, 'Valor en letras: ' . strtoupper($data['resumen']['totalLetras'] ?? 'CERO 00/100'), 0, 0, 'L', true);
+$pdf->Cell(130, 6, utf8_decode('Valor en letras: ' . strtoupper($data['resumen']['totalLetras'] ?? 'CERO 00/100')), 0, 0, 'L', true);
 $pdf->Cell(60, 6, 'Condicion de la operacion: Contado', 0, 1, 'R', true);
 $pdf->SetTextColor(0); // Restaurar color
 
@@ -248,15 +253,58 @@ $pdf->Cell(35, 6, utf8_decode('Nombre : ' . $row7['nombre']), 0, 0);
 $pdf->Cell(235, 6, utf8_decode('Numero de Documento : ' . $row7['numerofactura']), 0, 1, 'C');
 $pdf->Cell(46, 6, utf8_decode('Sello Ministerio de Hacienda : ' . $row['selloRecibido']), 0, 0, 'L');
 
-$pdf->Ln(40);
-$pdf->SetFont('Arial', '', 10);
-$pdf->SetFillColor(80, 80, 80);
-$pdf->SetTextColor(255);
-$pdf->Cell(190, 6, utf8_decode('Ferreteria Fuentes Construyendo tus sueños'), 0, 1, 'C', true);
-$pdf->SetFont('Arial', '', 8);
-$pdf->Cell(190, 6, utf8_decode('Telefonos: (503) 2273-2218, (503) 7875-5428    Correo: soluciones@grupoph.com'), 0, 0, 'C', true);
-$pdf->SetTextColor(2); // Restaurar color
+// $pdf->Ln(30);
+// $pdf->SetFont('Arial', '', 10);
+// $pdf->SetFillColor(80, 80, 80);
+// $pdf->SetTextColor(255);
+// $pdf->Cell(190, 6, utf8_decode('Ferreteria Fuentes Construyendo tus sueños'), 0, 1, 'C', true);
+// $pdf->SetFont('Arial', '', 8);
+// $pdf->Cell(190, 6, utf8_decode('Telefonos: (503) 2273-2218, (503) 7875-5428    Correo: soluciones@grupoph.com'), 0, 0, 'C', true);
+// $pdf->SetTextColor(2); // Restaurar color
 
 
-$pdf->Output();
+$nombreArchivo = $ident['numeroControl'] . '.pdf';
+$pdf->Output('F', $nombreArchivo); // Guarda el archivo en disco
+
+// ----- 2. ENVIAR EL PDF POR CORREO -----
+$mail = new PHPMailer(true);
+
+try {
+    // Configuración del servidor SMTP
+    $mail->isSMTP();
+    $mail->Host = 'smtp.gmail.com';
+    $mail->SMTPAuth = true;
+    $mail->Username = 'alex.calix1992@gmail.com';
+    $mail->Password = 'mvwo raxu urmn jhps'; // Contraseña de aplicación
+    $mail->SMTPSecure = 'tls';
+    $mail->Port = 587;
+
+    // Remitente y receptor
+    $mail->setFrom('alex.calix1992@gmail.com', utf8_decode('Ferretería Fuentes'));
+    $mail->addAddress($receptor['correo'], 'Cliente');
+
+    // Adjuntar PDF
+    $mail->addAttachment($nombreArchivo);
+    // Adjuntar JSON desde variable
+    $mail->addStringAttachment(
+        $json,         // contenido del archivo
+        $ident['numeroControl'] . '.json',       // nombre del archivo
+        'base64',             // codificación
+        'application/json'    // tipo MIME
+    );
+
+    // Contenido del correo
+    $mail->isHTML(true);
+    $mail->Subject = utf8_decode('FERRETERIA FUENTES - Factura Electrónica');
+    $mail->Body = 'Estimado cliente,<br><br>Este correo es generado automaticamente por : <b>FERRETERIA FUENTES</b><br><br>Gracias por su compra.';
+
+    $mail->send();
+    $pdf->Output('I', $nombreArchivo . '.pdf');
+
+    // Opcional: Eliminar el archivo PDF del servidor
+    unlink($nombreArchivo);
+
+} catch (Exception $e) {
+    echo "No se pudo enviar el correo: {$mail->ErrorInfo}";
+}
 ?>

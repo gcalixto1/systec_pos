@@ -135,9 +135,15 @@ $('#pagoForm').submit(function(e) {
                     confirmButtonText: 'OK'
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        window.open(resp.ticket_url, '_blank');
-                        window.open(resp.facturaElectronica, '_blank');
-                        location.reload();
+                        const win1 = window.open(resp.ticket_url, '_blank');
+                        const win2 = window.open(resp.facturaElectronica, '_blank');
+
+                        if (!win1 || !win2) {
+                            alert(
+                                "Por favor habilita las ventanas emergentes (pop-ups) para este sitio.");
+                        } else {
+                            setTimeout(() => location.reload(), 500);
+                        }
                     }
                 });
             } else {

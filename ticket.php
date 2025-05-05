@@ -1,89 +1,91 @@
 <?php
-// Iniciar el buffer de salida
 ob_start();
 include "conexionfin.php";
 
 if (empty($_REQUEST['id'])) {
 	echo "No es posible generar la factura.";
-} else {
-	$id_factura = $_GET['id'];
-	$consulta = mysqli_query($conexion, "SELECT * FROM configuracion");
-	$resultado = mysqli_fetch_assoc($consulta);
-	$ventas = mysqli_query($conexion, "SELECT * FROM factura WHERE id = $id_factura");
-	$result_venta = mysqli_fetch_assoc($ventas);
-	$idcliente = $result_venta['idcliente'];
-	$clientes = mysqli_query($conexion, "SELECT * FROM cliente WHERE idcliente =$idcliente");
-	$result_cliente = mysqli_fetch_assoc($clientes);
-	$productos = mysqli_query($conexion, "SELECT d.idfactura, d.cod_producto, d.cantidad, p.codBarra, p.descripcion, p.precio FROM detallefactura d INNER JOIN producto p ON d.idfactura = $id_factura WHERE d.cod_producto = p.codproducto");
-	require_once 'factura/fpdf/fpdf.php';
-	$pdf = new FPDF('P', 'mm', array(80, 150));
-	$pdf->AddPage();
-	$pdf->SetMargins(1, 0, 0);
-	$pdf->SetTitle("rpt_ticket_venta");
-	$pdf->SetFont('Arial', 'B', 12);
-	$pdf->Cell(60, 5, utf8_decode($resultado['nombre']), 0, 1, 'C');
-	$pdf->Ln();
-	$pdf->image("img/logo.png", 50, 18, 23, 15, 'PNG');
-	$pdf->SetFont('Arial', 'B', 7);
-	$pdf->Cell(15, 5, "Ruc: ", 0, 0, 'L');
-	$pdf->SetFont('Arial', '', 7);
-	$pdf->Cell(20, 5, $resultado['dni'], 0, 1, 'L');
-	$pdf->SetFont('Arial', 'B', 7);
-	$pdf->Cell(15, 5, utf8_decode("Teléfono: "), 0, 0, 'L');
-	$pdf->SetFont('Arial', '', 7);
-	$pdf->Cell(20, 5, $resultado['telefono'], 0, 1, 'L');
-	$pdf->SetFont('Arial', 'B', 7);
-	$pdf->Cell(15, 5, utf8_decode("Dirección: "), 0, 0, 'L');
-	$pdf->SetFont('Arial', '', 7);
-	$pdf->Cell(20, 5, utf8_decode($resultado['direccion']), 0, 1, 'L');
-	$pdf->SetFont('Arial', 'B', 7);
-	$pdf->Cell(15, 5, "Ticked: ", 0, 0, 'L');
-	$pdf->SetFont('Arial', '', 7);
-	$pdf->Cell(20, 5, $id_factura, 0, 0, 'L');
-	$pdf->SetFont('Arial', 'B', 7);
-	$pdf->Cell(16, 5, "Fecha: ", 0, 0, 'R');
-	$pdf->SetFont('Arial', '', 7);
-	$pdf->Cell(25, 5, $result_venta['fechafactura'], 0, 1, 'R');
-	$pdf->SetFont('Arial', 'B', 7);
-	$pdf->Cell(60, 5, "Datos del cliente", 0, 1, 'L');
-	$pdf->Cell(40, 5, "Nombre", 0, 0, 'L');
-	$pdf->Cell(20, 5, utf8_decode("Teléfono"), 0, 0, 'L');
-	$pdf->Cell(25, 5, '', 0, 1, 'L');
-	$pdf->SetFont('Arial', '', 7);
-	$pdf->Cell(40, 5, utf8_decode($result_cliente['nombre']), 0, 0, 'L');
-	$pdf->Cell(20, 5, utf8_decode($result_cliente['telefono']), 0, 0, 'L');
-	$pdf->Cell(25, 5, '', 0, 1, 'L');
-	$pdf->SetFont('Arial', 'B', 7);
-	$pdf->Cell(75, 5, "Detalle de Productos", 0, 1, 'L');
-	$pdf->SetTextColor(0, 0, 0);
-	$pdf->SetFont('Arial', 'B', 7);
-	$pdf->Cell(42, 5, 'Nombre', 0, 0, 'L');
-	$pdf->Cell(8, 5, 'Cant', 0, 0, 'L');
-	$pdf->Cell(15, 5, 'Precio', 0, 0, 'L');
-	$pdf->Cell(15, 5, 'Total', 0, 1, 'L');
-	$pdf->SetFont('Arial', '', 7);
-	while ($row = mysqli_fetch_assoc($productos)) {
-		$pdf->Cell(42, 5, utf8_decode($row['descripcion']), 0, 0, 'L');
-		$pdf->Cell(8, 5, $row['cantidad'], 0, 0, 'L');
-		$pdf->Cell(15, 5, number_format($row['precio'], 2, '.', ','), 0, 0, 'L');
-		$importe = number_format($row['cantidad'] * $row['precio'], 2, '.', ',');
-		$pdf->Cell(15, 5, $importe, 0, 1, 'L');
-	}
-	$pdf->Ln();
-	$pdf->SetFont('Arial', 'B', 10);
-
-	$pdf->Cell(76, 5, 'Total: ' . number_format($result_venta['totalpagar'], 2, '.', ','), 0, 1, 'R');
-	$pdf->Ln();
-	$pdf->SetFont('Arial', '', 7);
-	$pdf->Cell(80, 5, utf8_decode("Gracias por su preferencia"), 0, 1, 'C');
-	$pdf->Output("compra.pdf", "I");
+	exit;
 }
 
-// Limpiar el buffer de salida antes de enviar el PDF
-ob_clean();
+$id_factura = $_GET['id'];
+
+// Obtener datos de configuración, factura, cliente y productos
+$config = mysqli_fetch_assoc(mysqli_query($conexion, "SELECT * FROM configuracion"));
+$venta = mysqli_fetch_assoc(mysqli_query($conexion, "SELECT * FROM factura WHERE id = $id_factura"));
+$cliente = mysqli_fetch_assoc(mysqli_query($conexion, "SELECT * FROM cliente WHERE idcliente = " . $venta['idcliente']));
+$detalle = mysqli_query($conexion, "
+    SELECT 
+        d.cantidad, 
+        p.descripcion, 
+        p.precio 
+    FROM detallefactura d 
+    INNER JOIN producto p ON d.cod_producto = p.codproducto 
+    WHERE d.idfactura = $id_factura
+");
+
+// Incluir FPDF
+require_once 'factura/fpdf/fpdf.php';
+$pdf = new FPDF('P', 'mm', array(80, 200));
+$pdf->AddPage();
+$pdf->SetMargins(5, 5, 5);
+
+// ===== ENCABEZADO =====
+$pdf->SetFont('Arial', 'B', 10);
+$pdf->Cell(0, 5, utf8_decode($config['nombre']), 0, 1, 'C');
+$pdf->SetFont('Arial', '', 8);
+$pdf->Cell(0, 5, utf8_decode("RUC: " . $config['dni']), 0, 1, 'C');
+$pdf->Cell(0, 5, utf8_decode("Tel: " . $config['telefono']), 0, 1, 'C');
+$pdf->MultiCell(0, 4, utf8_decode("Dirección: " . $config['direccion']), 0, 'C');
+$pdf->Ln(1);
+$pdf->Cell(0, 0, "-------------------------------------------------------------------------", 0, 1, 'C');
+$pdf->Ln(2);
+
+// ===== DATOS DE FACTURA =====
+$pdf->SetFont('Arial', 'B', 8);
+$pdf->Cell(0, 5, utf8_decode("Factura N°: ") . $venta['numerofactura'], 0, 1, 'L');
+$pdf->Cell(0, 1.5, "Fecha: " . $venta['fechafactura'], 0, 1, 'L');
+$pdf->Ln(1);
+
+// ===== DATOS DEL CLIENTE =====
+
+$pdf->SetFont('Arial', 'B', 8);
+$pdf->Cell(0, 8, "Cliente:", 0, 1, 'L');
+$pdf->SetFont('Arial', '', 8);
+$pdf->Cell(0, 0.1, utf8_decode($cliente['nombre']), 0, 1, 'L');
+$pdf->Cell(0, 7, "Tel: " . $cliente['telefono'], 0, 1, 'L');
+$pdf->Cell(0, 0, "-------------------------------------------------------------------------", 0, 1, 'C');
+$pdf->Ln(2);
+
+// ===== DETALLE DE PRODUCTOS =====
+$pdf->SetFont('Arial', 'B', 8);
+$pdf->Cell(40, 5, "Producto", 0, 0, 'L');
+$pdf->Cell(10, 5, "Cant", 0, 0, 'C');
+$pdf->Cell(10, 5, "Precio", 0, 0, 'R');
+$pdf->Cell(10, 5, "Total", 0, 1, 'R');
+
+$pdf->SetFont('Arial', '', 7);
+while ($row = mysqli_fetch_assoc($detalle)) {
+	$total = $row['cantidad'] * $row['precio'];
+	$pdf->Cell(40, 5, utf8_decode($row['descripcion']), 0, 0, 'L');
+	$pdf->Cell(10, 5, $row['cantidad'], 0, 0, 'C');
+	$pdf->Cell(10, 5, number_format($row['precio'], 2), 0, 0, 'R');
+	$pdf->Cell(10, 5, number_format($total, 2), 0, 1, 'R');
+}
+$pdf->Cell(0, 0, "------------------------------------------------------------------------------------", 0, 1, 'C');
+$pdf->Ln(2);
+
+// ===== TOTAL A PAGAR =====
+$pdf->SetFont('Arial', 'B', 10);
+$pdf->Cell(0, 7, "TOTAL: $" . number_format($venta['totalpagar'], 2), 0, 1, 'R');
+$pdf->Ln(10);
+
+$pdf->Ln(5);
+// ===== MENSAJE DE CIERRE =====
+$pdf->SetFont('Arial', '', 8);
+$pdf->MultiCell(0, 5, utf8_decode("Gracias por su preferencia.\nVuelva pronto."), 0, 'C');
 
 // Salida del PDF
-$pdf->Output('I', 'ticket.pdf');
-
-// Terminar el buffer de salida
+ob_clean();
+$pdf->Output("ticket_" . $id_factura . ".pdf", "I");
 ob_end_flush();
+?>
