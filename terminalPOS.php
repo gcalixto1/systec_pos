@@ -215,7 +215,7 @@ body {
                             <?php echo $consecutivo[$i]['descripcionconse'] ?>
                         </option>
                         <?php } ?>
-                    </select> 
+                    </select>
                 </div>
             </div>
             <table>
@@ -275,7 +275,7 @@ body {
 <script src="assets/script/autocompleto.js"></script>
 <script>
 function AgregarCliente() {
-    uni_modal("Gestion Clientes", "manage_clientes.php")
+    uni_modal2("Gestion Clientes", "manage_clientes_venta.php")
 }
 
 function filterProducts() {

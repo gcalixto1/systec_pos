@@ -1,13 +1,34 @@
 <?php
 ob_start();
 include "conexionfin.php";
+require('phpqrcode/qrlib.php');
 
 if (empty($_REQUEST['id'])) {
-	echo "No es posible generar la factura.";
-	exit;
+    echo "No es posible generar la factura.";
+    exit;
 }
 
 $id_factura = $_GET['id'];
+
+$sql = "SELECT selloRecibido,jsondte FROM respuestadte WHERE id_factura = $id_factura";
+$resultado = $conexion->query($sql);
+$row = $resultado->fetch_assoc();
+$json = $row['jsondte'];
+
+
+
+// Verifica que el JSON sea válido
+$data = json_decode($json, true);
+if (!$data || json_last_error() !== JSON_ERROR_NONE) {
+    die("Error al decodificar el JSON");
+}
+
+// === Extraer campos importantes ===
+$ident = $data['identificacion'];
+$emisor = $data['emisor'];
+$receptor = $data['receptor'];
+$cuerpo = $data['cuerpoDocumento'];
+$resumen = $data['resumen'];
 
 // Obtener datos de configuración, factura, cliente y productos
 $config = mysqli_fetch_assoc(mysqli_query($conexion, "SELECT * FROM configuracion"));
@@ -23,11 +44,22 @@ $detalle = mysqli_query($conexion, "
     WHERE d.idfactura = $id_factura
 ");
 
+// === Generar QR ===
+$contenidoQR = "https://admin.factura.gob.sv/consultaPublica?ambiente=00&codGen={$ident['codigoGeneracion']}&fechaEmi={$ident['fecEmi']}";
+$archivoQR = 'qr_temp.png';
+QRcode::png($contenidoQR, $archivoQR, QR_ECLEVEL_H, 4);
+
+
 // Incluir FPDF
 require_once 'factura/fpdf/fpdf.php';
+
+// Código QR
+
+
 $pdf = new FPDF('P', 'mm', array(80, 200));
 $pdf->AddPage();
 $pdf->SetMargins(5, 5, 5);
+
 
 // ===== ENCABEZADO =====
 $pdf->SetFont('Arial', 'B', 10);
@@ -65,11 +97,11 @@ $pdf->Cell(10, 5, "Total", 0, 1, 'R');
 
 $pdf->SetFont('Arial', '', 7);
 while ($row = mysqli_fetch_assoc($detalle)) {
-	$total = $row['cantidad'] * $row['precio'];
-	$pdf->Cell(40, 5, utf8_decode($row['descripcion']), 0, 0, 'L');
-	$pdf->Cell(10, 5, $row['cantidad'], 0, 0, 'C');
-	$pdf->Cell(10, 5, number_format($row['precio'], 2), 0, 0, 'R');
-	$pdf->Cell(10, 5, number_format($total, 2), 0, 1, 'R');
+    $total = $row['cantidad'] * $row['precio'];
+    $pdf->Cell(40, 5, utf8_decode($row['descripcion']), 0, 0, 'L');
+    $pdf->Cell(10, 5, $row['cantidad'], 0, 0, 'C');
+    $pdf->Cell(10, 5, number_format($row['precio'], 2), 0, 0, 'R');
+    $pdf->Cell(10, 5, number_format($total, 2), 0, 1, 'R');
 }
 $pdf->Cell(0, 0, "------------------------------------------------------------------------------------", 0, 1, 'C');
 $pdf->Ln(2);
@@ -77,11 +109,12 @@ $pdf->Ln(2);
 // ===== TOTAL A PAGAR =====
 $pdf->SetFont('Arial', 'B', 10);
 $pdf->Cell(0, 7, "TOTAL: $" . number_format($venta['totalpagar'], 2), 0, 1, 'R');
-$pdf->Ln(10);
-
 $pdf->Ln(5);
+
+$pdf->Ln(2);
 // ===== MENSAJE DE CIERRE =====
 $pdf->SetFont('Arial', '', 8);
+$pdf->Image($archivoQR, 19, null, 40, 40, 'PNG');
 $pdf->MultiCell(0, 5, utf8_decode("Gracias por su preferencia.\nVuelva pronto."), 0, 'C');
 
 // Salida del PDF

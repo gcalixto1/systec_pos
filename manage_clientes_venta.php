@@ -159,7 +159,7 @@ $('#savecliente').submit(function(e) {
                         icon: 'success',
                         confirmButtonColor: '#28a745',
                         confirmButtonText: 'OK'
-                    }).then(() => location.reload());
+                    });
                 }
             }
         });

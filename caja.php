@@ -15,9 +15,9 @@ if ($query) {
     <br>
     <div class="col-lg-12">
 
-        <?php if ($_SESSION['login_rol'] == 1) : ?>
-            <div class="text-right">
-                <?php
+        <?php if ($_SESSION['login_rol'] == 1): ?>
+        <div class="text-right">
+            <?php
                 $qry = $conexion->query("SELECT * FROM apertura_caja");
                 if ($qry->num_rows > 0) { // Verifica si hay registros
                     $hayCajaAbierta = false;
@@ -39,10 +39,10 @@ if ($query) {
                     echo '<button class="btn btn-success btn-lg" type="button" id="apertura"><i class="fa fa-cash-register"></i> Apertura de Caja</button>';
                 }
                 ?>
-                <!-- <button class="btn btn-danger btn-lg" type="button" id="cierre"><i class="fa fa-columns"></i> Cierre de
+            <!-- <button class="btn btn-danger btn-lg" type="button" id="cierre"><i class="fa fa-columns"></i> Cierre de
                     Caja</button> -->
-            </div>
-            <br />
+        </div>
+        <br />
         <?php endif; ?>
         <input hidden name="idcajaA" id="idcajaA" class="form-control"
             value="<?php echo isset($meta['idcaja']) ? htmlspecialchars($meta['idcaja']) : ''; ?>">
@@ -71,45 +71,45 @@ if ($query) {
                 <?php
                 $i = 1;
                 $qry = $conexion->query("SELECT * FROM apertura_caja");
-                while ($row = $qry->fetch_assoc()) :
+                while ($row = $qry->fetch_assoc()):
 
-                ?>
-                    <tr>
-                        <td>
-                            <?php echo $i++ ?>
-                        </td>
-                        <td>
-                            <?php echo $row['num_apertura'] ?>
-                        </td>
-                        <td>
-                            <?php echo $row['fch_hora_apertura'] ?>
-                        </td>
-                        <td>
-                            <?php echo $row['saldo_inicial'] ?>
-                        </td>
-                        <td>
-                            <?php echo $row['saldo_venta_total'] ?>
-                        </td>
-                        <td>
-                            <?php echo $row['gasto'] ?>
-                        </td>
+                    ?>
+                <tr>
+                    <td>
+                        <?php echo $i++ ?>
+                    </td>
+                    <td>
+                        <?php echo $row['num_apertura'] ?>
+                    </td>
+                    <td>
+                        <?php echo $row['fch_hora_apertura'] ?>
+                    </td>
+                    <td>
+                        <?php echo $row['saldo_inicial'] ?>
+                    </td>
+                    <td>
+                        <?php echo $row['saldo_venta_total'] ?>
+                    </td>
+                    <td>
+                        <?php echo $row['gasto'] ?>
+                    </td>
 
-                        <td style="white-space: nowrap;">
-                            <center>
-                                <button class="btn btn-primary btn-ms edit_borrower" type="button"
-                                    data-id="<?php echo $row['idcaja'] ?>" data-bs-toggle="tooltip" data-bs-placement="top"
-                                    title="Ver Detalle">
-                                    <i class="fa fa-eye"></i>
-                                </button>
-                                <button class="btn btn-danger btn-ms" type="button" data-bs-toggle="tooltip"
-                                    data-bs-placement="top" data-id="<?php echo $row['idcaja'] ?>" title="Cerrar Caja"
-                                    id="cierre">
-                                    <i class="fa fa-lock"></i>
-                                </button>
-                            </center>
-                        </td>
+                    <td style="white-space: nowrap;">
+                        <center>
+                            <button class="btn btn-primary btn-ms edit_borrower" type="button"
+                                data-id="<?php echo $row['idcaja'] ?>" data-bs-toggle="tooltip" data-bs-placement="top"
+                                title="Ver Detalle">
+                                <i class="fa fa-eye"></i>
+                            </button>
+                            <button class="btn btn-danger btn-ms cierre" type="button" data-bs-toggle="tooltip"
+                                data-bs-placement="top" data-id="<?php echo $row['idcaja'] ?>" title="Cerrar Caja"
+                                id="cierre">
+                                <i class="fa fa-lock"></i>
+                            </button>
+                        </center>
+                    </td>
 
-                    </tr>
+                </tr>
                 <?php endwhile; ?>
             </tbody>
         </table>
@@ -118,15 +118,15 @@ if ($query) {
 </div>
 
 <script>
-    var id_caja = document.getElementById("idcajaA").value;
-    $('#borrower-list').dataTable()
-    $('#apertura').click(function() {
-        uni_modal("Apertura de Caja", "apertura_caja.php")
-    })
-    $('#cierre').click(function() {
-        uni_modal("Cierre de Caja", "cierre_caja.php?idcaja=" + $(this).attr('data-id'))
-    })
-    $('#borrower-list').on('click', '.edit_borrower', function() {
-        uni_modal_documentos("Detalle de caja", "detalle_caja.php?idcaja=" + $(this).attr('data-id'))
-    })
+var id_caja = document.getElementById("idcajaA").value;
+$('#borrower-list').dataTable()
+$('#apertura').click(function() {
+    uni_modal("Apertura de Caja", "apertura_caja.php")
+})
+$('#borrower-list').on('click', '.cierre', function() {
+    uni_modal("Cierre de Caja", "cierre_caja.php?idcaja=" + $(this).attr('data-id'))
+})
+$('#borrower-list').on('click', '.edit_borrower', function() {
+    uni_modal_documentos("Detalle de caja", "detalle_caja.php?idcaja=" + $(this).attr('data-id'))
+})
 </script>

@@ -95,6 +95,25 @@ body {
         </div>
     </div>
 
+    <div class="modal fade" id="uni_modal2" role='dialog'>
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"></h5>
+                </div>
+                <div class="modal-body" required>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" id='submit' onclick="$('#uni_modal form').submit()"><i
+                            class="fa fa-save"></i> Guardar</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">
+                        Cerrar <i class="fa fa-times"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="modal fade" id="uni_modal_caja" role='dialog'>
         <div class="modal-dialog modal-md" role="document">
             <div class="modal-content">
@@ -174,6 +193,29 @@ window.uni_modal = function($title = '', $url = '', $size = "") {
                     $('#uni_modal .modal-dialog').removeAttr("class").addClass("modal-dialog modal-lg")
                 }
                 $('#uni_modal').modal('show')
+                end_load()
+            }
+        }
+    })
+}
+window.uni_modal2 = function($title = '', $url = '', $size = "") {
+    start_load()
+    $.ajax({
+        url: $url,
+        error: err => {
+            console.log()
+            alert("An error occured")
+        },
+        success: function(resp) {
+            if (resp) {
+                $('#uni_modal2 .modal-title').html($title)
+                $('#uni_modal2 .modal-body').html(resp)
+                if ($size != '') {
+                    $('#uni_modal2 .modal-dialog').addClass($size)
+                } else {
+                    $('#uni_modal2 .modal-dialog').removeAttr("class").addClass("modal-dialog modal-lg")
+                }
+                $('#uni_modal2').modal('show')
                 end_load()
             }
         }

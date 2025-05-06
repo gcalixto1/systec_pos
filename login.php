@@ -8,15 +8,15 @@
     <title>Punto de venta</title>
 
     <?php include('header_desing.php'); ?>
-    <?php 
+    <?php
     $conexionfin_included = false;
 
-       if (!isset($_GET['pv'])) {
+    if (!isset($_GET['pv'])) {
         include('conexion.php');
-    }else{
+    } else {
         // include('conexionfin.php');
     }
-      ?>
+    ?>
     <?php
 
     if (isset($_SESSION['login_idusuario']))
@@ -25,18 +25,18 @@
 
 </head>
 <style>
-    body {
-        background-image: url('img/fondo.jpg');
-        /* Ruta de la imagen de fondo */
-        background-size: cover;
-        /* Cubre todo el área del body */
-        background-position: center;
-        /* Centra la imagen */
-        background-attachment: fixed;
-        /* Fija la imagen de fondo para que no se desplace con el contenido */
-        backdrop-filter: blur(500px);
-        /* Aplica un desenfoque al fondo */
-    }
+body {
+    background-image: url('img/fondo.jpg');
+    /* Ruta de la imagen de fondo */
+    background-size: cover;
+    /* Cubre todo el área del body */
+    background-position: center;
+    /* Centra la imagen */
+    background-attachment: fixed;
+    /* Fija la imagen de fondo para que no se desplace con el contenido */
+    backdrop-filter: blur(500px);
+    /* Aplica un desenfoque al fondo */
+}
 </style>
 
 <body>
@@ -61,58 +61,67 @@
                     <label for="password" class="control-label" style="color:#f6a016;">Clave de acceso</label>
                     <input type="password" id="password" name="password" class="form-control">
                 </div>
-                <button type="submit" class="btn btn-primary">Entrar al sistema</button> <!-- Cambiado type a "submit" -->
+                <button type="submit" class="btn btn-primary">Entrar al sistema</button>
+                <!-- Cambiado type a "submit" -->
             </form>
             <br>
         </div>
         <br>
         <?php
-            // Verificar si el parámetro tiene_tablas está definido
-            if (isset($_GET['pv'])) {
-                if ($_GET['pv'] == 0) {
-                    ?>
-                    <button type='button' class='btn btn-warning'  style="color:#000;" onclick="crearConfiguraciones()">CREAR CONFIGURACIONES PARA EL CLIENTE <img width="30" height="30" src="https://img.icons8.com/ios-filled/30/database.png" alt="database"/></button>
-                    <?php
-                } else {
-                    
-                }
+        // Verificar si el parámetro tiene_tablas está definido
+        if (isset($_GET['pv'])) {
+            if ($_GET['pv'] == 0) {
+                ?>
+        <button type='button' class='btn btn-warning' style="color:#000;" onclick="crearConfiguraciones()">CREAR
+            CONFIGURACIONES PARA EL CLIENTE <img width="30" height="30"
+                src="https://img.icons8.com/ios-filled/30/database.png" alt="database" /></button>
+        <?php
             } else {
-                echo "No se pudo determinar el estado de las tablas.";
+
             }
-            ?>
+        } else {
+            echo "No se pudo determinar el estado de las tablas.";
+        }
+        ?>
     </div>
 
     <a href="#" class="back-to-top"><i class="icofont-simple-up"></i></a>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-        $('#login-form').submit(function(e) {
-            e.preventDefault()
-            $('#login-form button[type="submit"]').attr('disabled', true).html('Iniciando sesión...'); // Cambiado a "submit"
-            if ($(this).find('.alert-danger').length > 0)
-                $(this).find('.alert-danger').remove();
+    $('#login-form').submit(function(e) {
+        e.preventDefault()
+        $('#login-form button[type="submit"]').attr('disabled', true).html(
+        'Iniciando sesión...'); // Cambiado a "submit"
+        if ($(this).find('.alert-danger').length > 0)
+            $(this).find('.alert-danger').remove();
 
-            $.ajax({
-                url: 'ajax.php?action=login',
-                method: 'POST',
-                data: $(this).serialize(),
-                error: function(err) {
-                    console.log(err);
-                    $('#login-form button[type="submit"]').removeAttr('disabled').html('Entrar al sistema'); // Cambiado a "submit"
-                },
-                success: function(resp) {
-                    if (resp == 1) {
-                        location.href = 'index.php?page=home';
-                    } else if (resp == 3) {
-                        $('#login-form').prepend('<div class="alert alert-danger">El usuario o la clave de acceso son incorrectos.</div>');
-                        $('#login-form button[type="submit"]').removeAttr('disabled').html('Entrar al sistema'); // Cambiado a "submit"
-                    }
+        $.ajax({
+            url: 'ajax.php?action=login',
+            method: 'POST',
+            data: $(this).serialize(),
+            error: function(err) {
+                console.log(err);
+                $('#login-form button[type="submit"]').removeAttr('disabled').html(
+                    'Entrar al sistema'); // Cambiado a "submit"
+            },
+            success: function(resp) {
+                if (resp == 1) {
+                    location.href = 'index.php?page=home';
+                } else if (resp == 3) {
+                    $('#login-form').prepend(
+                        '<div class="alert alert-danger">El usuario o la clave de acceso son incorrectos.</div>'
+                        );
+                    $('#login-form button[type="submit"]').removeAttr('disabled').html(
+                        'Entrar al sistema'); // Cambiado a "submit"
                 }
-            })
+            }
         })
-        function crearConfiguraciones() {
-            window.location.href = 'creacion.php';
-        }
+    })
+
+    function crearConfiguraciones() {
+        window.location.href = 'creacion.php';
+    }
     </script>
 
 </body>

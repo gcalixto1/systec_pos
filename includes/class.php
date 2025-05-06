@@ -258,6 +258,21 @@ class Action
 		$data .= ", telefono = '$telefono'";
 		$data .= ", correo = '$correo'";
 		$data .= ", tipoDocumento = '$tipoDoc'";
+		$data .= ", tipoControbuyente = '$tipoControbuyente'";
+		if ($tipoControbuyente == 2) {
+			$data .= ", dato1 = '$dato1'";
+			$data .= ", dato2 = '$dato2'";
+			$data .= ", dato3 = 'N/A'";
+			$data .= ", dato4 = 'N/A'";
+			$data .= ", dato5 = 'N/A'";
+		} else {
+			$data .= ", dato1 = 'N/A'";
+			$data .= ", dato2 = 'N/A'";
+			$data .= ", dato3 = 'N/A'";
+			$data .= ", dato4 = 'N/A'";
+			$data .= ", dato5 = 'N/A'";
+		}
+
 
 		// Evita inyección SQL usando consultas preparadas
 		if (empty($id)) {
