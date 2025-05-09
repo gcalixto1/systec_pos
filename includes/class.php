@@ -739,7 +739,7 @@ class Action
 		// Extraer y sanitizar los datos
 		extract($_POST);
 		$numeroALetras = new NumeroALetras();
-		if (isset($subtotal, $iva_impuesto, $totalpagar, $codcliente, $detalle, $prefix)) {
+		if (isset($subtotal, $iva_impuesto, $totalpagar, $codcliente, $detalle, $prefix, $forma_pago)) {
 			$subtotal = $this->dbh->real_escape_string($subtotal);
 			$iva_impuesto = $this->dbh->real_escape_string($iva_impuesto);
 			$totalpagar = $this->dbh->real_escape_string($totalpagar);
@@ -747,7 +747,7 @@ class Action
 			$prefix = $this->dbh->real_escape_string($prefix);
 			$tipofactura = $prefix;
 			$letras = $numeroALetras->toMoney($totalpagar, 2, 'dolares', 'centavos');
-			$forma_pago = 'na';
+			$forma_pagos = $this->dbh->real_escape_string($forma_pago);
 			$idusuario = $_SESSION['login_idusuario'];
 			$estado = 'Pendiente';
 			$detalle = json_decode($detalle, true);
@@ -786,7 +786,7 @@ class Action
 					$data_factura .= ", iva_impuesto = '$iva_impuesto'";
 					$data_factura .= ", totalpagar = '$totalpagar'";
 					$data_factura .= ", letras = '$letras'";
-					$data_factura .= ", forma_pago = '$forma_pago'";
+					$data_factura .= ", forma_pago = '$forma_pagos'";
 					$data_factura .= ", idusuario = '$idusuario'";
 					$data_factura .= ", idcliente = '$codcliente'";
 					$data_factura .= ", estado = '$estado'";
@@ -899,8 +899,7 @@ class Action
 	{
 		extract($_POST);
 		$id = mysqli_real_escape_string($this->dbh, $id);
-		$data = "forma_pago = '$forma_pago'";
-		$data .= ", estado = 'Pagado'";
+		$data = "estado = 'Pagado'";
 
 		$save = $this->dbh->query("UPDATE factura SET " . $data . " WHERE id = $id");
 		if ($save) {

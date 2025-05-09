@@ -65,24 +65,7 @@ if ($meta['tipofactura'] == "fcf") {
                 <hr>
                 <div id="condiciones">
                     <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group has-feedback">
-                                <label class="control-label">Forma de Pago: </label>
-                                <select name="forma_pago" id="forma_pago" class="form-control" aria-required="true">
-                                    <option value=""> -- SELECCIONE -- </option>
-                                    <?php
-                                    require_once("includes/class.php");
-                                    $pago = new Action();
-                                    $pago = $pago->ListarMediosPagos();
-                                    for ($i = 0; $i < sizeof($pago); $i++) { ?>
-                                    <option value="<?php echo $pago[$i]['codigo']; ?>">
-                                        <?php echo $pago[$i]['medio_pago'] ?>
-                                    </option>
-                                    <?php } ?>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
+                        <div class="col-md-12">
                             <div class="form-group has-feedback">
                                 <label class="control-label">Monto Recibido: </label>
                                 <input class="form-control" type="text" name="montopagado" id="montopagado"

@@ -6,15 +6,17 @@ $idfactura = intval($_GET['idfactura']);
 
 // OBTENER FACTURA
 $query = $conexion->query("SELECT factura.id, factura.tipofactura, factura.numerofactura, 
-                                         factura.subtotal, factura.iva_impuesto, factura.totalpagar, 
-                                         factura.letras, factura.forma_pago, factura.fechafactura, 
-                                         cliente.nombre, cliente.dni, cliente.telefono, cliente.correo,
-                                         cliente_direccion.departamento, cliente_direccion.municipio, 
-                                         cliente_direccion.complemento,cliente.tipoDocumento
-                                         FROM factura 
-                                         INNER JOIN cliente ON cliente.idcliente = factura.idcliente
-                                         INNER JOIN cliente_direccion ON cliente_direccion.cliente_dni = cliente.dni
-                                         WHERE factura.id = $idfactura");
+                                    factura.subtotal, factura.iva_impuesto, factura.totalpagar, 
+                                    factura.letras, factura.forma_pago, factura.fechafactura, 
+                                    cliente.nombre, cliente.dni, cliente.telefono, cliente.correo,
+                                    cliente.dato1, cliente.dato2, cliente.dato3,
+                                    cliente_direccion.departamento, cliente_direccion.municipio, 
+                                    cliente_direccion.complemento, cliente.tipoDocumento, medio_pago.medio_pago
+                                FROM factura 
+                                INNER JOIN cliente ON cliente.idcliente = factura.idcliente
+                                LEFT JOIN cliente_direccion ON cliente_direccion.cliente_dni = cliente.dni
+                                INNER JOIN medio_pago ON medio_pago.codigo = factura.forma_pago
+                                WHERE factura.id = $idfactura");
 $factura = $query->fetch_assoc();
 
 // OBTENER DETALLE DE PRODUCTOS
@@ -102,8 +104,8 @@ $facturaJson = [
             "correo" => "ferreteriafuentes019@gmail.com",
             "codEstable" => null,
             "codPuntoVenta" => null,
-            "codEstableMH" => null,
-            "codPuntoVentaMH" => null
+            "codEstableMH" => "M001",
+            "codPuntoVentaMH" => "P001"
         ],
         "receptor" => [
             "nrc" => null,
@@ -144,7 +146,15 @@ $facturaJson = [
             "totalLetras" => $factura['letras'],
             "saldoFavor" => 0,
             "condicionOperacion" => 1,
-            "pagos" => null,
+            "pagos" => [
+                [
+                    "codigo" => $factura['forma_pago'],
+                    "montoPago" => round($totalGravada, 2),
+                    "referencia" => $factura['medio_pago'],
+                    "plazo" => null,
+                    "periodo" => null
+                ]
+            ],
             "numPagoElectronico" => null
         ],
         "extension" => null,

@@ -105,6 +105,7 @@ document.getElementById('saveventa').addEventListener('submit', function(event) 
         totalpagar: $("#total").text(),
         codcliente: $("#codcliente").val(),
         prefix: $("#prefix").val(),
+        forma_pago: $("#forma_pago").val(),
         csrf_token: $("#csrf_token").val(),
         detalle: JSON.stringify(cart)
     };
