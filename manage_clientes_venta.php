@@ -23,7 +23,20 @@ $municipioSeleccionado = isset($_POST['municipio']) ? $_POST['municipio'] : (iss
 $departamentos = $pro->ListarDepartamentos();
 $municipios = $departamentoSeleccionado ? $pro->ListarMunicipios($departamentoSeleccionado) : [];
 $documentos = $pro->ListarDocumentos();
+
+$busqueda = isset($_GET['buscar']) ? trim($_GET['buscar']) : '';
+$actividades = $pro->ListarActividades($busqueda);
 ?>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Select2 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Select2 JS -->
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <div class="container-fluid">
     <div class="card">
         <form class="form form-material" method="post" action="#" name="savecliente" id="savecliente">
@@ -34,7 +47,7 @@ $documentos = $pro->ListarDocumentos();
                         <input type="hidden" name="id" value="<?php echo $id; ?>">
 
                         <div class="form-group col-md-6">
-                            <label for="tipoControbuyente">Tipo Contribuyente</label>
+                            <label for="tipoControbuyente">Tipo Cliente</label>
                             <select name="tipoControbuyente" id="tipoControbuyente" class="form-control" required>
                                 <option value="0">SELECCIONE</option>
                                 <option value="1"
@@ -45,7 +58,18 @@ $documentos = $pro->ListarDocumentos();
                                     PERSONA JURIDICA</option>
                             </select>
                         </div>
-
+                        <div class="form-group col-md-6">
+                            <label for="actividad">Seleccionar Actividad</label>
+                            <select name="dato3" id="dato3" class="form-control select2" required>
+                                <option value="">-- SELECCIONE --</option>
+                                <?php foreach ($actividades as $act): ?>
+                                <option value="<?php echo $act['codigo']; ?>"
+                                    <?php echo (isset($meta['dato3']) && $meta['dato3'] == $act['codigo']) ? 'selected' : ''; ?>>
+                                    <?php echo $act['codigo'] . ' - ' . $act['descripcion']; ?>
+                                </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
                         <div class="form-group col-md-6">
                             <label for="nrc">N.R.C.</label>
                             <input type="text" name="dato1" id="dato1" class="form-control"
@@ -166,6 +190,7 @@ $('#savecliente').submit(function(e) {
     }
 });
 
+
 $(document).ready(function() {
     $('#departamento').change(function() {
         var idDepartamento = $(this).val();
@@ -211,5 +236,14 @@ $(document).ready(function() {
         }
     });
     <?php endif; ?>
+});
+
+$(document).ready(function() {
+    $('.select2').select2({
+        width: '100%',
+        height: '150%',
+        placeholder: "-- Seleccionar una actividad --",
+        allowClear: true
+    });
 });
 </script>

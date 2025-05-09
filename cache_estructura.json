@@ -1,1 +1,161 @@
-{"nit":"03011504761021","activo":"true","passwordPri":"Oscar01*","dteJson":{"identificacion":{"version":1,"ambiente":"00","tipoDte":"01","numeroControl":"DTE-01-M001P001-000000000000031","codigoGeneracion":"C2833FFA-47E5-9755-D98D-0E422B91D6E3","tipoModelo":1,"tipoOperacion":1,"tipoContingencia":null,"motivoContin":null,"fecEmi":"2025-05-05","horEmi":"13:36:35","tipoMoneda":"USD"},"documentoRelacionado":null,"emisor":{"nit":"03011504761021","nrc":"3173130","nombre":"Oscar Eduardo Fuentes Mancia","codActividad":"46632","descActividad":"venta al por mayor de articulos de ferreteria y pinturerias","nombreComercial":"FERRETERIA FUENTES","tipoEstablecimiento":"02","direccion":{"departamento":"03","municipio":"20","complemento":"Canton Punta Remedios, Caserio Los Cobanos,Acajutla"},"telefono":"73999642","correo":"ferreteriafuentes019@gmail.com","codEstable":null,"codPuntoVenta":null,"codEstableMH":null,"codPuntoVentaMH":null},"receptor":{"nrc":null,"tipoDocumento":"13","numDocumento":"01031767-9","nombre":"Claudia Guadalupe Calixto de Fuentes","codActividad":null,"descActividad":null,"direccion":{"departamento":"03","municipio":"18","complemento":"1 Calle Ote. Col. Santa Marta Final Pasaje Marin 1 Casa 11"},"telefono":"6123-8974","correo":"alex.calix1992@gmail.com"},"otrosDocumentos":null,"ventaTercero":null,"cuerpoDocumento":[{"numItem":1,"numeroDocumento":null,"tipoItem":1,"cantidad":1,"codigo":"02","uniMedida":59,"descripcion":"Cemento WP 42.5 KG","precioUni":8.2,"montoDescu":0,"codTributo":null,"ventaNoSuj":0,"ventaExenta":0,"ventaGravada":8.2,"ivaItem":0.94,"tributos":null,"psv":8.2,"noGravado":0},{"numItem":2,"numeroDocumento":null,"tipoItem":1,"cantidad":1,"codigo":"02","uniMedida":59,"descripcion":"Destornillador phillips no. 1 x 3 pulg","precioUni":1.8,"montoDescu":0,"codTributo":null,"ventaNoSuj":0,"ventaExenta":0,"ventaGravada":1.8,"ivaItem":0.21,"tributos":null,"psv":1.8,"noGravado":0}],"resumen":{"totalNoSuj":0,"totalExenta":0,"totalGravada":10,"subTotalVentas":10,"descuNoSuj":0,"descuExenta":0,"descuGravada":0,"totalDescu":0,"porcentajeDescuento":0,"tributos":null,"subTotal":10,"totalIva":1.15,"ivaRete1":0,"reteRenta":0,"montoTotalOperacion":10,"totalNoGravado":0,"totalPagar":10,"totalLetras":"DIEZ DOLARES","saldoFavor":0,"condicionOperacion":1,"pagos":null,"numPagoElectronico":null},"extension":null,"apendice":null}}
+{
+    "nit": "03011504761021",
+    "activo": "true",
+    "passwordPri": "Oscar01*",
+    "dteJson": {
+        "identificacion": {
+            "version": 3,
+            "ambiente": "00",
+            "tipoDte": "03",
+            "numeroControl": "DTE-03-M001P001-000000000000058",
+            "codigoGeneracion": "2956B5EA-6904-E90E-71C8-9D6A02C2516D",
+            "tipoOperacion": 1,
+            "tipoModelo": 1,
+            "tipoContingencia": null,
+            "motivoContin": null,
+            "fecEmi": "2025-05-08",
+            "horEmi": "23:55:52",
+            "tipoMoneda": "USD"
+        },
+        "documentoRelacionado": null,
+        "emisor": {
+            "nit": "03011504761021",
+            "nrc": "3173130",
+            "nombre": "Oscar Eduardo Fuentes Mancia",
+            "codActividad": "46632",
+            "descActividad": "venta al por mayor de articulos de ferreteria y pinturerias",
+            "nombreComercial": "FERRETERIA FUENTES",
+            "tipoEstablecimiento": "02",
+            "direccion": {
+                "departamento": "03",
+                "municipio": "20",
+                "complemento": "Canton Punta Remedios, Caserio Los Cobanos,Acajutla"
+            },
+            "telefono": "73999642",
+            "correo": "ferreteriafuentes019@gmail.com",
+            "codEstableMH": "M001",
+            "codEstable": null,
+            "codPuntoVentaMH": "P001",
+            "codPuntoVenta": null
+        },
+        "receptor": {
+            "nit": "06142610921281",
+            "nrc": "3335743",
+            "nombre": "Gerson Alexander Escobar Calixto",
+            "nombreComercial": "SYSTEC S.A. DE C.V.",
+            "codActividad": "62090",
+            "descActividad": "Otras actividades de tecnología de información y servicios de computadora",
+            "direccion": {
+                "departamento": "03",
+                "municipio": "18",
+                "complemento": "1 calle Ote. Col. Santa Marta Final PAsaje Marin 1 casa 11"
+            },
+            "telefono": "7399-9642",
+            "correo": "alex.calix1992@gmail.com"
+        },
+        "otrosDocumentos": null,
+        "ventaTercero": null,
+        "cuerpoDocumento": [
+            {
+                "numItem": 1,
+                "tipoItem": 1,
+                "numeroDocumento": null,
+                "codigo": null,
+                "codTributo": null,
+                "descripcion": "Cemento WP 42.5 KG",
+                "cantidad": 2,
+                "uniMedida": 59,
+                "precioUni": 7.26,
+                "montoDescu": 0,
+                "ventaNoSuj": 0,
+                "ventaExenta": 0,
+                "ventaGravada": 14.51,
+                "tributos": [
+                    "20"
+                ],
+                "psv": 0,
+                "noGravado": 0
+            },
+            {
+                "numItem": 2,
+                "tipoItem": 1,
+                "numeroDocumento": null,
+                "codigo": null,
+                "codTributo": null,
+                "descripcion": "Destornillador phillips no. 1 x 3 pulg",
+                "cantidad": 4,
+                "uniMedida": 59,
+                "precioUni": 1.59,
+                "montoDescu": 0,
+                "ventaNoSuj": 0,
+                "ventaExenta": 0,
+                "ventaGravada": 6.37,
+                "tributos": [
+                    "20"
+                ],
+                "psv": 0,
+                "noGravado": 0
+            },
+            {
+                "numItem": 3,
+                "tipoItem": 1,
+                "numeroDocumento": null,
+                "codigo": null,
+                "codTributo": null,
+                "descripcion": "Cemento Fuerte Holcim 50 KG",
+                "cantidad": 1,
+                "uniMedida": 59,
+                "precioUni": 8.63,
+                "montoDescu": 0,
+                "ventaNoSuj": 0,
+                "ventaExenta": 0,
+                "ventaGravada": 8.63,
+                "tributos": [
+                    "20"
+                ],
+                "psv": 0,
+                "noGravado": 0
+            }
+        ],
+        "resumen": {
+            "totalNoSuj": 0,
+            "totalExenta": 0,
+            "totalGravada": 29.51,
+            "subTotalVentas": 29.51,
+            "descuNoSuj": 0,
+            "descuExenta": 0,
+            "descuGravada": 0,
+            "porcentajeDescuento": 0,
+            "totalDescu": 0,
+            "tributos": [
+                {
+                    "codigo": "20",
+                    "descripcion": "Impuesto al Valor Agregado 13%",
+                    "valor": 3.84
+                }
+            ],
+            "subTotal": 29.51,
+            "ivaPerci1": 0,
+            "ivaRete1": 0,
+            "reteRenta": 0,
+            "montoTotalOperacion": 33.35,
+            "totalNoGravado": 0,
+            "totalPagar": 33.35,
+            "totalLetras": "TREINTA Y TRES DOLARES CON TREINTA Y CINCO CENTAVOS",
+            "saldoFavor": 0,
+            "condicionOperacion": 1,
+            "pagos": [
+                {
+                    "codigo": "01",
+                    "montoPago": 33.35,
+                    "referencia": "EFECTIVO",
+                    "plazo": null,
+                    "periodo": null
+                }
+            ],
+            "numPagoElectronico": null
+        },
+        "extension": null,
+        "apendice": null
+    }
+}

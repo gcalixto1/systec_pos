@@ -29,9 +29,6 @@ if (!isset($_SESSION['login_idusuario'])) {
     <script type="text/javascript" src="assets/js/jquery-te-1.4.0.min.js" charset="utf-8"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-
-
-
 </head>
 <style>
 body {
