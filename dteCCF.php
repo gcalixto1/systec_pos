@@ -11,10 +11,11 @@ $query = $conexion->query("SELECT factura.id, factura.tipofactura, factura.numer
                                     cliente.nombre, cliente.dni, cliente.telefono, cliente.correo,
                                     cliente.dato1, cliente.dato2, cliente.dato3,
                                     cliente_direccion.departamento, cliente_direccion.municipio, 
-                                    cliente_direccion.complemento, cliente.tipoDocumento
+                                    cliente_direccion.complemento, cliente.tipoDocumento, medio_pago.medio_pago
                                 FROM factura 
                                 INNER JOIN cliente ON cliente.idcliente = factura.idcliente
                                 LEFT JOIN cliente_direccion ON cliente_direccion.cliente_dni = cliente.dni
+                                INNER JOIN medio_pago ON medio_pago.codigo = factura.forma_pago
                                 WHERE factura.id = $idfactura");
 $factura = $query->fetch_assoc();
 
@@ -68,7 +69,6 @@ $horaEmision = date("H:i:s");
 $sql6 = "SELECT * FROM actividad_economica WHERE codigo = '" . $factura['dato3'] . "'";
 $resultado6 = $conexion->query($sql6);
 $row6 = $resultado6->fetch_assoc();
-
 // ARMAR JSON PARA EL FIRMADOR
 $facturaJson = [
     "nit" => MH_USER,
@@ -157,9 +157,9 @@ $facturaJson = [
             "condicionOperacion" => 1,
             "pagos" => [
                 [
-                    "codigo" => "01",
+                    "codigo" => $factura['forma_pago'],
                     "montoPago" => round($totalGravada, 2),
-                    "referencia" => "EFECTIVO",
+                    "referencia" => $factura['medio_pago'],
                     "plazo" => null,
                     "periodo" => null
                 ]
