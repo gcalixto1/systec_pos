@@ -36,3 +36,5 @@
 <script src="assets/DataTables/pdfmake-0.1.36/pdfmake.min.js"></script>
 <script src="assets/DataTables/pdfmake-0.1.36/vfs_fonts.js"></script>
 <script src="assets/DataTables/Buttons-1.5.6/js/buttons.html5.min.js"></script>
+
+<link href="assets/css/select2.min.css" rel="stylesheet" />

@@ -83,6 +83,12 @@ class Action
 		$txtigv = $_POST['txtIgv'];
 		$txtimpresion = $_POST['impresion'];
 		$txtmoneda = $_POST['moneda'];
+		$txtgiro = $_POST['giro'];
+		$txtdato1 = $_POST['dato1'];
+		$txtdato2 = $_POST['dato2'];
+		$txtdato3 = $_POST['dato3'];
+		$txtdato4 = $_POST['dato4'];
+		$txtdato5 = $_POST['dato5'];
 
 		// Construye la cadena de datos correctamente
 		$data = " dni = '$txtdni'";
@@ -94,6 +100,12 @@ class Action
 		$data .= ", igv = '$txtigv'";
 		$data .= ", impresion = '$txtimpresion'";
 		$data .= ", moneda = '$txtmoneda'";
+		$data .= ", giro = '$txtgiro'";
+		$data .= ", dato1 = '$txtdato1'";
+		$data .= ", dato2 = '$txtdato2'";
+		$data .= ", dato3 = '$txtdato3'";
+		$data .= ", dato4 = '$txtdato4'";
+		$data .= ", dato5 = '$txtdato5'";
 
 		// Evita inyección SQL usando consultas preparadas
 		$id = 1;
@@ -135,6 +147,25 @@ class Action
 			return 1;
 		}
 	}
+
+	public function ListarActividades($busqueda = '')
+	{
+		$busqueda = mysqli_real_escape_string($this->dbh, $busqueda);
+		$sql = "SELECT * FROM actividad_economica";
+		if (!empty($busqueda)) {
+			$sql .= " WHERE descripcion LIKE '%$busqueda%' OR codigo LIKE '%$busqueda%'";
+		}
+
+		$result = mysqli_query($this->dbh, $sql);
+		$actividades = array();
+		if ($result) {
+			while ($row = mysqli_fetch_assoc($result)) {
+				$actividades[] = $row;
+			}
+		}
+		return $actividades;
+	}
+
 	#endregion
 	#region Usuarios
 	function save_usuario()
@@ -262,7 +293,7 @@ class Action
 		if ($tipoControbuyente == 2) {
 			$data .= ", dato1 = '$dato1'";
 			$data .= ", dato2 = '$dato2'";
-			$data .= ", dato3 = 'N/A'";
+			$data .= ", dato3 = '$dato3'";
 			$data .= ", dato4 = 'N/A'";
 			$data .= ", dato5 = 'N/A'";
 		} else {

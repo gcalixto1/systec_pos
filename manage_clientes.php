@@ -23,7 +23,11 @@ $municipioSeleccionado = isset($_POST['municipio']) ? $_POST['municipio'] : (iss
 $departamentos = $pro->ListarDepartamentos();
 $municipios = $departamentoSeleccionado ? $pro->ListarMunicipios($departamentoSeleccionado) : [];
 $documentos = $pro->ListarDocumentos();
+
+$busqueda = isset($_GET['buscar']) ? trim($_GET['buscar']) : '';
+$actividades = $pro->ListarActividades($busqueda);
 ?>
+
 <div class="container-fluid">
     <div class="card">
         <form class="form form-material" method="post" action="#" name="savecliente" id="savecliente">
@@ -34,7 +38,7 @@ $documentos = $pro->ListarDocumentos();
                         <input type="hidden" name="id" value="<?php echo $id; ?>">
 
                         <div class="form-group col-md-6">
-                            <label for="tipoControbuyente">Tipo Contribuyente</label>
+                            <label for="tipoControbuyente">Tipo Cliente</label>
                             <select name="tipoControbuyente" id="tipoControbuyente" class="form-control" required>
                                 <option value="0">SELECCIONE</option>
                                 <option value="1"
@@ -45,7 +49,18 @@ $documentos = $pro->ListarDocumentos();
                                     PERSONA JURIDICA</option>
                             </select>
                         </div>
-
+                        <div class="form-group col-md-6">
+                            <label for="actividad">Seleccionar Actividad</label>
+                            <select name="dato3" id="dato3" class="form-control select2" required>
+                                <option value="">-- SELECCIONE --</option>
+                                <?php foreach ($actividades as $act): ?>
+                                <option value="<?php echo $act['codigo']; ?>"
+                                    <?php echo (isset($meta['dato3']) && $meta['dato3'] == $act['codigo']) ? 'selected' : ''; ?>>
+                                    <?php echo $act['codigo'] . ' - ' . $act['descripcion']; ?>
+                                </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
                         <div class="form-group col-md-6">
                             <label for="nrc">N.R.C.</label>
                             <input type="text" name="dato1" id="dato1" class="form-control"
@@ -211,5 +226,14 @@ $(document).ready(function() {
         }
     });
     <?php endif; ?>
+});
+
+$(document).ready(function() {
+    $('.select2').select2({
+        width: '100%',
+        height: '150%',
+        placeholder: "-- Seleccionar una actividad --",
+        allowClear: true
+    });
 });
 </script>

@@ -16,8 +16,15 @@ if (!empty($id)) {
         }
     }
 }
+if ($meta['tipofactura'] == "fcf") {
+    include 'dte.php';
+} else if ($meta['tipofactura'] == "ccf") {
+    include 'dteCCF.php';
+}
+
 ?>
-<?php include 'dte.php'; ?>
+
+<?php ?>
 <!-- Begin Page Content -->
 <div class="container-fluid">
     <form class="form form-material" method="post" action="#" name="pagoForm" id="pagoForm">
@@ -68,7 +75,7 @@ if (!empty($id)) {
                                     $pago = new Action();
                                     $pago = $pago->ListarMediosPagos();
                                     for ($i = 0; $i < sizeof($pago); $i++) { ?>
-                                    <option value="<?php echo $pago[$i]['idmedio']; ?>">
+                                    <option value="<?php echo $pago[$i]['codigo']; ?>">
                                         <?php echo $pago[$i]['medio_pago'] ?>
                                     </option>
                                     <?php } ?>
@@ -140,7 +147,8 @@ $('#pagoForm').submit(function(e) {
 
                         if (!win1 || !win2) {
                             alert(
-                                "Por favor habilita las ventanas emergentes (pop-ups) para este sitio.");
+                                "Por favor habilita las ventanas emergentes (pop-ups) para este sitio."
+                            );
                         } else {
                             setTimeout(() => location.reload(), 500);
                         }

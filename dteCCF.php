@@ -6,15 +6,16 @@ $idfactura = intval($_GET['idfactura']);
 
 // OBTENER FACTURA
 $query = $conexion->query("SELECT factura.id, factura.tipofactura, factura.numerofactura, 
-                                         factura.subtotal, factura.iva_impuesto, factura.totalpagar, 
-                                         factura.letras, factura.forma_pago, factura.fechafactura, 
-                                         cliente.nombre, cliente.dni, cliente.telefono, cliente.correo,
-                                         cliente_direccion.departamento, cliente_direccion.municipio, 
-                                         cliente_direccion.complemento,cliente.tipoDocumento
-                                         FROM factura 
-                                         INNER JOIN cliente ON cliente.idcliente = factura.idcliente
-                                         INNER JOIN cliente_direccion ON cliente_direccion.cliente_dni = cliente.dni
-                                         WHERE factura.id = $idfactura");
+                                    factura.subtotal, factura.iva_impuesto, factura.totalpagar, 
+                                    factura.letras, factura.forma_pago, factura.fechafactura, 
+                                    cliente.nombre, cliente.dni, cliente.telefono, cliente.correo,
+                                    cliente.dato1, cliente.dato2, cliente.dato3,
+                                    cliente_direccion.departamento, cliente_direccion.municipio, 
+                                    cliente_direccion.complemento, cliente.tipoDocumento
+                                FROM factura 
+                                INNER JOIN cliente ON cliente.idcliente = factura.idcliente
+                                LEFT JOIN cliente_direccion ON cliente_direccion.cliente_dni = cliente.dni
+                                WHERE factura.id = $idfactura");
 $factura = $query->fetch_assoc();
 
 // OBTENER DETALLE DE PRODUCTOS
@@ -24,27 +25,27 @@ $numItem = 1;
 $totalGravada = 0;
 $totalIva = 0;
 
+
 while ($row = $detalle->fetch_assoc()) {
     $monto = floatval($row['cantidad']) * floatval($row['precioventa']);
     $montoiva = round($monto / 1.13, 2);
     $ivaItem = round($montoiva * 0.13, 2);
     $items[] = [
         "numItem" => $numItem++,
-        "numeroDocumento" => null,
         "tipoItem" => 1,
-        "cantidad" => floatval($row['cantidad']),
-        "codigo" => "02",
-        "uniMedida" => 59,
-        "descripcion" => $row['descripcion'],
-        "precioUni" => floatval($row['precioventa']),
-        "montoDescu" => 0,
+        "numeroDocumento" => null,
+        "codigo" => null,
         "codTributo" => null,
+        "descripcion" => $row['descripcion'],
+        "cantidad" => floatval($row['cantidad']),
+        "uniMedida" => 59,
+        "precioUni" => round(floatval($row['precioventa'] / 1.13), 2),
+        "montoDescu" => 0,
         "ventaNoSuj" => 0,
         "ventaExenta" => 0,
-        "ventaGravada" => $monto,
-        "ivaItem" => $ivaItem,
-        "tributos" => null,
-        "psv" => $monto,
+        "ventaGravada" => round($monto / 1.13, 2),
+        "tributos" => ["20"],
+        "psv" => 0,
         "noGravado" => 0
     ];
     $totalGravada += $monto;
@@ -64,6 +65,10 @@ date_default_timezone_set("America/El_Salvador");
 $fechaEmision = date("Y-m-d");  // Formato: 2025-04-18
 $horaEmision = date("H:i:s");
 
+$sql6 = "SELECT * FROM actividad_economica WHERE codigo = '" . $factura['dato3'] . "'";
+$resultado6 = $conexion->query($sql6);
+$row6 = $resultado6->fetch_assoc();
+
 // ARMAR JSON PARA EL FIRMADOR
 $facturaJson = [
     "nit" => MH_USER,
@@ -71,13 +76,13 @@ $facturaJson = [
     "passwordPri" => MH_PWD_DTE,
     "dteJson" => [
         "identificacion" => [
-            "version" => 1,
+            "version" => 3,
             "ambiente" => "00",
-            "tipoDte" => "01",
-            "numeroControl" => "DTE-01-M001P001-" . str_pad($idfactura, 15, "0", STR_PAD_LEFT),
+            "tipoDte" => "03",
+            "numeroControl" => "DTE-03-M001P001-" . str_pad($idfactura, 15, "0", STR_PAD_LEFT),
             "codigoGeneracion" => $codigoGeneracion,
-            "tipoModelo" => 1,
             "tipoOperacion" => 1,
+            "tipoModelo" => 1,
             "tipoContingencia" => null,
             "motivoContin" => null,
             "fecEmi" => $fechaEmision,
@@ -100,18 +105,18 @@ $facturaJson = [
             ],
             "telefono" => "73999642",
             "correo" => "ferreteriafuentes019@gmail.com",
+            "codEstableMH" => "M001",
             "codEstable" => null,
-            "codPuntoVenta" => null,
-            "codEstableMH" => null,
-            "codPuntoVentaMH" => null
+            "codPuntoVentaMH" => "P001",
+            "codPuntoVenta" => null
         ],
         "receptor" => [
-            "nrc" => null,
-            "tipoDocumento" => $factura['tipoDocumento'],
-            "numDocumento" => $factura['dni'],
+            "nit" => $factura['dni'],
+            "nrc" => $factura['dato1'],
             "nombre" => $factura['nombre'],
-            "codActividad" => null,
-            "descActividad" => null,
+            "nombreComercial" => $factura['dato2'],
+            "codActividad" => $factura['dato3'],
+            "descActividad" => $row6['descripcion'],
             "direccion" => [
                 "departamento" => $factura['departamento'],
                 "municipio" => $factura['municipio'],
@@ -126,16 +131,22 @@ $facturaJson = [
         "resumen" => [
             "totalNoSuj" => 0,
             "totalExenta" => 0,
-            "totalGravada" => round($totalGravada, 2),
-            "subTotalVentas" => round($totalGravada, 2),
+            "totalGravada" => round($factura['subtotal'], 2),
+            "subTotalVentas" => round($factura['subtotal'], 2),
             "descuNoSuj" => 0,
             "descuExenta" => 0,
             "descuGravada" => 0,
-            "totalDescu" => 0,
             "porcentajeDescuento" => 0,
-            "tributos" => null,
-            "subTotal" => round($totalGravada, 2),
-            "totalIva" => round($totalIva, 2),
+            "totalDescu" => 0,
+            "tributos" => [
+                [
+                    "codigo" => "20",
+                    "descripcion" => "Impuesto al Valor Agregado 13%",
+                    "valor" => round($totalIva, 2)
+                ]
+            ],
+            "subTotal" => round($factura['subtotal'], 2),
+            "ivaPerci1" => 0,
             "ivaRete1" => 0,
             "reteRenta" => 0,
             "montoTotalOperacion" => round($totalGravada, 2),
@@ -144,7 +155,15 @@ $facturaJson = [
             "totalLetras" => $factura['letras'],
             "saldoFavor" => 0,
             "condicionOperacion" => 1,
-            "pagos" => null,
+            "pagos" => [
+                [
+                    "codigo" => "01",
+                    "montoPago" => round($totalGravada, 2),
+                    "referencia" => "EFECTIVO",
+                    "plazo" => null,
+                    "periodo" => null
+                ]
+            ],
             "numPagoElectronico" => null
         ],
         "extension" => null,
@@ -179,7 +198,7 @@ curl_close($curl);
 
 // SI FIRMA CORRECTAMENTE, ENVIAR A HACIENDA
 if ($httpCode === 200) {
-    include 'recepciondte.php'; // Enviar automáticamente a Hacienda después de firmar
+    include 'recepciondteCCF.php'; // Enviar automáticamente a Hacienda después de firmar
 } else {
     echo json_encode(['success' => false, 'message' => 'Error al firmar documento', 'detalle' => $response]);
 }
