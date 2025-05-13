@@ -52,7 +52,7 @@ class Action
 	function logout()
 	{
 		session_destroy();
-		header("location:login.php");
+		header("location:login.php?pv=1");
 		exit; // Asegurar la terminación del script después de la redirección
 	}
 	public function ListarImpresoras()

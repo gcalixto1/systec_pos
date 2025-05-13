@@ -27,19 +27,9 @@ $documentos = $pro->ListarDocumentos();
 $busqueda = isset($_GET['buscar']) ? trim($_GET['buscar']) : '';
 $actividades = $pro->ListarActividades($busqueda);
 ?>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css" rel="stylesheet">
-
-<!-- Select2 CSS -->
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-
-<!-- jQuery -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-<!-- Select2 JS -->
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <div class="container-fluid">
     <div class="card">
-        <form class="form form-material" method="post" action="#" name="savecliente" id="savecliente">
+        <form class="form form-material" method="post" action="#" name="saveclientes" id="saveclientes">
             <div id="save"></div>
             <div class="form-body">
                 <div class="card-body">
@@ -165,7 +155,7 @@ $actividades = $pro->ListarActividades($busqueda);
 </div>
 
 <script>
-$('#savecliente').submit(function(e) {
+$('#saveclientes').submit(function(e) {
     e.preventDefault();
     var isValid = true;
 
