@@ -19,6 +19,11 @@ $query = $conexion->query("SELECT factura.id, factura.tipofactura, factura.numer
                                 WHERE factura.id = $idfactura");
 $factura = $query->fetch_assoc();
 
+$queryEmpresa = $conexion->query("SELECT * FROM configuracion WHERE id = 1");
+$Empresa = $queryEmpresa->fetch_assoc();
+
+$queryActividad = $conexion->query("SELECT descripcion FROM actividad_economica WHERE codigo = $Empresa[giro]");
+$ActividaE = $queryActividad->fetch_assoc();
 // OBTENER DETALLE DE PRODUCTOS
 $items = [];
 $detalle = $conexion->query("SELECT df.cantidad,p.descripcion, df.precioventa FROM detallefactura df inner join producto p ON p.codproducto = df.cod_producto WHERE idfactura = $idfactura");
@@ -88,20 +93,20 @@ $facturaJson = [
         ],
         "documentoRelacionado" => null,
         "emisor" => [
-            "nit" => "03011504761021",
-            "nrc" => "3173130",
-            "nombre" => "Oscar Eduardo Fuentes Mancia",
-            "codActividad" => "46632",
-            "descActividad" => "venta al por mayor de articulos de ferreteria y pinturerias",
-            "nombreComercial" => "FERRETERIA FUENTES",
+            "nit" => MH_USER,
+            "nrc" => str_replace('-', '', $Empresa['dato1']),
+            "nombre" => $Empresa['nombre'],
+            "codActividad" => $Empresa['giro'],
+            "descActividad" => $ActividaE['descripcion'],
+            "nombreComercial" => $Empresa['razon_social'],
             "tipoEstablecimiento" => "02",
             "direccion" => [
-                "departamento" => "03",
-                "municipio" => "20",
-                "complemento" => "Canton Punta Remedios, Caserio Los Cobanos,Acajutla"
+                "departamento" => $Empresa['dato6'],
+                "municipio" => $Empresa['dato7'],
+                "complemento" => $Empresa['direccion']
             ],
-            "telefono" => "73999642",
-            "correo" => "ferreteriafuentes019@gmail.com",
+            "telefono" => $Empresa['telefono'],
+            "correo" => $Empresa['email'],
             "codEstable" => null,
             "codPuntoVenta" => null,
             "codEstableMH" => "M001",

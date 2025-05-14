@@ -52,7 +52,7 @@ class Action
 	function logout()
 	{
 		session_destroy();
-		header("location:login.php");
+		header("location:login.php?pv=1");
 		exit; // Asegurar la terminación del script después de la redirección
 	}
 	public function ListarImpresoras()
@@ -89,6 +89,8 @@ class Action
 		$txtdato3 = $_POST['dato3'];
 		$txtdato4 = $_POST['dato4'];
 		$txtdato5 = $_POST['dato5'];
+		$txtdato6 = $_POST['dato6'];
+		$txtdato7 = $_POST['dato7'];
 
 		// Construye la cadena de datos correctamente
 		$data = " dni = '$txtdni'";
@@ -106,6 +108,9 @@ class Action
 		$data .= ", dato3 = '$txtdato3'";
 		$data .= ", dato4 = '$txtdato4'";
 		$data .= ", dato5 = '$txtdato5'";
+		$data .= ", dato6 = '$txtdato6'";
+		$data .= ", dato7 = '$txtdato7'";
+		$data .= ", dato8 = 'ND'";
 
 		// Evita inyección SQL usando consultas preparadas
 		$id = 1;

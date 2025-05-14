@@ -292,7 +292,7 @@ body {
 <script src="assets/script/autocompleto.js"></script>
 <script>
 function AgregarCliente() {
-    uni_modal2("Gestion Clientes", "manage_clientes_venta.php")
+    uni_modal("Gestion Clientes", "manage_clientes_venta.php")
 }
 
 function filterProducts() {

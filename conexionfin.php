@@ -1,13 +1,20 @@
 <?php
-$host = "localhost";
-$user = "root";
-$clave = "";
-$bd = "sis_venta";
+if ($_SERVER['HTTP_HOST'] === 'localhost') {
+    // LOCAL
+    $host = "localhost";
+    $user = "root";
+    $clave = "";
+    $bd = "sis_venta";
+} else {
+    // SERVIDOR
+    $host = "controlinterno.net";
+    $user = "contr566_gallos";
+    $clave = "Elcreador2025*";
+    $bd = "contr566_compliance";
+}
 
-// Establecer la conexión a la base de datos
 $conexion = new mysqli($host, $user, $clave, $bd);
 
-// Verificar si hay errores de conexión
 if ($conexion->connect_error) {
     die("No se pudo conectar a la base de datos: " . $conexion->connect_error);
 }

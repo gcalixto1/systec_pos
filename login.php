@@ -14,7 +14,7 @@
     if (!isset($_GET['pv'])) {
         include('conexion.php');
     } else {
-        // include('conexionfin.php');
+        include('conexionfin.php');
     }
     ?>
     <?php
@@ -25,18 +25,18 @@
 
 </head>
 <style>
-body {
-    background-image: url('img/fondo.jpg');
-    /* Ruta de la imagen de fondo */
-    background-size: cover;
-    /* Cubre todo el área del body */
-    background-position: center;
-    /* Centra la imagen */
-    background-attachment: fixed;
-    /* Fija la imagen de fondo para que no se desplace con el contenido */
-    backdrop-filter: blur(500px);
-    /* Aplica un desenfoque al fondo */
-}
+    body {
+        background-image: url('img/fondo.jpg');
+        /* Ruta de la imagen de fondo */
+        background-size: cover;
+        /* Cubre todo el área del body */
+        background-position: center;
+        /* Centra la imagen */
+        background-attachment: fixed;
+        /* Fija la imagen de fondo para que no se desplace con el contenido */
+        backdrop-filter: blur(500px);
+        /* Aplica un desenfoque al fondo */
+    }
 </style>
 
 <body>
@@ -72,10 +72,10 @@ body {
         if (isset($_GET['pv'])) {
             if ($_GET['pv'] == 0) {
                 ?>
-        <button type='button' class='btn btn-warning' style="color:#000;" onclick="crearConfiguraciones()">CREAR
-            CONFIGURACIONES PARA EL CLIENTE <img width="30" height="30"
-                src="https://img.icons8.com/ios-filled/30/database.png" alt="database" /></button>
-        <?php
+                <button type='button' class='btn btn-warning' style="color:#000;" onclick="crearConfiguraciones()">CREAR
+                    CONFIGURACIONES PARA EL CLIENTE <img width="30" height="30"
+                        src="https://img.icons8.com/ios-filled/30/database.png" alt="database" /></button>
+                <?php
             } else {
 
             }
@@ -89,39 +89,39 @@ body {
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-    $('#login-form').submit(function(e) {
-        e.preventDefault()
-        $('#login-form button[type="submit"]').attr('disabled', true).html(
-        'Iniciando sesión...'); // Cambiado a "submit"
-        if ($(this).find('.alert-danger').length > 0)
-            $(this).find('.alert-danger').remove();
+        $('#login-form').submit(function (e) {
+            e.preventDefault()
+            $('#login-form button[type="submit"]').attr('disabled', true).html(
+                'Iniciando sesión...'); // Cambiado a "submit"
+            if ($(this).find('.alert-danger').length > 0)
+                $(this).find('.alert-danger').remove();
 
-        $.ajax({
-            url: 'ajax.php?action=login',
-            method: 'POST',
-            data: $(this).serialize(),
-            error: function(err) {
-                console.log(err);
-                $('#login-form button[type="submit"]').removeAttr('disabled').html(
-                    'Entrar al sistema'); // Cambiado a "submit"
-            },
-            success: function(resp) {
-                if (resp == 1) {
-                    location.href = 'index.php?page=home';
-                } else if (resp == 3) {
-                    $('#login-form').prepend(
-                        '<div class="alert alert-danger">El usuario o la clave de acceso son incorrectos.</div>'
-                        );
+            $.ajax({
+                url: 'ajax.php?action=login',
+                method: 'POST',
+                data: $(this).serialize(),
+                error: function (err) {
+                    console.log(err);
                     $('#login-form button[type="submit"]').removeAttr('disabled').html(
                         'Entrar al sistema'); // Cambiado a "submit"
+                },
+                success: function (resp) {
+                    if (resp == 1) {
+                        location.href = 'index.php?page=home';
+                    } else if (resp == 3) {
+                        $('#login-form').prepend(
+                            '<div class="alert alert-danger">El usuario o la clave de acceso son incorrectos.</div>'
+                        );
+                        $('#login-form button[type="submit"]').removeAttr('disabled').html(
+                            'Entrar al sistema'); // Cambiado a "submit"
+                    }
                 }
-            }
+            })
         })
-    })
 
-    function crearConfiguraciones() {
-        window.location.href = 'creacion.php';
-    }
+        function crearConfiguraciones() {
+            window.location.href = 'creacion.php';
+        }
     </script>
 
 </body>

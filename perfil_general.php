@@ -13,7 +13,21 @@ if (!empty($id)) {
         }
     }
 }
+
+require_once("includes/class.php");
+$pro = new Action();
+
+$departamentoSeleccionado = isset($_POST['departamento']) ? $_POST['departamento'] : (isset($meta['dato6']) ? $meta['dato6'] : '');
+$municipioSeleccionado = isset($_POST['municipio']) ? $_POST['municipio'] : (isset($meta['dato7']) ? $meta['dato7'] : '');
+
+$departamentos = $pro->ListarDepartamentos();
+$municipios = $departamentoSeleccionado ? $pro->ListarMunicipios($departamentoSeleccionado) : [];
+$documentos = $pro->ListarDocumentos();
+
+$busqueda = isset($_GET['buscar']) ? trim($_GET['buscar']) : '';
+$actividades = $pro->ListarActividades($busqueda);
 ?>
+
 <div class="container-fluid">
     <div class="card">
         <div class="card-header">
@@ -58,10 +72,16 @@ if (!empty($id)) {
                             </div>
                         </div>
                         <div class="form-group col-md-3">
-                            <label for="nrc">Giro:</label>
-                            <input type="text" name="giro" id="giro" class="form-control"
-                                value="<?php echo isset($meta['giro']) ? htmlspecialchars($meta['giro']) : ''; ?>"
-                                required>
+                            <label for="actividad">Seleccionar Actividad</label>
+                            <select name="giro" id="giro" class="form-control select2" required>
+                                <option value="">-- SELECCIONE --</option>
+                                <?php foreach ($actividades as $act): ?>
+                                <option value="<?php echo $act['codigo']; ?>"
+                                    <?php echo (isset($meta['giro']) && $meta['giro'] == $act['codigo']) ? 'selected' : ''; ?>>
+                                    <?php echo $act['codigo'] . ' - ' . $act['descripcion']; ?>
+                                </option>
+                                <?php endforeach; ?>
+                            </select>
                         </div>
                         <div class="form-group col-md-3">
                             <label for="nrc">Resolucion por MH:</label>
@@ -104,6 +124,31 @@ if (!empty($id)) {
                                     id="txtEmailEmpresa" placeholder="Correo de la Empresa" required>
 
                             </div>
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label for="departamento">Departamento</label>
+                            <select name="dato6" id="dato6" class="form-control" required>
+                                <option value="">-- SELECCIONE --</option>
+                                <?php foreach ($departamentos as $dep): ?>
+                                <option value="<?php echo $dep['codigo']; ?>"
+                                    <?php echo ($dep['codigo'] == $departamentoSeleccionado) ? 'selected' : ''; ?>>
+                                    <?php echo $dep['valor']; ?>
+                                </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+
+                        <div class="form-group col-md-3">
+                            <label for="municipio">Municipio</label>
+                            <select name="dato7" id="dato7" class="form-control" required>
+                                <option value="">-- SELECCIONE MUNICIPIO --</option>
+                                <?php foreach ($municipios as $mun): ?>
+                                <option value="<?php echo $mun['codigo']; ?>"
+                                    <?php echo ($mun['codigo'] == $municipioSeleccionado) ? 'selected' : ''; ?>>
+                                    <?php echo $mun['valor']; ?>
+                                </option>
+                                <?php endforeach; ?>
+                            </select>
                         </div>
                         <div class="col-md-3">
                             <div class="form-group has-feedback">
@@ -314,6 +359,61 @@ $(document).ready(function() {
                 }
             }
         });
+    });
+});
+$(document).ready(function() {
+    $('#dato6').change(function() {
+        var idDepartamento = $(this).val();
+        if (idDepartamento !== '') {
+            $.ajax({
+                url: 'cargar_municipios.php?id_departamento=' + idDepartamento,
+                method: 'GET',
+                dataType: 'json',
+                success: function(response) {
+                    var municipioSelect = $('#dato7');
+                    municipioSelect.empty();
+                    municipioSelect.append(
+                        '<option value="">-- SELECCIONE MUNICIPIO --</option>');
+                    $.each(response, function(index, municipio) {
+                        municipioSelect.append($('<option>', {
+                            value: municipio.codigo,
+                            text: municipio.valor
+                        }));
+                    });
+                }
+            });
+        }
+    });
+
+    <?php if (!empty($departamentoSeleccionado) && !empty($municipioSeleccionado)): ?>
+    $.ajax({
+        url: 'ajax_municipios.php?id_departamento=' + '<?php echo $departamentoSeleccionado; ?>',
+        method: 'GET',
+        dataType: 'json',
+        success: function(response) {
+            var municipioSelect = $('#dato7');
+            municipioSelect.empty();
+            municipioSelect.append('<option value="">-- SELECCIONE MUNICIPIO --</option>');
+            $.each(response, function(index, municipio) {
+                var selected = municipio.codigo ===
+                    '<?php echo $municipioSeleccionado; ?>' ? 'selected' : '';
+                municipioSelect.append($('<option>', {
+                    value: municipio.codigo,
+                    text: municipio.valor,
+                    selected: selected
+                }));
+            });
+        }
+    });
+    <?php endif; ?>
+});
+
+$(document).ready(function() {
+    $('.select2').select2({
+        width: '100%',
+        height: '150%',
+        placeholder: "-- Seleccionar una actividad --",
+        allowClear: true
     });
 });
 </script>

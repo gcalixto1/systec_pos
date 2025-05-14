@@ -45,7 +45,7 @@ function imprimirMenu($menu_arbol)
     foreach ($menu_arbol as $menu) {
         echo '<li class="sidebar-item">';
         if (!empty($menu['submenu'])) {
-            echo '<a class="sidebar-link has-arrow waves-dark" href="javascript:void(0)" aria-expanded="false">';
+            echo '<a class="sidebar-link has-arrow waves-dark" href="javascript:void(0)" style="font-family:Arial;font-weight: 400; " aria-expanded="false">';
             echo '<i class="' . $menu['icon'] . '"></i><span class="hide-menu">' . $menu['Menu'] . ' <i class="fa fa-caret-down"></i></span></a>';
             echo '<ul aria-expanded="false" class="collapse second-level">';
             imprimirMenu($menu['submenu']);
