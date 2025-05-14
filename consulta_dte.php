@@ -1,6 +1,6 @@
 <?php
 include('conexionfin.php');
-
+include('config/config.php');
 // Token
 $contenido = file_get_contents('storage/token_cache.json');
 $data = json_decode($contenido, true);
@@ -19,7 +19,7 @@ if (!$codigoGeneracion) {
 }
 
 $body = json_encode([
-    "nitEmisor" => "03011504761021",
+    "nitEmisor" => MH_USER,
     "tdte" => "01",
     "codigoGeneracion" => $codigoGeneracion
 ]);
@@ -51,19 +51,17 @@ $respuesta = json_decode($response, true);
 <table class="table table-bordered table-responsive">
     <colgroup>
         <col width="5%">
-        <col width="15%">
-        <col width="15%">
+        <col width="10%">
+        <col width="10%">
         <col width="35%">
+        <col width="10%">
         <col width="35%">
-        <col width="35%">
-        <col width="20%">
     </colgroup>
     <thead class="thead-dark">
         <tr>
             <th>Versión</th>
             <th>Ambiente</th>
             <th>Estado</th>
-            <th>Generación</th>
             <th>Sello Recibido</th>
             <th>F. Proceso</th>
             <th>Mensaje</th>
@@ -74,7 +72,6 @@ $respuesta = json_decode($response, true);
             <td><?php echo $respuesta['version'] ?? ''; ?></td>
             <td><?php echo $respuesta['ambiente'] ?? ''; ?></td>
             <td><?php echo $respuesta['estado'] ?? ''; ?></td>
-            <td><?php echo $respuesta['codigoGeneracion'] ?? ''; ?></td>
             <td><?php echo $respuesta['selloRecibido'] ?? ''; ?></td>
             <td><?php echo $respuesta['fhProcesamiento'] ?? ''; ?></td>
             <td><?php echo $respuesta['descripcionMsg'] ?? ''; ?></td>
