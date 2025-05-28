@@ -94,68 +94,68 @@ if ($meta['tipofactura'] == "fcf") {
 </div>
 
 <script>
-    function calcularCambio() {
-        // Obtener los valores de los campos
-        var importe = parseFloat(document.getElementById("TextImporte").textContent) || 0;
-        var pagado = parseFloat(document.getElementById("montopagado").value) || 0;
+function calcularCambio() {
+    // Obtener los valores de los campos
+    var importe = parseFloat(document.getElementById("TextImporte").textContent) || 0;
+    var pagado = parseFloat(document.getElementById("montopagado").value) || 0;
 
-        // Calcular la diferencia
-        var cambio = pagado - importe;
+    // Calcular la diferencia
+    var cambio = pagado - importe;
 
-        // Mostrar el resultado en el campo TextCambio y asegurarse de que los decimales sean siempre 2
-        document.getElementById("TextCambio").textContent = cambio.toFixed(2);
-        document.getElementById("TextPagado").textContent = pagado.toFixed(2);
-    }
+    // Mostrar el resultado en el campo TextCambio y asegurarse de que los decimales sean siempre 2
+    document.getElementById("TextCambio").textContent = cambio.toFixed(2);
+    document.getElementById("TextPagado").textContent = pagado.toFixed(2);
+}
 
-    $('#pagoForm').submit(function (e) {
-        e.preventDefault();
-        start_load();
-        $.ajax({
-            url: 'ajax.php?action=save_venta_completa',
-            method: 'POST',
-            data: $(this).serialize(),
-            success: function (resp) {
-                resp = JSON.parse(resp);
-                if (resp.success) {
-                    Swal.fire({
-                        title: '¡Éxito!',
-                        text: 'Venta Registrada',
-                        icon: 'success',
-                        confirmButtonColor: '#28a745',
-                        confirmButtonText: 'OK'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            const win1 = window.open(resp.ticket_url, '_blank');
-                            const win2 = window.open(resp.facturaElectronica, '_blank');
+$('#pagoForm').submit(function(e) {
+    e.preventDefault();
+    start_load();
+    $.ajax({
+        url: 'ajax.php?action=save_venta_completa',
+        method: 'POST',
+        data: $(this).serialize(),
+        success: function(resp) {
+            resp = JSON.parse(resp);
+            if (resp.success) {
+                Swal.fire({
+                    title: '¡Éxito!',
+                    text: 'Venta Registrada',
+                    icon: 'success',
+                    confirmButtonColor: '#28a745',
+                    confirmButtonText: 'OK'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        const win1 = window.open(resp.ticket_url, '_blank');
+                        const win2 = window.open(resp.facturaElectronica, '_blank');
 
-                            if (!win1 || !win2) {
-                                alert(
-                                    "Por favor habilita las ventanas emergentes (pop-ups) para este sitio."
-                                );
-                            } else {
-                                setTimeout(() => location.reload(), 500);
-                            }
+                        if (!win1 || !win2) {
+                            alert(
+                                "Por favor habilita las ventanas emergentes (pop-ups) para este sitio."
+                            );
+                        } else {
+                            setTimeout(() => location.reload(), 500);
                         }
-                    });
-                } else {
-                    Swal.fire({
-                        title: 'Error',
-                        text: resp.message || 'Ocurrió un error al registrar la venta.',
-                        icon: 'error',
-                        confirmButtonColor: '#d33',
-                        confirmButtonText: 'OK'
-                    });
-                }
-            },
-            error: function () {
+                    }
+                });
+            } else {
                 Swal.fire({
                     title: 'Error',
-                    text: 'No se pudo conectar con el servidor.',
+                    text: resp.message || 'Ocurrió un error al registrar la venta.',
                     icon: 'error',
                     confirmButtonColor: '#d33',
                     confirmButtonText: 'OK'
                 });
             }
-        });
+        },
+        error: function() {
+            Swal.fire({
+                title: 'Error',
+                text: 'No se pudo conectar con el servidor.',
+                icon: 'error',
+                confirmButtonColor: '#d33',
+                confirmButtonText: 'OK'
+            });
+        }
     });
+});
 </script>

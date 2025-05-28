@@ -910,7 +910,7 @@ class Action
 		if ($save) {
 			// Construir la URL del ticket
 			$ticket_url = "ticket.php?id=" . $id;
-			$facturaElectronica = "facturaElectronica.php?id=" . $id;
+			$facturaElectronica = "facturaElectronica.php?id=" . $id . "&codigo=0";
 
 			echo json_encode([
 				'success' => true,
@@ -982,4 +982,42 @@ class Action
 		}
 	}
 	#endregion
+
+	function save_NotaCredito()
+	{
+		extract($_POST);
+
+		$observaciones = $_POST['observaciones'] ?? '';
+		$codigoGeneracionP = $_POST['codigoGeneracion'] ?? '';
+		$monto = $_POST['monto'] ?? '';
+		$documentos = isset($_POST['documentos']) ? json_decode($_POST['documentos'], true) : [];
+		$codigo = "";
+		// Procesar los documentos
+		foreach ($documentos as $doc) {
+			$codigo = $doc['codigo'];
+			$fecha = $doc['fecha'];
+			// Guardar cada documento relacionado, si aplica
+		}
+
+		$data = "Observacion = '$observaciones'";
+		$data .= ", monto = '$monto'";
+		$data .= ", codigoGeneracion = '$codigo'";
+
+		$save = $this->dbh->query("INSERT notas_credito SET " . $data);
+		if ($save) {
+
+			$facturaNC = "dteNC.php?codigo=" . $codigo . "&codigoGeneracion=" . $codigoGeneracionP;
+			$facturaElectronica = "facturaElectronica.php?codigo=" . $codigoGeneracionP;
+
+			echo json_encode([
+				'success' => true,
+				'facturaNC' => $facturaNC,
+				'facturaElectronica' => $facturaElectronica
+			]);
+		} else {
+			// Devolver un JSON con success = false
+			echo json_encode(['success' => false, 'message' => 'Error al actualizar la factura.']);
+		}
+		exit;
+	}
 }
