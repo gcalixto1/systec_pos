@@ -32,7 +32,7 @@ $query = $conexion->query("SELECT factura.id, factura.tipofactura, factura.numer
                                 LEFT JOIN cliente_direccion ON cliente_direccion.cliente_dni = cliente.dni
                                 INNER JOIN medio_pago ON medio_pago.codigo = factura.forma_pago
                                 INNER JOIN respuestadte ON respuestadte.id_factura = factura.id
-                                WHERE respuestadte.codigoGeneracion= '$codigo'");
+                                WHERE respuestadte.codigoGeneracion= '$codigo' limit 1");
 $factura = $query->fetch_assoc();
 
 $queryEmpresa = $conexion->query("SELECT * FROM configuracion WHERE id = 1");
@@ -219,3 +219,9 @@ if ($httpCode === 200) {
     echo json_encode(['success' => false, 'message' => 'Error al firmar documento', 'detalle' => $response]);
 }
 echo json_encode($response);
+
+echo "<script>
+window.onload = function () {
+    setTimeout(() => window.close(), 500); // da tiempo a que se inicie impresión
+};
+</script>";

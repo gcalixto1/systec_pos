@@ -243,7 +243,33 @@ $('#savecliente').submit(function(e) {
                         confirmButtonColor: '#28a745',
                         confirmButtonText: 'OK'
                     }).then((result) => {
-                        window.open(resp.facturaElectronica, '_blank');
+                        const win1 = window.open(resp.facturaNC, '_blank');
+                        let win2;
+
+                        if (!win1) {
+                            alert(
+                                "Por favor habilita las ventanas emergentes (pop-ups) para este sitio."
+                                );
+                        } else {
+                            // Verificar cada 500ms si la ventana fue cerrada
+                            const checkClosed = setInterval(() => {
+                                if (win1.closed) {
+                                    clearInterval(checkClosed);
+                                    // Cuando se cierre la ventana 1, abrir la factura principal
+                                    win2 = window.open(resp.facturaElectronica,
+                                        '_blank');
+
+                                    if (!win2) {
+                                        alert(
+                                            "No se pudo abrir la factura electrónica. Habilita los pop-ups."
+                                            );
+                                    } else {
+                                        // Finalmente, puedes refrescar o hacer otra acción
+                                        setTimeout(() => location.reload(), 500);
+                                    }
+                                }
+                            }, 500);
+                        }
                     });
                 } else {
                     Swal.fire({

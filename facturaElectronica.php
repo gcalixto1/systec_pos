@@ -27,7 +27,7 @@ if ($id) {
 
 
 }
-// echo "<pre>" . print_r($sql) . "</pre>";
+//echo "<pre>" . print_r($sql) . "</pre>";
 $resultado = $conexion->query($sql);
 $row = $resultado->fetch_assoc();
 $json = $row['jsondte'];
@@ -577,7 +577,7 @@ if ($ident['tipoDte'] == '01') {
     $pdf->Cell(35, 6, utf8_decode($row['selloRecibido']), 0, 0);
     $pdf->Cell(210, 6, utf8_decode($ident['fecEmi'] . ' ' . $ident['horEmi']), 0, 1, 'C');
 
-    $pdf->Ln(5);
+    $pdf->Ln(3);
 
     $actividad = $emisor['descActividad'] ?? '';
     $codActividad = $emisor['descActividad']['codActividad'] ?? '';
@@ -670,18 +670,31 @@ if ($ident['tipoDte'] == '01') {
     $contador = 1;
 
     foreach ($data['cuerpoDocumento'] as $item) {
-        $pdf->Cell(10, 5, $contador++, 1, 0, 'C');
+        $x = $pdf->GetX();
+        $y = $pdf->GetY();
 
-        $pdf->Cell(15, 5, $item['cantidad'] ?? '', 1, 0, 'C');
-        $pdf->Cell(10, 5, $item['uniMedida'] ?? '', 1, 0, 'C');
-        $pdf->Cell(55, 5, substr($item['descripcion'] ?? '', 0, 40), 1);
-        $pdf->Cell(20, 5, '$' . number_format($item['precioUni'] ?? 0, 4), 1, 0, 'R');
-        $pdf->Cell(20, 5, '$' . number_format($item['montoDescu'] ?? 0, 3), 1, 0, 'R');
-        $pdf->Cell(20, 5, '$' . number_format($item['ventaNoSuj'] ?? 0, 2), 1, 0, 'R');
-        $pdf->Cell(20, 5, '$' . number_format($item['ventaExenta'] ?? 0, 2), 1, 0, 'R');
-        $pdf->Cell(20, 5, '$' . number_format($item['ventaGravada'] ?? 0, 2), 1, 1, 'R');
+        // Calcular altura que tomará la descripción
+        $pdf->SetXY($x + 10 + 15 + 10, $y); // posición de descripción
+        $pdf->MultiCell(55, 5, utf8_decode($item['descripcion'] ?? ''), 1);
+        $height = $pdf->GetY() - $y;
+
+        // Volver al inicio de línea
+        $pdf->SetXY($x, $y);
+
+        // Columnas alineadas
+        $pdf->Cell(10, $height, $contador++, 1, 0, 'C');
+        $pdf->Cell(15, $height, $item['cantidad'] ?? '', 1, 0, 'C');
+        $pdf->Cell(10, $height, $item['uniMedida'] ?? '', 1, 0, 'C');
+
+        // Ya se imprimió descripción con MultiCell, avanzar el cursor
+        $pdf->SetXY($x + 10 + 15 + 10 + 55, $y);
+
+        $pdf->Cell(20, $height, '$' . number_format($item['precioUni'] ?? 0, 4), 1, 0, 'R');
+        $pdf->Cell(20, $height, '$' . number_format($item['montoDescu'] ?? 0, 3), 1, 0, 'R');
+        $pdf->Cell(20, $height, '$' . number_format($item['ventaNoSuj'] ?? 0, 2), 1, 0, 'R');
+        $pdf->Cell(20, $height, '$' . number_format($item['ventaExenta'] ?? 0, 2), 1, 0, 'R');
+        $pdf->Cell(20, $height, '$' . number_format($item['ventaGravada'] ?? 0, 2), 1, 1, 'R');
     }
-
     // Totales
     $pdf->SetFont('Arial', 'B', 8);
     $pdf->Cell(170, 5, 'SUMA DE VENTAS:', 1, 0, 'R');
@@ -717,18 +730,6 @@ if ($ident['tipoDte'] == '01') {
         $pdf->Cell(44, 5, $descripcion, 0, 0, 'L');
         $pdf->Cell(25, 5, '$' . $valor, 0, 1, 'R');
     }
-    $pdf->Cell(120, 5, '', 0, 0);
-    $pdf->Cell(45, 5, 'IVA Percibido:', 0, 0, 'R');
-    $pdf->Cell(25, 5, '$' . number_format(0, 2), 0, 1, 'R');
-
-
-    $pdf->Cell(120, 5, '', 0, 0);
-    $pdf->Cell(45, 5, 'IVA Retenido:', 0, 0, 'R');
-    $pdf->Cell(25, 5, '$' . number_format(0, 2), 0, 1, 'R');
-
-    $pdf->Cell(120, 5, '', 0, 0);
-    $pdf->Cell(45, 5, 'Retencion de Renta:', 0, 0, 'R');
-    $pdf->Cell(25, 5, '$' . number_format($data['resumen']['reteRenta'] ?? 0, 2), 0, 1, 'R');
 
     $pdf->SetFont('Arial', 'B', 10);
     $pdf->Cell(120, 5, '', 0, 0);

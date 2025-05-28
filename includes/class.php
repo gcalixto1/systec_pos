@@ -992,6 +992,8 @@ class Action
 		$monto = $_POST['monto'] ?? '';
 		$documentos = isset($_POST['documentos']) ? json_decode($_POST['documentos'], true) : [];
 		$codigo = "";
+		$idusuario = $_SESSION['login_idusuario'];
+		$numeroDocumento = $this->generateCorrelativo('ndc');
 		// Procesar los documentos
 		foreach ($documentos as $doc) {
 			$codigo = $doc['codigo'];
@@ -1001,12 +1003,15 @@ class Action
 
 		$data = "Observacion = '$observaciones'";
 		$data .= ", monto = '$monto'";
-		$data .= ", codigoGeneracion = '$codigo'";
+		$data .= ", codigoGeneracion = '$codigoGeneracionP'";
+		$data .= ", id_usuario = '$idusuario'";
+		$data .= ", numeroDocumento = '$numeroDocumento'";
 
 		$save = $this->dbh->query("INSERT notas_credito SET " . $data);
 		if ($save) {
 
 			$facturaNC = "dteNC.php?codigo=" . $codigo . "&codigoGeneracion=" . $codigoGeneracionP;
+
 			$facturaElectronica = "facturaElectronica.php?codigo=" . $codigoGeneracionP;
 
 			echo json_encode([
