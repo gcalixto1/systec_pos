@@ -121,3 +121,9 @@ if ($action == 'save_venta_completa') {
 		echo $save;
 }
 #endregion
+
+if ($action == 'saveNotasCredito') {
+	$save = $crud->save_NotaCredito();
+	if ($save)
+		echo $save;
+}
