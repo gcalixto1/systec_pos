@@ -58,7 +58,7 @@ $number = intval(substr($rowconsecutivo['last_id'], strlen("ndc")));
 $newNumber = $number + 1;
 
 $monto = $factura['totalpagar'];
-$observaciones = "Nota de crédito por devolución de mercancía, número de factura original: " . $factura['numerofactura'];
+$observaciones = $observaciones . " " . $factura['numerofactura'];
 $montoiva = round($monto / 1.13, 2);
 $ivaItem = round($montoiva * 0.13, 2);
 $items[] = [
@@ -103,7 +103,7 @@ $facturaJson = [
             "ambiente" => "00",
             "tipoDte" => "05",
             "numeroControl" => "DTE-05-M001P001-" . str_pad($newNumber, 15, "0", STR_PAD_LEFT),
-            "codigoGeneracion" => $codigoGeneracion,
+            "codigoGeneracion" => $codigo,
             "tipoModelo" => 1,
             "tipoOperacion" => 1,
             "tipoContingencia" => null,

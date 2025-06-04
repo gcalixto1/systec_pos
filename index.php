@@ -29,6 +29,7 @@ if (!isset($_SESSION['login_idusuario'])) {
     <script type="text/javascript" src="assets/js/jquery-te-1.4.0.min.js" charset="utf-8"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="assets/DataTables/datatables.min.css">
+    <link rel="stylesheet" href="assets/css/select2.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
 
 
@@ -167,200 +168,200 @@ if (!isset($_SESSION['login_idusuario'])) {
     </div>
 </body>
 <script>
-window.start_load = function() {
-    $('body').prepend('<di id="preloader2"></di>')
-}
-window.end_load = function() {
-    $('#preloader2').fadeOut('fast', function() {
-        $(this).remove();
-    })
-}
+    window.start_load = function () {
+        $('body').prepend('<di id="preloader2"></di>')
+    }
+    window.end_load = function () {
+        $('#preloader2').fadeOut('fast', function () {
+            $(this).remove();
+        })
+    }
 
-window.uni_modal = function($title = '', $url = '', $size = "") {
-    start_load()
-    $.ajax({
-        url: $url,
-        error: err => {
-            console.log()
-            alert("An error occured")
-        },
-        success: function(resp) {
-            if (resp) {
-                $('#uni_modal .modal-title').html($title)
-                $('#uni_modal .modal-body').html(resp)
-                if ($size != '') {
-                    $('#uni_modal .modal-dialog').addClass($size)
-                } else {
-                    $('#uni_modal .modal-dialog').removeAttr("class").addClass("modal-dialog modal-lg")
-                }
-                $('#uni_modal').modal('show')
-                end_load()
-            }
-        }
-    })
-}
-window.uni_modal2 = function($title = '', $url = '', $size = "") {
-    start_load()
-    $.ajax({
-        url: $url,
-        error: err => {
-            console.log()
-            alert("An error occured")
-        },
-        success: function(resp) {
-            if (resp) {
-                $('#uni_modal2 .modal-title').html($title)
-                $('#uni_modal2 .modal-body').html(resp)
-                if ($size != '') {
-                    $('#uni_modal2 .modal-dialog').addClass($size)
-                } else {
-                    $('#uni_modal2 .modal-dialog').removeAttr("class").addClass("modal-dialog modal-lg")
-                }
-                $('#uni_modal2').modal('show')
-                end_load()
-            }
-        }
-    })
-}
-window.uni_modal_caja = function($title = '', $url = '', $size = "") {
-    start_load()
-    $.ajax({
-        url: $url,
-        error: err => {
-            console.log()
-            alert("An error occured")
-        },
-        success: function(resp) {
-            if (resp) {
-                $('#uni_modal .modal-title').html($title)
-                $('#uni_modal .modal-body').html(resp)
-                if ($size != '') {
-                    $('#uni_modal .modal-dialog').addClass($size)
-                } else {
-                    $('#uni_modal .modal-dialog').removeAttr("class").addClass("modal-dialog modal-lg")
-                }
-                $('#uni_modal').modal('show')
-                end_load()
-            }
-        }
-    })
-}
-window.uni_modal_documentos = function($title1 = '', $url1 = '', $size1 = "") {
-    start_load()
-    $.ajax({
-        url: $url1,
-        error: err => {
-            console.log()
-            alert("An error occured")
-        },
-        success: function(resp1) {
-            if (resp1) {
-                $('#uni_modal_documentos .modal-title').html($title1)
-                $('#uni_modal_documentos .modal-body').html(resp1)
-                if ($size1 != '') {
-                    $('#uni_modal_documentos .modal-dialog').addClass($size1)
-                } else {
-                    $('#uni_modal_documentos .modal-dialog').removeAttr("class").addClass(
-                        "modal-dialog modal-xl")
-                }
-                $('#uni_modal_documentos').modal('show')
-                end_load()
-            }
-        }
-    })
-}
-window.uni_modal_generador = function($title1 = '', $url1 = '', $size1 = "") {
-    start_load()
-    $.ajax({
-        url: $url1,
-        error: err => {
-            console.log()
-            alert("An error occured")
-        },
-        success: function(resp1) {
-            if (resp1) {
-                $('#uni_modal_generador .modal-title').html($title1)
-                $('#uni_modal_generador .modal-body').html(resp1)
-                if ($size1 != '') {
-                    $('#uni_modal_generador .modal-dialog').addClass($size1)
-                } else {
-                    $('#uni_modal_generador .modal-dialog').removeAttr("class").addClass(
-                        "col-lg.12 modal-dialog modal-md")
-                }
-                $('#uni_modal_generador').modal('show')
-                end_load()
-            }
-        }
-    })
-}
-window.uni_modal_notasCredito = function($title1 = '', $url1 = '', $size1 = "") {
-    start_load()
-    $.ajax({
-        url: $url1,
-        error: err => {
-            console.log(err)
-            alert("Ocurrió un error")
-        },
-        success: function(resp1) {
-            if (resp1) {
-                $('#uni_modal_notasCredito .modal-title').html($title1)
-                $('#uni_modal_notasCredito .modal-body').html(resp1)
-                if ($size1 != '') {
-                    $('#uni_modal_notasCredito .modal-dialog').addClass($size1)
-                } else {
-                    $('#uni_modal_notasCredito .modal-dialog').removeAttr("class").addClass(
-                        "modal-dialog modal-xl")
-                }
-                $('#uni_modal_notasCredito').modal('show')
-
-                setTimeout(function() {
-                    if ($.fn.DataTable.isDataTable('#tablaVentas')) {
-                        $('#tablaVentas').DataTable().destroy();
+    window.uni_modal = function ($title = '', $url = '', $size = "") {
+        start_load()
+        $.ajax({
+            url: $url,
+            error: err => {
+                console.log()
+                alert("An error occured")
+            },
+            success: function (resp) {
+                if (resp) {
+                    $('#uni_modal .modal-title').html($title)
+                    $('#uni_modal .modal-body').html(resp)
+                    if ($size != '') {
+                        $('#uni_modal .modal-dialog').addClass($size)
+                    } else {
+                        $('#uni_modal .modal-dialog').removeAttr("class").addClass("modal-dialog modal-lg")
                     }
-                    $('#tablaVentas').DataTable({
-                        language: {
-                            url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json'
-                        },
-                        order: [
-                            [0, 'desc']
-                        ]
-                    });
-                }, 200)
-                end_load()
+                    $('#uni_modal').modal('show')
+                    end_load()
+                }
             }
-        }
-    })
-}
+        })
+    }
+    window.uni_modal2 = function ($title = '', $url = '', $size = "") {
+        start_load()
+        $.ajax({
+            url: $url,
+            error: err => {
+                console.log()
+                alert("An error occured")
+            },
+            success: function (resp) {
+                if (resp) {
+                    $('#uni_modal2 .modal-title').html($title)
+                    $('#uni_modal2 .modal-body').html(resp)
+                    if ($size != '') {
+                        $('#uni_modal2 .modal-dialog').addClass($size)
+                    } else {
+                        $('#uni_modal2 .modal-dialog').removeAttr("class").addClass("modal-dialog modal-lg")
+                    }
+                    $('#uni_modal2').modal('show')
+                    end_load()
+                }
+            }
+        })
+    }
+    window.uni_modal_caja = function ($title = '', $url = '', $size = "") {
+        start_load()
+        $.ajax({
+            url: $url,
+            error: err => {
+                console.log()
+                alert("An error occured")
+            },
+            success: function (resp) {
+                if (resp) {
+                    $('#uni_modal .modal-title').html($title)
+                    $('#uni_modal .modal-body').html(resp)
+                    if ($size != '') {
+                        $('#uni_modal .modal-dialog').addClass($size)
+                    } else {
+                        $('#uni_modal .modal-dialog').removeAttr("class").addClass("modal-dialog modal-lg")
+                    }
+                    $('#uni_modal').modal('show')
+                    end_load()
+                }
+            }
+        })
+    }
+    window.uni_modal_documentos = function ($title1 = '', $url1 = '', $size1 = "") {
+        start_load()
+        $.ajax({
+            url: $url1,
+            error: err => {
+                console.log()
+                alert("An error occured")
+            },
+            success: function (resp1) {
+                if (resp1) {
+                    $('#uni_modal_documentos .modal-title').html($title1)
+                    $('#uni_modal_documentos .modal-body').html(resp1)
+                    if ($size1 != '') {
+                        $('#uni_modal_documentos .modal-dialog').addClass($size1)
+                    } else {
+                        $('#uni_modal_documentos .modal-dialog').removeAttr("class").addClass(
+                            "modal-dialog modal-xl")
+                    }
+                    $('#uni_modal_documentos').modal('show')
+                    end_load()
+                }
+            }
+        })
+    }
+    window.uni_modal_generador = function ($title1 = '', $url1 = '', $size1 = "") {
+        start_load()
+        $.ajax({
+            url: $url1,
+            error: err => {
+                console.log()
+                alert("An error occured")
+            },
+            success: function (resp1) {
+                if (resp1) {
+                    $('#uni_modal_generador .modal-title').html($title1)
+                    $('#uni_modal_generador .modal-body').html(resp1)
+                    if ($size1 != '') {
+                        $('#uni_modal_generador .modal-dialog').addClass($size1)
+                    } else {
+                        $('#uni_modal_generador .modal-dialog').removeAttr("class").addClass(
+                            "col-lg.12 modal-dialog modal-md")
+                    }
+                    $('#uni_modal_generador').modal('show')
+                    end_load()
+                }
+            }
+        })
+    }
+    window.uni_modal_notasCredito = function ($title1 = '', $url1 = '', $size1 = "") {
+        start_load()
+        $.ajax({
+            url: $url1,
+            error: err => {
+                console.log(err)
+                alert("Ocurrió un error")
+            },
+            success: function (resp1) {
+                if (resp1) {
+                    $('#uni_modal_notasCredito .modal-title').html($title1)
+                    $('#uni_modal_notasCredito .modal-body').html(resp1)
+                    if ($size1 != '') {
+                        $('#uni_modal_notasCredito .modal-dialog').addClass($size1)
+                    } else {
+                        $('#uni_modal_notasCredito .modal-dialog').removeAttr("class").addClass(
+                            "modal-dialog modal-xl")
+                    }
+                    $('#uni_modal_notasCredito').modal('show')
 
-window._conf = function($msg = '', $func = '', $params = []) {
-    $('#confirm_modal #confirm').attr('onclick', $func + "(" + $params.join(',') + ")")
-    $('#confirm_modal .modal-body').html($msg)
-    $('#confirm_modal').modal('show')
-}
-window.alert_toast = function($msg = 'TEST', $bg = 'success') {
-    $('#alert_toast').removeClass('bg-success')
-    $('#alert_toast').removeClass('bg-danger')
-    $('#alert_toast').removeClass('bg-info')
-    $('#alert_toast').removeClass('bg-warning')
+                    setTimeout(function () {
+                        if ($.fn.DataTable.isDataTable('#tablaVentas')) {
+                            $('#tablaVentas').DataTable().destroy();
+                        }
+                        $('#tablaVentas').DataTable({
+                            language: {
+                                url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json'
+                            },
+                            order: [
+                                [0, 'desc']
+                            ]
+                        });
+                    }, 200)
+                    end_load()
+                }
+            }
+        })
+    }
 
-    if ($bg == 'success')
-        $('#alert_toast').addClass('bg-success')
-    if ($bg == 'danger')
-        $('#alert_toast').addClass('bg-danger')
-    if ($bg == 'info')
-        $('#alert_toast').addClass('bg-info')
-    if ($bg == 'warning')
-        $('#alert_toast').addClass('bg-warning')
-    $('#alert_toast .toast-body').html($msg)
-    $('#alert_toast').toast({
-        delay: 3000
-    }).toast('show');
-}
-$(document).ready(function() {
-    $('#preloader').fadeOut('fast', function() {
-        $(this).remove();
+    window._conf = function ($msg = '', $func = '', $params = []) {
+        $('#confirm_modal #confirm').attr('onclick', $func + "(" + $params.join(',') + ")")
+        $('#confirm_modal .modal-body').html($msg)
+        $('#confirm_modal').modal('show')
+    }
+    window.alert_toast = function ($msg = 'TEST', $bg = 'success') {
+        $('#alert_toast').removeClass('bg-success')
+        $('#alert_toast').removeClass('bg-danger')
+        $('#alert_toast').removeClass('bg-info')
+        $('#alert_toast').removeClass('bg-warning')
+
+        if ($bg == 'success')
+            $('#alert_toast').addClass('bg-success')
+        if ($bg == 'danger')
+            $('#alert_toast').addClass('bg-danger')
+        if ($bg == 'info')
+            $('#alert_toast').addClass('bg-info')
+        if ($bg == 'warning')
+            $('#alert_toast').addClass('bg-warning')
+        $('#alert_toast .toast-body').html($msg)
+        $('#alert_toast').toast({
+            delay: 3000
+        }).toast('show');
+    }
+    $(document).ready(function () {
+        $('#preloader').fadeOut('fast', function () {
+            $(this).remove();
+        })
     })
-})
 </script>
 
 </html>

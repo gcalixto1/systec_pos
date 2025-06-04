@@ -21,6 +21,16 @@ if (!empty($id)) {
         }
     }
 }
+
+require_once("includes/class.php");
+$pro = new Action();
+
+$departamentoSeleccionado = isset($_POST['departamento']) ? $_POST['departamento'] : (isset($meta['departamento']) ? $meta['departamento'] : '');
+$municipioSeleccionado = isset($_POST['municipio']) ? $_POST['municipio'] : (isset($meta['municipio']) ? $meta['municipio'] : '');
+
+$departamentos = $pro->ListarDepartamentos();
+$municipios = $departamentoSeleccionado ? $pro->ListarMunicipios($departamentoSeleccionado) : [];
+$documentos = $pro->ListarDocumentos();
 ?>
 <div class="container-fluid">
     <div class="card">
@@ -34,7 +44,7 @@ if (!empty($id)) {
                             <input type="hidden" name="id"
                                 value="<?php echo isset($_GET['idproveedor']) ? $_GET['idproveedor'] : '' ?>">
                         </div>
-                        <div class="form-group col-md-12">
+                        <div class="form-group col-md-4">
                             <label for="name">Tipo Contribuyente</label>
                             <select name="tipoControbuyente" id="tipoControbuyente" class="form-control" required
                                 aria-required="true">
@@ -52,17 +62,29 @@ if (!empty($id)) {
                                 </option>
                             </select>
                         </div>
-
-                        <div class="form-group col-md-12">
+                        <div class="form-group col-md-8"></div>
+                        <div class="form-group col-md-6">
                             <label for="name">Nombre Completo</label>
                             <input type="text" name="proveedor" id="proveedor" class="form-control"
                                 value="<?php echo isset($meta['proveedor']) ? htmlspecialchars($meta['proveedor']) : ''; ?>"
                                 required>
                         </div>
-                        <div class="form-group col-md-4">
+                        <div class="form-group col-md-6">
+                            <label for="tipoDoc">Tipo Documento</label>
+                            <select name="tipoDoc" id="tipoDoc" class="form-control" required>
+                                <option value="">-- SELECCIONE --</option>
+                                <?php foreach ($documentos as $doc): ?>
+                                <option value="<?php echo $doc['codigo']; ?>"
+                                    <?php echo (isset($meta['tipoDocumento']) && $meta['tipoDocumento'] == $doc['codigo']) ? 'selected' : ''; ?>>
+                                    <?php echo $doc['valor']; ?>
+                                </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-3">
                             <label for="name">Documento</label>
-                            <input type="text" name="contacto" id="contacto" class="form-control"
-                                value="<?php echo isset($meta['contacto']) ? htmlspecialchars($meta['contacto']) : ''; ?>"
+                            <input type="text" name="dni" id="dni" class="form-control"
+                                value="<?php echo isset($meta['documento']) ? htmlspecialchars($meta['documento']) : ''; ?>"
                                 required>
                         </div>
                         <div class="form-group col-md-3">
@@ -71,16 +93,42 @@ if (!empty($id)) {
                                 value="<?php echo isset($meta['telefono']) ? htmlspecialchars($meta['telefono']) : ''; ?>"
                                 required>
                         </div>
-                        <div class="form-group col-md-5">
+                        <div class="form-group col-md-6">
                             <label for="name">Correo Electronico</label>
                             <input type="text" name="correo" id="correo" class="form-control"
                                 value="<?php echo isset($meta['correo']) ? htmlspecialchars($meta['correo']) : ''; ?>"
                                 required>
                         </div>
+                        <div class="form-group col-md-6">
+                            <label for="departamento">Departamento</label>
+                            <select name="departamento" id="departamento" class="form-control" required>
+                                <option value="">-- SELECCIONE --</option>
+                                <?php foreach ($departamentos as $dep): ?>
+                                <option value="<?php echo $dep['codigo']; ?>"
+                                    <?php echo ($dep['codigo'] == $departamentoSeleccionado) ? 'selected' : ''; ?>>
+                                    <?php echo $dep['valor']; ?>
+                                </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+
+                        <div class="form-group col-md-6">
+                            <label for="municipio">Municipio</label>
+                            <select name="municipio" id="municipio" class="form-control" required>
+                                <option value="">-- SELECCIONE MUNICIPIO --</option>
+                                <?php foreach ($municipios as $mun): ?>
+                                <option value="<?php echo $mun['codigo']; ?>"
+                                    <?php echo ($mun['codigo'] == $municipioSeleccionado) ? 'selected' : ''; ?>>
+                                    <?php echo $mun['valor']; ?>
+                                </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
+
                         <div class="form-group col-md-12">
-                            <label for="name">Dirección</label>
+                            <label for="direccion">Dirección</label>
                             <input type="text" name="direccion" id="direccion" class="form-control"
-                                value="<?php echo isset($meta['direccion']) ? htmlspecialchars($meta['direccion']) : ''; ?>"
+                                value="<?php echo isset($meta['complemento']) ? htmlspecialchars($meta['complemento']) : ''; ?>"
                                 required>
                         </div>
                     </div>
@@ -91,65 +139,91 @@ if (!empty($id)) {
 </div>
 
 <script>
-    $('#saveproveedor').submit(function(e) {
-        e.preventDefault();
-        var isValid = true;
-        $('#saveproveedor input[required]').each(function() {
-            if ($(this).val().trim() === '') {
-                isValid = false;
-                Swal.fire({
-                    title: 'Error!',
-                    text: 'Todos los campos son obligatorios. Por favor, complete el campo vacio',
-                    icon: 'error',
-                    confirmButtonColor: '#d33',
-                    confirmButtonText: 'OK'
-                });
-                return false;
+$('#saveproveedor').submit(function(e) {
+    e.preventDefault();
+    var isValid = true;
+    $('#saveproveedor input[required]').each(function() {
+        if ($(this).val().trim() === '') {
+            isValid = false;
+            Swal.fire({
+                title: 'Error!',
+                text: 'Todos los campos son obligatorios. Por favor, complete el campo vacio',
+                icon: 'error',
+                confirmButtonColor: '#d33',
+                confirmButtonText: 'OK'
+            });
+            return false;
+        }
+    });
+    if (isValid) {
+        start_load();
+        $.ajax({
+            url: 'ajax.php?action=save_proveedores',
+            method: 'POST',
+            data: $(this).serialize(),
+            success: function(resp) {
+                if (resp == 1) {
+                    Swal.fire({
+                        title: 'Éxito!',
+                        text: 'El registro se guardó con éxito.',
+                        icon: 'success',
+                        confirmButtonColor: '#28a745',
+                        confirmButtonText: 'OK'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            location.reload();
+                        }
+                    });
+                }
             }
         });
-        if (isValid) {
-            start_load();
+    }
+});
+
+$(document).ready(function() {
+    $('#departamento').change(function() {
+        var idDepartamento = $(this).val();
+        if (idDepartamento !== '') {
             $.ajax({
-                url: 'ajax.php?action=save_proveedores',
-                method: 'POST',
-                data: $(this).serialize(),
-                success: function(resp) {
-                    if (resp == 1) {
-                        Swal.fire({
-                            title: 'Éxito!',
-                            text: 'El registro se guardó con éxito.',
-                            icon: 'success',
-                            confirmButtonColor: '#28a745',
-                            confirmButtonText: 'OK'
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                location.reload();
-                            }
-                        });
-                    }
+                url: 'cargar_municipios.php?id_departamento=' + idDepartamento,
+                method: 'GET',
+                dataType: 'json',
+                success: function(response) {
+                    var municipioSelect = $('#municipio');
+                    municipioSelect.empty();
+                    municipioSelect.append(
+                        '<option value="">-- SELECCIONE MUNICIPIO --</option>');
+                    $.each(response, function(index, municipio) {
+                        municipioSelect.append($('<option>', {
+                            value: municipio.codigo,
+                            text: municipio.valor
+                        }));
+                    });
                 }
             });
         }
     });
 
-    function cargarMunicipios() {
-        var id_provincia = document.getElementById("id_provincia").value;
-
-        // Realizar la solicitud AJAX para obtener los municipios
-        fetch('departamentos_vista.php?id_departamento=' + id_provincia)
-            .then(response => response.json())
-            .then(data => {
-                var selectMunicipios = document.getElementById("id_departamento");
-                // Limpiar las opciones anteriores
-                selectMunicipios.innerHTML = '<option value="0"> -- SELECCIONE -- </option>';
-                // Agregar las opciones de municipios correspondientes al departamento seleccionado
-                data.forEach(municipio => {
-                    var option = document.createElement("option");
-                    option.text = municipio.departamento;
-                    option.value = municipio.id_departamento;
-                    selectMunicipios.appendChild(option);
-                });
-            })
-            .catch(error => console.error('Error:', error));
-    }
+    <?php if (!empty($departamentoSeleccionado) && !empty($municipioSeleccionado)): ?>
+    $.ajax({
+        url: 'ajax_municipios.php?id_departamento=' + '<?php echo $departamentoSeleccionado; ?>',
+        method: 'GET',
+        dataType: 'json',
+        success: function(response) {
+            var municipioSelect = $('#municipio');
+            municipioSelect.empty();
+            municipioSelect.append('<option value="">-- SELECCIONE MUNICIPIO --</option>');
+            $.each(response, function(index, municipio) {
+                var selected = municipio.codigo ===
+                    '<?php echo $municipioSeleccionado; ?>' ? 'selected' : '';
+                municipioSelect.append($('<option>', {
+                    value: municipio.codigo,
+                    text: municipio.valor,
+                    selected: selected
+                }));
+            });
+        }
+    });
+    <?php endif; ?>
+});
 </script>
