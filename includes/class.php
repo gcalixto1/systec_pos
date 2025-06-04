@@ -436,11 +436,12 @@ class Action
 		extract($_POST);
 		// Construye la cadena de datos correctamente
 		$data = " proveedor = '$proveedor'";
-		$data .= ", contacto = '$contacto'";
+		$data .= ", documento = '$dni'";
 		$data .= ", telefono = '$telefono'";
 		$data .= ", direccion = '$direccion'";
 		$data .= ", tipoControbuyente = '$tipoControbuyente'";
 		$data .= ", correo = '$correo'";
+		$data .= ", tipoDoc = '$tipoDoc'";
 
 		// Evita inyección SQL usando consultas preparadas
 		if (empty($id)) {
@@ -451,6 +452,7 @@ class Action
 		}
 
 		if ($save) {
+			$this->save_clienteDireccion(); // Llama a la función para guardar la dirección del cliente
 			return 1;
 		}
 	}
@@ -474,6 +476,14 @@ class Action
 			}
 		}
 		return $impuesto;
+	}
+	public function BuscarProveedores($search)
+	{
+		$sql = "SELECT idproveedor, proveedor FROM proveedores 
+				WHERE proveedor LIKE :search LIMIT 20";
+		$stmt = $this->dbh->prepare($sql);
+		$stmt->execute([':search' => '%' . $search . '%']);
+		return $stmt->fetchAll(PDO::FETCH_ASSOC);
 	}
 
 	#endregion
@@ -982,7 +992,7 @@ class Action
 		}
 	}
 	#endregion
-
+#region Notas de Crédito y Invalidaciones
 	function save_NotaCredito()
 	{
 		extract($_POST);
@@ -1003,16 +1013,16 @@ class Action
 
 		$data = "Observacion = '$observaciones'";
 		$data .= ", monto = '$monto'";
-		$data .= ", codigoGeneracion = '$codigoGeneracionP'";
+		$data .= ", codigoGeneracion = '$codigo'";
 		$data .= ", id_usuario = '$idusuario'";
 		$data .= ", numeroDocumento = '$numeroDocumento'";
 
 		$save = $this->dbh->query("INSERT notas_credito SET " . $data);
 		if ($save) {
 
-			$facturaNC = "dteNC.php?codigo=" . $codigo . "&codigoGeneracion=" . $codigoGeneracionP;
+			$facturaNC = "dteNC.php?codigo=" . $codigo . "&codigoGeneracion=" . $codigo;
 
-			$facturaElectronica = "facturaElectronica.php?codigo=" . $codigoGeneracionP;
+			$facturaElectronica = "facturaElectronica.php?codigo=" . $codigo;
 
 			echo json_encode([
 				'success' => true,
@@ -1025,4 +1035,119 @@ class Action
 		}
 		exit;
 	}
+	function save_Invalidacion()
+	{
+		extract($_POST);
+
+		$tipoAnulacion = $_POST['tipoInvalidacion'] ?? '';
+		$numeroControl = $_POST['numeroControl'] ?? '';
+		$codigoGeneracion = $_POST['codigoGeneracion'] ?? '';
+		$tDcoResponsable = $_POST['tipoDoc2'] ?? '';
+		$nDcoResponsable = $_POST['documento2'] ?? '';
+		$nombreResponsable = $_POST['responsable'] ?? '';
+		$nombreSolicita = $_POST['solicitante'] ?? '';
+		$tDcoSolicita = $_POST['tipoDoc1'] ?? '';
+		$nDcoSolicita = $_POST['documento1'] ?? '';
+
+		// Validar tipo de anulación
+		$motivos_validos = [
+			'1' => 'Error en la información del Documento Tributario Electrónico a invalidar',
+			'2' => 'Recindir de la operación realizada',
+			'3' => 'Otro'
+		];
+
+		if (!isset($motivos_validos[$tipoAnulacion])) {
+			echo json_encode([
+				'success' => false,
+				'message' => 'Tipo de anulación no válido.'
+			]);
+			exit;
+		}
+
+		$motivo_final = $motivos_validos[$tipoAnulacion];
+
+		$data = "codigoGeneracion = '$codigoGeneracion'";
+		$data .= ", numeroControl = '$numeroControl'";
+		$data .= ", tipoAnulacion = '$tipoAnulacion'";
+		$data .= ", motivo = '$motivo_final'";
+		$data .= ", tDcoResponsable = '$tDcoResponsable'";
+		$data .= ", nDcoResponsable = '$nDcoResponsable'";
+		$data .= ", nombreResponsable = '$nombreResponsable'";
+		$data .= ", nombreSolicita = '$nombreSolicita'";
+		$data .= ", tDcoSolicita = '$tDcoSolicita'";
+		$data .= ", nDcoSolicita = '$nDcoSolicita'";
+
+		$save = $this->dbh->query("INSERT INTO invalidaciones SET " . $data);
+
+		if ($save) {
+			echo json_encode([
+				'success' => true,
+				'message' => 'Invalidación guardada correctamente.'
+			]);
+		} else {
+			echo json_encode([
+				'success' => false,
+				'message' => 'Error al guardar la invalidación en la base de datos.'
+			]);
+		}
+		exit;
+
+	}
+	#endregion
+#region Sujetos Excluidos
+	function save_SujetoExcluido()
+	{
+		$numero_control = $_POST['numero_control'] ?? '';
+		$codigo = $_POST['codigo_generacion'] ?? '';
+		$forma_pago = $_POST['forma_pago'] ?? '';
+		$proveedor = $_POST['proveedor'] ?? '';
+		$items = json_decode($_POST['items'] ?? '[]', true);
+
+		if (empty($numero_control) || empty($items)) {
+			echo json_encode([
+				'success' => false,
+				'message' => 'Faltan datos para guardar los sujetos excluidos.'
+			]);
+			exit;
+		}
+
+		$this->dbh->begin_transaction();
+
+		try {
+			$sql = "INSERT INTO sujetoexcluido_dte (
+                    numero_control, detalle, cantidad, precio_unitario, renta_retenida, subtotal,idproveedor,forma_pago
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+			$stmt = $this->dbh->prepare($sql);
+
+			foreach ($items as $item) {
+				$detalle_json = json_encode($item['detalle'] ?? []);  // Convertir a JSON
+				$cantidad = intval($item['cantidad'] ?? 0);
+				$precio = floatval($item['precio'] ?? 0);
+				$rentaPorcentaje = floatval($item['renta'] ?? 0) / 100;
+				$subtotal = floatval($item['subtotal'] ?? ($cantidad * $precio));
+				$renta = $subtotal * $rentaPorcentaje;
+
+				$stmt->bind_param("ssidddis", $numero_control, $detalle_json, $cantidad, $precio, $renta, $subtotal, $proveedor, $forma_pago);
+				$stmt->execute();
+			}
+
+			$stmt->close();
+			$this->dbh->commit();
+			echo json_encode([
+				'success' => true,
+				$numerodoc = $this->generateCorrelativo('fse'),
+				'message' => 'Ítems de sujetos excluidos guardados correctamente. ' . $numerodoc,
+				"codigo_generacion" => $codigo,
+			]);
+		} catch (Exception $e) {
+			$this->dbh->rollback();
+			echo json_encode([
+				'success' => false,
+				'message' => 'Error al guardar: ' . $e->getMessage()
+			]);
+		}
+
+		exit;
+	}
+	#endregion
 }

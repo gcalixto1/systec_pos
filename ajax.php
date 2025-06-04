@@ -127,3 +127,14 @@ if ($action == 'saveNotasCredito') {
 	if ($save)
 		echo $save;
 }
+
+if ($action == 'saveInvalidacion') {
+	$save = $crud->save_Invalidacion();
+	if ($save)
+		echo $save;
+}
+if ($action == 'save_sujetoExcluido') {
+	$save = $crud->save_sujetoExcluido();
+	if ($save)
+		echo $save;
+}

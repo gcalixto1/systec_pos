@@ -123,7 +123,7 @@ $codigoGeneracion = strtoupper(vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2he
                             </select>
                         </div>
 
-                        <div class="form-group col-md-9">
+                        <div class="form-group col-md-6">
                             <label for="direccion">Dirección</label>
                             <input type="text" name="direccion" id="direccion" class="form-control"
                                 value="<?php echo isset($meta['complemento']) ? htmlspecialchars($meta['complemento']) : ''; ?>"
@@ -131,7 +131,6 @@ $codigoGeneracion = strtoupper(vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2he
                         </div>
 
                         <div class="form-group col-md-6"></div>
-                        <div class="form-group col-md-12"></div>
                         <div class="form-group col-md-12"></div>
 
                         <div class="form-group col-md-6">
@@ -249,7 +248,7 @@ $('#savecliente').submit(function(e) {
                         if (!win1) {
                             alert(
                                 "Por favor habilita las ventanas emergentes (pop-ups) para este sitio."
-                                );
+                            );
                         } else {
                             // Verificar cada 500ms si la ventana fue cerrada
                             const checkClosed = setInterval(() => {
@@ -262,7 +261,7 @@ $('#savecliente').submit(function(e) {
                                     if (!win2) {
                                         alert(
                                             "No se pudo abrir la factura electrónica. Habilita los pop-ups."
-                                            );
+                                        );
                                     } else {
                                         // Finalmente, puedes refrescar o hacer otra acción
                                         setTimeout(() => location.reload(), 500);
