@@ -2,7 +2,7 @@
 include 'conexionfin.php';
 require_once 'config/config.php'; // Asegúrate de que este archivo tenga las constantes necesarias
 
-$idfactura = intval($_GET['idfactura']);
+$idfactura = isset($_POST['idfactura']) ? intval($_POST['idfactura']) : 0;
 
 // OBTENER FACTURA
 $query = $conexion->query("SELECT factura.id, factura.tipofactura, factura.numerofactura, 
@@ -195,6 +195,11 @@ curl_close($curl);
 // SI FIRMA CORRECTAMENTE, ENVIAR A HACIENDA
 if ($httpCode === 200) {
     include 'recepciondte.php'; // Enviar automáticamente a Hacienda después de firmar
+    echo json_encode([
+        'success' => true,
+        'idfactura' => $idfactura
+    ]);
+    exit;
 } else {
     echo json_encode(['success' => false, 'message' => 'Error al firmar documento', 'detalle' => $response]);
 }

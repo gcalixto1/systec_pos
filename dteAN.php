@@ -118,7 +118,7 @@ $facturaJson = [
             "montoIva" => $ivaInvalidar,
             "codigoGeneracionR" => null,
             "tipoDocumento" => "36",
-            "numDocumento" => $receptor['numDocumento'],
+            "numDocumento" => $receptor['nit'],
             "nombre" => $receptor['nombre'],
             "telefono" => $receptor['telefono'],
             "correo" => $receptor['correo'],
@@ -163,7 +163,11 @@ curl_close($curl);
 
 // SI FIRMA CORRECTAMENTE, ENVIAR A HACIENDA
 if ($httpCode === 200) {
-    include 'recepciondteAN.php'; // Enviar automáticamente a Hacienda después de firmar
+    include 'recepciondteAN.php';
+    echo json_encode([
+        'success' => true,
+    ]);
+    exit;
 } else {
     echo json_encode(['success' => false, 'message' => 'Error al firmar documento', 'detalle' => $response]);
 }

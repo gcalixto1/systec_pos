@@ -918,20 +918,22 @@ class Action
 
 		$save = $this->dbh->query("UPDATE factura SET " . $data . " WHERE id = $id");
 		if ($save) {
-			// Construir la URL del ticket
-			$ticket_url = "ticket.php?id=" . $id;
-			$facturaElectronica = "facturaElectronica.php?id=" . $id . "&codigo=0";
+			$factura = $this->dbh->query("SELECT * FROM factura WHERE id = $id");
+			if ($factura && $factura->num_rows > 0) {
+				$row = $factura->fetch_assoc();
 
-			echo json_encode([
-				'success' => true,
-				'ticket_url' => $ticket_url,
-				'facturaElectronica' => $facturaElectronica
-			]);
-		} else {
-			// Devolver un JSON con success = false
-			echo json_encode(['success' => false, 'message' => 'Error al actualizar la factura.']);
+				echo json_encode([
+					'success' => true,
+					'message' => 'Venta Registrada correctamente. ',
+					"idfactura" => $row['id'],
+					"tipodocfac" => $row['tipofactura'],
+				]);
+			} else {
+				// Devolver un JSON con success = false
+				echo json_encode(['success' => false, 'message' => 'Error al actualizar la factura.']);
+			}
+			exit;
 		}
-		exit;
 	}
 
 	private function generateCorrelativo($prefix)

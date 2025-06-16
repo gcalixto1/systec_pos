@@ -83,7 +83,7 @@ if (curl_errno($ch)) {
     }
 
     // ID de factura (ajusta de dónde lo estás obteniendo)
-    $id_factura = intval($_GET['idfactura']);
+    $id_factura = $_POST['idfactura'] ?? ($_GET['idfactura'] ?? null);
 
     // INSERTAR EN LA TABLA
     $stmt = $conexion->prepare("INSERT INTO respuestadte (

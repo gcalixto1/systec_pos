@@ -26,6 +26,9 @@ $documentos = $pro->ListarDocumentos();
 
 $busqueda = isset($_GET['buscar']) ? trim($_GET['buscar']) : '';
 $actividades = $pro->ListarActividades($busqueda);
+
+$giroSeleccionado = isset($meta['giro']) ? $meta['giro'] : '';
+
 ?>
 
 <div class="container-fluid">
@@ -73,7 +76,7 @@ $actividades = $pro->ListarActividades($busqueda);
                         </div>
                         <div class="form-group col-md-3">
                             <label for="actividad">Seleccionar Actividad</label>
-                            <select name="giro" id="giro" class="form-control select2" required>
+                            <select name="giro" id="giro" class="form-control" required>
                                 <option value="">-- SELECCIONE --</option>
                                 <?php foreach ($actividades as $act): ?>
                                 <option value="<?php echo $act['codigo']; ?>"
@@ -259,7 +262,6 @@ $actividades = $pro->ListarActividades($busqueda);
         </form>
     </div>
 </div>
-
 <script>
 function previewImage(event, previewId, inputId) {
     console.log("Función llamada");
@@ -408,12 +410,26 @@ $(document).ready(function() {
     <?php endif; ?>
 });
 
-$(document).ready(function() {
-    $('.select2').select2({
-        width: '100%',
-        height: '150%',
-        placeholder: "-- Seleccionar una actividad --",
-        allowClear: true
-    });
+
+$('#giro').select2({
+    placeholder: "-- SELECCIONE ACTIVIDAD --",
+    minimumInputLength: 2,
+    ajax: {
+        url: 'buscar_actividades.php',
+        dataType: 'json',
+        delay: 250,
+        data: function(params) {
+            return {
+                term: params.term // término de búsqueda
+            };
+        },
+        processResults: function(data) {
+            return {
+                results: data.results
+            };
+        },
+        cache: true
+    },
+    width: '100%'
 });
 </script>
