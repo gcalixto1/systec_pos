@@ -1152,4 +1152,22 @@ class Action
 		exit;
 	}
 	#endregion
+	public function facturas()
+	{
+		$id = $_POST['idfacturaV'];
+		$factura = $this->dbh->query("SELECT * FROM factura WHERE id = $id");
+		if ($factura && $factura->num_rows > 0) {
+			$row = $factura->fetch_assoc();
+
+			echo json_encode([
+				'success' => true,
+				'message' => 'Venta Registrada correctamente. ',
+				"idfactura" => $row['id']
+			]);
+		} else {
+			// Devolver un JSON con success = false
+			echo json_encode(['success' => false, 'message' => 'Error al actualizar la factura.']);
+		}
+		exit;
+	}
 }

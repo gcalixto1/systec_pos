@@ -23,7 +23,7 @@ if (!$data || json_last_error() !== JSON_ERROR_NONE) {
     die("Error al decodificar el JSON");
 }
 
-// === Extraer campos importantes ===
+// // === Extraer campos importantes ===
 $ident = $data['identificacion'];
 $emisor = $data['emisor'];
 $receptor = $data['receptor'];

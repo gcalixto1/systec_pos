@@ -114,6 +114,10 @@ if ($action == 'save_venta_previa') {
 	$save = $crud->save_factura();
 	echo $save;
 }
+if ($action == 'obtenerFactura') {
+	$save = $crud->facturas();
+	echo $save;
+}
 
 if ($action == 'save_venta_completa') {
 	$save = $crud->save_ventacompleta();

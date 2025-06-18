@@ -5,7 +5,7 @@ $queryEmpresa = $conexion->query("SELECT * FROM configuracion WHERE id = 1");
 $Empresa = $queryEmpresa->fetch_assoc();
 
 define("MH_API_URL", "https://apitest.dtes.mh.gob.sv/seguridad/auth");
-define("MH_API_FIRMADOR", "http://192.168.0.10:8113/firmardocumento/");
+define("MH_API_FIRMADOR", "http://localhost:8113/firmardocumento/");
 define("MH_USER", str_replace('-', '', $Empresa['dni']));
 // define("MH_PWD", "Oscarfuentes01*");
 define("MH_PWD", "Cindy01*");

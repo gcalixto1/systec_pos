@@ -26,33 +26,33 @@ if (!empty($id)) {
 
 <?php ?>
 <style>
-.spinner-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(255, 255, 255, 0.7);
-    z-index: 9999;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.spinner {
-    border: 6px solid #ccc;
-    border-top: 6px solid #007bff;
-    border-radius: 50%;
-    width: 60px;
-    height: 60px;
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    to {
-        transform: rotate(360deg);
+    .spinner-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(255, 255, 255, 0.7);
+        z-index: 9999;
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
-}
+
+    .spinner {
+        border: 6px solid #ccc;
+        border-top: 6px solid #007bff;
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
 </style>
 <div id="spinner"
     style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(255, 255, 255, 0.77);z-index:9999;text-align:center;padding-top:200px;font-size:24px;">
@@ -132,124 +132,124 @@ if (!empty($id)) {
 </div>
 
 <script>
-function calcularCambio() {
-    // Obtener los valores de los campos
-    var importe = parseFloat(document.getElementById("TextImporte").textContent) || 0;
-    var pagado = parseFloat(document.getElementById("montopagado").value) || 0;
+    function calcularCambio() {
+        // Obtener los valores de los campos
+        var importe = parseFloat(document.getElementById("TextImporte").textContent) || 0;
+        var pagado = parseFloat(document.getElementById("montopagado").value) || 0;
 
-    // Calcular la diferencia
-    var cambio = pagado - importe;
+        // Calcular la diferencia
+        var cambio = pagado - importe;
 
-    // Mostrar el resultado en el campo TextCambio y asegurarse de que los decimales sean siempre 2
-    document.getElementById("TextCambio").textContent = cambio.toFixed(2);
-    document.getElementById("TextPagado").textContent = pagado.toFixed(2);
-}
-
-$(document).ready(function() {
-    function showSpinner() {
-        $('#spinner').show();
+        // Mostrar el resultado en el campo TextCambio y asegurarse de que los decimales sean siempre 2
+        document.getElementById("TextCambio").textContent = cambio.toFixed(2);
+        document.getElementById("TextPagado").textContent = pagado.toFixed(2);
     }
 
-    function hideSpinner() {
-        $('#spinner').hide();
-    }
+    $(document).ready(function () {
+        function showSpinner() {
+            $('#spinner').show();
+        }
 
-    $('#pagoForm').submit(function(e) {
-        e.preventDefault();
-        showSpinner();
+        function hideSpinner() {
+            $('#spinner').hide();
+        }
 
-        $.ajax({
-            url: 'ajax.php?action=save_venta_completa',
-            method: 'POST',
-            data: $(this).serialize(),
-            processData: true,
-            contentType: 'application/x-www-form-urlencoded',
-            dataType: 'json',
-            success: function(resp) {
-                if (resp.success) {
-                    let idfactura = resp.idfactura;
-                    let tipo = resp
-                        .tipodocfac;
+        $('#pagoForm').submit(function (e) {
+            e.preventDefault();
+            showSpinner();
 
-                    let urlDTE = tipo === 'ccf' ? 'dteCCF.php' : 'dte.php';
+            $.ajax({
+                url: 'ajax.php?action=save_venta_completa',
+                method: 'POST',
+                data: $(this).serialize(),
+                processData: true,
+                contentType: 'application/x-www-form-urlencoded',
+                dataType: 'json',
+                success: function (resp) {
+                    if (resp.success) {
+                        let idfactura = resp.idfactura;
+                        let tipo = resp
+                            .tipodocfac;
 
-                    $.ajax({
-                        url: urlDTE,
-                        method: 'POST',
-                        data: {
-                            idfactura: idfactura
-                        },
-                        dataType: 'json',
-                        success: function(respDte) {
-                            hideSpinner();
-                            if (respDte.success) {
-                                Swal.fire({
-                                    title: 'Éxito!',
-                                    text: 'Venta registrada y procesada correctamente.',
-                                    icon: 'success',
-                                    confirmButtonColor: '#28a745',
-                                    confirmButtonText: 'Imprimir y enviar por correo comprobante DTE'
-                                }).then(() => {
-                                    const win1 = window.open(
-                                        'ticket.php?id=' +
-                                        encodeURIComponent(
-                                            idfactura),
-                                        '_blank'
-                                    );
-                                    const win2 = window.open(
-                                        'facturaElectronica.php?id=' +
-                                        encodeURIComponent(
-                                            idfactura) +
-                                        '&codigo=0',
-                                        '_blank'
-                                    );
-                                    if (!win1 || !win2) {
-                                        alert(
-                                            "Por favor habilita las ventanas emergentes (pop-ups) para este sitio."
+                        let urlDTE = tipo === 'ccf' ? 'dteCCF.php' : 'dte.php';
+
+                        $.ajax({
+                            url: urlDTE,
+                            method: 'POST',
+                            data: {
+                                idfactura: idfactura
+                            },
+                            dataType: 'json',
+                            success: function (respDte) {
+                                hideSpinner();
+                                if (respDte.success) {
+                                    Swal.fire({
+                                        title: 'Éxito!',
+                                        text: 'Venta registrada y procesada correctamente.',
+                                        icon: 'success',
+                                        confirmButtonColor: '#28a745',
+                                        confirmButtonText: 'Imprimir y enviar por correo comprobante DTE'
+                                    }).then(() => {
+                                        const win1 = window.open(
+                                            'ticket.php?id=' +
+                                            encodeURIComponent(
+                                                idfactura),
+                                            '_blank'
                                         );
-                                    } else {
-                                        setTimeout(() => location
-                                            .reload(), 500);
-                                    }
-                                });
-                            } else {
+                                        const win2 = window.open(
+                                            'facturaElectronica.php?id=' +
+                                            encodeURIComponent(
+                                                idfactura) +
+                                            '&codigo=0',
+                                            '_blank'
+                                        );
+                                        if (!win1 || !win2) {
+                                            alert(
+                                                "Por favor habilita las ventanas emergentes (pop-ups) para este sitio."
+                                            );
+                                        } else {
+                                            setTimeout(() => location
+                                                .reload(), 500);
+                                        }
+                                    });
+                                } else {
+                                    Swal.fire({
+                                        title: 'Error en DTE',
+                                        text: respDte.detalle ||
+                                            'Ocurrió un error al procesar el DTE.',
+                                        icon: 'error'
+                                    });
+                                }
+                            },
+                            error: function () {
+                                hideSpinner();
                                 Swal.fire({
-                                    title: 'Error en DTE',
-                                    text: respDte.detalle ||
-                                        'Ocurrió un error al procesar el DTE.',
+                                    title: 'Error',
+                                    text: 'Error al enviar los datos al DTE.',
                                     icon: 'error'
                                 });
                             }
-                        },
-                        error: function() {
-                            hideSpinner();
-                            Swal.fire({
-                                title: 'Error',
-                                text: 'Error al enviar los datos al DTE.',
-                                icon: 'error'
-                            });
-                        }
-                    });
-                } else {
+                        });
+                    } else {
+                        hideSpinner();
+                        Swal.fire({
+                            title: 'Error',
+                            text: resp.message || 'Error al guardar la venta.',
+                            icon: 'error'
+                        });
+                    }
+                },
+                error: function () {
                     hideSpinner();
                     Swal.fire({
                         title: 'Error',
-                        text: resp.message || 'Error al guardar la venta.',
+                        text: 'No se pudo conectar con el servidor.',
                         icon: 'error'
                     });
                 }
-            },
-            error: function() {
-                hideSpinner();
-                Swal.fire({
-                    title: 'Error',
-                    text: 'No se pudo conectar con el servidor.',
-                    icon: 'error'
-                });
-            }
+            });
         });
+
+
     });
-
-
-});
 </script>

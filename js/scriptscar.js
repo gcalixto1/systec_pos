@@ -29,7 +29,7 @@ function updatecantidad(codproducto, change) {
             renderCart();
         }
     }
-}
+} 
 
 function handleManualChangeCantidad(input, codproducto) {
     const value = parseInt(input.value);

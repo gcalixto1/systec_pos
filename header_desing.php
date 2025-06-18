@@ -14,6 +14,13 @@
 <script src="assets/vendor/jquery/jquery.min.js"></script>
 <!-- <script src="https://cdn.datatables.net/2.0.3/js/dataTables.bootstrap5.js "></script> -->
 <!-- <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script> -->
+<script src="assets/vendor/jquery.easing/jquery.easing.min.js"></script>
+<script src="assets/vendor/php-email-form/validate.js"></script>
+<script src="assets/vendor/venobox/venobox.min.js"></script>
+<script src="assets/vendor/waypoints/jquery.waypoints.min.js"></script>
+<script src="assets/vendor/counterup/counterup.min.js"></script>
+<script src="assets/vendor/owl.carousel/owl.carousel.min.js"></script>
+<script src="assets/vendor/bootstrap-datepicker/js/bootstrap-datepicker.min.js"></script>
 <script type="text/javascript" src="assets/js/select2.min.js"></script>
 <script type="text/javascript" src="assets/js/jquery.datetimepicker.full.min.js"></script>
 <script type="text/javascript" src="assets/font-awesome/js/all.min.js"></script>
@@ -21,7 +28,6 @@
 <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
 <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.dataTables.min.css">
 <script type="text/javascript" src="assets/DataTables/datatables.min.js"></script>
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
 <!-- para usar botones en datatables JS -->
 <script src="assets/DataTables/Buttons-1.5.6/js/dataTables.buttons.min.js"></script>
