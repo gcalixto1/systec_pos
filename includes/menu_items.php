@@ -60,8 +60,6 @@ function imprimirMenu($menu_arbol)
     <title>Punto de venta</title>
     <!-- Agrega tus enlaces CSS aquí -->
     <link rel="stylesheet" href="assets/css/style_Menu.css">
-    <link href="assets/vendor/icofont/icofont.min.css" rel="stylesheet">
-    <link href="assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
 </head>
 
 <body>

@@ -91,6 +91,7 @@ class Action
 		$txtdato5 = $_POST['dato5'];
 		$txtdato6 = $_POST['dato6'];
 		$txtdato7 = $_POST['dato7'];
+		$txtdato8 = $_POST['dato8'];
 
 		// Construye la cadena de datos correctamente
 		$data = " dni = '$txtdni'";
@@ -110,7 +111,7 @@ class Action
 		$data .= ", dato5 = '$txtdato5'";
 		$data .= ", dato6 = '$txtdato6'";
 		$data .= ", dato7 = '$txtdato7'";
-		$data .= ", dato8 = 'ND'";
+		$data .= ", dato8 = '$txtdato8'";
 
 		// Evita inyección SQL usando consultas preparadas
 		$id = 1;
@@ -726,6 +727,18 @@ class Action
 	public function ListarMediosPagos()
 	{
 		$sql = "SELECT * FROM medio_pago";
+		$result = mysqli_query($this->dbh, $sql);
+		$pago = array();
+		if ($result) {
+			while ($row = mysqli_fetch_assoc($result)) {
+				$pago[] = $row;
+			}
+		}
+		return $pago;
+	}
+	public function ListarCtaContingencias()
+	{
+		$sql = "SELECT * FROM cta_contingencias";
 		$result = mysqli_query($this->dbh, $sql);
 		$pago = array();
 		if ($result) {

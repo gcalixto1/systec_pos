@@ -34,6 +34,7 @@ $codigoGeneracion = strtoupper(vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2he
         margin: auto;
     }
 </style>
+
 <form class="form form-material" method="post" action="#" name="saveSujetoExcluido" id="saveSujetoExcluido">
     <div class="container-fluid">
         <div id="spinner"
