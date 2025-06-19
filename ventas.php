@@ -16,26 +16,64 @@ if (!empty($id)) {
         }
     }
 }
-if ($meta['tipofactura'] == "fcf") {
-    include 'dte.php';
-} else if ($meta['tipofactura'] == "ccf") {
-    include 'dteCCF.php';
-}
+// if ($meta['tipofactura'] == "fcf") {
+//     include 'dte.php';
+// } else if ($meta['tipofactura'] == "ccf") {
+//     include 'dteCCF.php';
+// }
 
 ?>
 
 <?php ?>
-<!-- Begin Page Content -->
+<style>
+    .spinner-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(255, 255, 255, 0.7);
+        z-index: 9999;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .spinner {
+        border: 6px solid #ccc;
+        border-top: 6px solid #007bff;
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+</style>
+<div id="spinner"
+    style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(255, 255, 255, 0.77);z-index:9999;text-align:center;padding-top:200px;font-size:24px;">
+    <div class="spinner-border text-primary" role="status">
+        <span class="sr-only">Cargando...</span>
+    </div>
+    <p>Procesando Comprobante...</p>
+</div>
 <div class="container-fluid">
+
     <form class="form form-material" method="post" action="#" name="pagoForm" id="pagoForm">
         <div class="form-content">
             <div class="form-body">
                 <input type="hidden" name="id" id="id"
-                    value="<?php echo isset($_GET['idfactura']) ? $_GET['idfactura'] : '' ?>"">
+                    value="<?php echo isset($_GET['idfactura']) ? $_GET['idfactura'] : '' ?>">
                 <input type=" hidden" name="montodevuelto" hidden id="montodevuelto" value="0.00">
                 <input type="hidden" name="creditoinicial" id="creditoinicial" value="0.00">
                 <input type="hidden" name="creditodisponible" id="creditodisponible" value="0.00">
                 <input type="hidden" name="abonototal" id="abonototal" value="0.00">
+                <input type="hidden" name="tipodocventa" id="tipodocventa"
+                    value="<?php echo isset($meta['tipofactura']) ? $meta['tipofactura'] : '' ?>">
 
                 <div class="row">
                     <div class="col-md-4">
@@ -94,68 +132,124 @@ if ($meta['tipofactura'] == "fcf") {
 </div>
 
 <script>
-function calcularCambio() {
-    // Obtener los valores de los campos
-    var importe = parseFloat(document.getElementById("TextImporte").textContent) || 0;
-    var pagado = parseFloat(document.getElementById("montopagado").value) || 0;
+    function calcularCambio() {
+        // Obtener los valores de los campos
+        var importe = parseFloat(document.getElementById("TextImporte").textContent) || 0;
+        var pagado = parseFloat(document.getElementById("montopagado").value) || 0;
 
-    // Calcular la diferencia
-    var cambio = pagado - importe;
+        // Calcular la diferencia
+        var cambio = pagado - importe;
 
-    // Mostrar el resultado en el campo TextCambio y asegurarse de que los decimales sean siempre 2
-    document.getElementById("TextCambio").textContent = cambio.toFixed(2);
-    document.getElementById("TextPagado").textContent = pagado.toFixed(2);
-}
+        // Mostrar el resultado en el campo TextCambio y asegurarse de que los decimales sean siempre 2
+        document.getElementById("TextCambio").textContent = cambio.toFixed(2);
+        document.getElementById("TextPagado").textContent = pagado.toFixed(2);
+    }
 
-$('#pagoForm').submit(function(e) {
-    e.preventDefault();
-    start_load();
-    $.ajax({
-        url: 'ajax.php?action=save_venta_completa',
-        method: 'POST',
-        data: $(this).serialize(),
-        success: function(resp) {
-            resp = JSON.parse(resp);
-            if (resp.success) {
-                Swal.fire({
-                    title: '¡Éxito!',
-                    text: 'Venta Registrada',
-                    icon: 'success',
-                    confirmButtonColor: '#28a745',
-                    confirmButtonText: 'OK'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        const win1 = window.open(resp.ticket_url, '_blank');
-                        const win2 = window.open(resp.facturaElectronica, '_blank');
-
-                        if (!win1 || !win2) {
-                            alert(
-                                "Por favor habilita las ventanas emergentes (pop-ups) para este sitio."
-                            );
-                        } else {
-                            setTimeout(() => location.reload(), 500);
-                        }
-                    }
-                });
-            } else {
-                Swal.fire({
-                    title: 'Error',
-                    text: resp.message || 'Ocurrió un error al registrar la venta.',
-                    icon: 'error',
-                    confirmButtonColor: '#d33',
-                    confirmButtonText: 'OK'
-                });
-            }
-        },
-        error: function() {
-            Swal.fire({
-                title: 'Error',
-                text: 'No se pudo conectar con el servidor.',
-                icon: 'error',
-                confirmButtonColor: '#d33',
-                confirmButtonText: 'OK'
-            });
+    $(document).ready(function () {
+        function showSpinner() {
+            $('#spinner').show();
         }
+
+        function hideSpinner() {
+            $('#spinner').hide();
+        }
+
+        $('#pagoForm').submit(function (e) {
+            e.preventDefault();
+            showSpinner();
+
+            $.ajax({
+                url: 'ajax.php?action=save_venta_completa',
+                method: 'POST',
+                data: $(this).serialize(),
+                processData: true,
+                contentType: 'application/x-www-form-urlencoded',
+                dataType: 'json',
+                success: function (resp) {
+                    if (resp.success) {
+                        let idfactura = resp.idfactura;
+                        let tipo = resp
+                            .tipodocfac;
+
+                        let urlDTE = tipo === 'ccf' ? 'dteCCF.php' : 'dte.php';
+
+                        $.ajax({
+                            url: urlDTE,
+                            method: 'POST',
+                            data: {
+                                idfactura: idfactura
+                            },
+                            dataType: 'json',
+                            success: function (respDte) {
+                                hideSpinner();
+                                if (respDte.success) {
+                                    Swal.fire({
+                                        title: 'Éxito!',
+                                        text: 'Venta registrada y procesada correctamente.',
+                                        icon: 'success',
+                                        confirmButtonColor: '#28a745',
+                                        confirmButtonText: 'Imprimir y enviar por correo comprobante DTE'
+                                    }).then(() => {
+                                        const win1 = window.open(
+                                            'ticket.php?id=' +
+                                            encodeURIComponent(
+                                                idfactura),
+                                            '_blank'
+                                        );
+                                        const win2 = window.open(
+                                            'facturaElectronica.php?id=' +
+                                            encodeURIComponent(
+                                                idfactura) +
+                                            '&codigo=0',
+                                            '_blank'
+                                        );
+                                        if (!win1 || !win2) {
+                                            alert(
+                                                "Por favor habilita las ventanas emergentes (pop-ups) para este sitio."
+                                            );
+                                        } else {
+                                            setTimeout(() => location
+                                                .reload(), 500);
+                                        }
+                                    });
+                                } else {
+                                    Swal.fire({
+                                        title: 'Error en DTE',
+                                        text: respDte.detalle ||
+                                            'Ocurrió un error al procesar el DTE.',
+                                        icon: 'error'
+                                    });
+                                }
+                            },
+                            error: function () {
+                                hideSpinner();
+                                Swal.fire({
+                                    title: 'Error',
+                                    text: 'Error al enviar los datos al DTE.',
+                                    icon: 'error'
+                                });
+                            }
+                        });
+                    } else {
+                        hideSpinner();
+                        Swal.fire({
+                            title: 'Error',
+                            text: resp.message || 'Error al guardar la venta.',
+                            icon: 'error'
+                        });
+                    }
+                },
+                error: function () {
+                    hideSpinner();
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'No se pudo conectar con el servidor.',
+                        icon: 'error'
+                    });
+                }
+            });
+        });
+
+
     });
-});
 </script>

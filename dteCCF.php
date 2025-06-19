@@ -1,10 +1,10 @@
 <?php
 include 'conexionfin.php';
-require_once 'config/config.php'; // Asegúrate de que este archivo tenga las constantes necesarias
+require_once 'config/config.php'; // Constantes necesarias
 
-$idfactura = intval($_GET['idfactura']);
+$idfactura = $_POST['idfactura'] ?? null;
 
-// OBTENER FACTURA
+// OBTENER DATOS DE LA FACTURA
 $query = $conexion->query("SELECT factura.id, factura.tipofactura, factura.numerofactura, 
                                     factura.subtotal, factura.iva_impuesto, factura.totalpagar, 
                                     factura.letras, factura.forma_pago, factura.fechafactura, 
@@ -25,13 +25,12 @@ $Empresa = $queryEmpresa->fetch_assoc();
 $queryActividad = $conexion->query("SELECT descripcion FROM actividad_economica WHERE codigo = $Empresa[giro]");
 $ActividaE = $queryActividad->fetch_assoc();
 
-// OBTENER DETALLE DE PRODUCTOS
+// DETALLE DE PRODUCTOS
 $items = [];
 $detalle = $conexion->query("SELECT df.cantidad,p.descripcion, df.precioventa FROM detallefactura df inner join producto p ON p.codproducto = df.cod_producto WHERE idfactura = $idfactura");
 $numItem = 1;
 $totalGravada = 0;
 $totalIva = 0;
-
 
 while ($row = $detalle->fetch_assoc()) {
     $monto = floatval($row['cantidad']) * floatval($row['precioventa']);
@@ -59,23 +58,23 @@ while ($row = $detalle->fetch_assoc()) {
     $totalIva += $ivaItem;
 }
 
-// OBTENER TOKEN DE HACIENDA
+// TOKEN
 require_once 'api/token.php';
 $token = leerTokenCache();
 if (!$token) {
     $token = obtenerTokenDesdeAPI();
 }
 
-// GENERAR CÓDIGO Y FECHA
+// GENERAR JSON
 $codigoGeneracion = strtoupper(vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex(random_bytes(16)), 4)));
 date_default_timezone_set("America/El_Salvador");
-$fechaEmision = date("Y-m-d");  // Formato: 2025-04-18
+$fechaEmision = date("Y-m-d");
 $horaEmision = date("H:i:s");
 
 $sql6 = "SELECT * FROM actividad_economica WHERE codigo = '" . $factura['dato3'] . "'";
 $resultado6 = $conexion->query($sql6);
 $row6 = $resultado6->fetch_assoc();
-// ARMAR JSON PARA EL FIRMADOR
+
 $facturaJson = [
     "nit" => MH_USER,
     "activo" => "true",
@@ -83,7 +82,7 @@ $facturaJson = [
     "dteJson" => [
         "identificacion" => [
             "version" => 3,
-            "ambiente" => "00",
+            "ambiente" => MH_AMBIENTE,
             "tipoDte" => "03",
             "numeroControl" => "DTE-03-M001P001-" . str_pad($idfactura, 15, "0", STR_PAD_LEFT),
             "codigoGeneracion" => $codigoGeneracion,
@@ -177,6 +176,9 @@ $facturaJson = [
     ]
 ];
 
+// Guardar JSON en archivo
+file_put_contents('cache_estructura.json', json_encode($facturaJson, JSON_UNESCAPED_UNICODE));
+
 // ENVIAR A FIRMADOR
 $curl = curl_init(MH_API_FIRMADOR);
 curl_setopt_array($curl, [
@@ -188,23 +190,36 @@ curl_setopt_array($curl, [
         'Authorization: Bearer ' . $token
     ]
 ]);
-file_put_contents('cache_estructura.json', json_encode($facturaJson, JSON_UNESCAPED_UNICODE));
+
 $response = curl_exec($curl);
-
-if (curl_errno($curl)) {
-    echo json_encode(['success' => false, 'message' => 'CURL error: ' . curl_error($curl)]);
-    curl_close($curl);
-    exit;
-}
-
-// GUARDAR RESPUESTA DEL FIRMADOR EN CACHE
-file_put_contents('cache_firmador.json', $response);
+$curlError = curl_error($curl);
 $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 curl_close($curl);
 
-// SI FIRMA CORRECTAMENTE, ENVIAR A HACIENDA
+// ⚠️ Si hubo error de conexión (NO si MH devuelve error, sino si falla conexión)
+if ($response === false || $curlError) {
+    $jsonEstructura = file_get_contents('cache_estructura.json');
+    $fechaContingencia = date('Y-m-d H:i:s');
+
+    // Insertar en lista_contingencia_dte
+    $insertContingencia = $conexion->prepare("INSERT INTO lista_contingencia_dte (idfactura, fechacontingencia, codigoGeneracion, dtejson) VALUES (?, ?, ?, ?)");
+    $insertContingencia->bind_param("isss", $idfactura, $fechaContingencia, $codigoGeneracion, $jsonEstructura);
+    $insertContingencia->execute();
+
+    echo json_encode([
+        'success' => false,
+        'message' => 'Fallo conexión con firmador. Guardado en contingencia.',
+        'error' => $curlError
+    ]);
+    exit;
+}
+
+// SI LA FIRMA FUE EXITOSA
+file_put_contents('cache_firmador.json', $response);
+
 if ($httpCode === 200) {
-    include 'recepciondteCCF.php'; // Enviar automáticamente a Hacienda después de firmar
+    include 'recepciondteCCF.php';
+    echo json_encode(['success' => true, 'idfactura' => $idfactura]);
 } else {
     echo json_encode(['success' => false, 'message' => 'Error al firmar documento', 'detalle' => $response]);
 }

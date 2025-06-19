@@ -1,6 +1,6 @@
 <?php
 
-$url = "https://apitest.dtes.mh.gob.sv/fesv/recepciondte";
+$url = MH_ENVIO_DTE_URL;
 
 // LEER JSON FIRMADO DEL ARCHIVO TEMPORAL
 $jsonFirmado = file_get_contents('cache_firmador.json');
@@ -41,7 +41,7 @@ $documento_firmado = $dteFirmado['body']; // <-- AQUÍ ESTABA EL ERROR
 
 $json_DTE_Estructurado = $JSONFinalArmado['dteJson'];
 $data = [
-    "ambiente" => "00",
+    "ambiente" => MH_AMBIENTE,
     "idEnvio" => "1",
     "version" => "1",
     "tipoDte" => "01",
@@ -83,7 +83,7 @@ if (curl_errno($ch)) {
     }
 
     // ID de factura (ajusta de dónde lo estás obteniendo)
-    $id_factura = intval($_GET['idfactura']);
+    $id_factura = $_POST['idfactura'] ?? ($_GET['idfactura'] ?? null);
 
     // INSERTAR EN LA TABLA
     $stmt = $conexion->prepare("INSERT INTO respuestadte (

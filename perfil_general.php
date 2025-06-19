@@ -26,6 +26,9 @@ $documentos = $pro->ListarDocumentos();
 
 $busqueda = isset($_GET['buscar']) ? trim($_GET['buscar']) : '';
 $actividades = $pro->ListarActividades($busqueda);
+
+$giroSeleccionado = isset($meta['giro']) ? $meta['giro'] : '';
+
 ?>
 
 <div class="container-fluid">
@@ -73,7 +76,7 @@ $actividades = $pro->ListarActividades($busqueda);
                         </div>
                         <div class="form-group col-md-3">
                             <label for="actividad">Seleccionar Actividad</label>
-                            <select name="giro" id="giro" class="form-control select2" required>
+                            <select name="giro" id="giro" class="form-control" required>
                                 <option value="">-- SELECCIONE --</option>
                                 <?php foreach ($actividades as $act): ?>
                                 <option value="<?php echo $act['codigo']; ?>"
@@ -150,7 +153,7 @@ $actividades = $pro->ListarActividades($busqueda);
                                 <?php endforeach; ?>
                             </select>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-6">
                             <div class="form-group has-feedback">
                                 <label>Dirección:</label>
                                 <input type="text" name="txtDirEmpresa" class="form-control"
@@ -185,6 +188,16 @@ $actividades = $pro->ListarActividades($busqueda);
                                     Impresion 58mm</option>
                                 <option value="80mm" <?php echo ($meta['impresion'] == "80mm") ? "selected" : ""; ?>>
                                     Impresion 80mm</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label class="control-label">Ambierte</label>
+                            <select name="dato8" id="dato8" class="form-control" required aria-required="true">
+                                <option value="">-- SELECCIONE --</option>
+                                <option value="00" <?php echo ($meta['dato8'] == "00") ? "selected" : ""; ?>>
+                                    Ambiente de Pruebas</option>
+                                <option value="01" <?php echo ($meta['dato8'] == "01") ? "selected" : ""; ?>>
+                                    Ambiente de producción</option>
                             </select>
                         </div>
                     </div>
@@ -259,7 +272,6 @@ $actividades = $pro->ListarActividades($busqueda);
         </form>
     </div>
 </div>
-
 <script>
 function previewImage(event, previewId, inputId) {
     console.log("Función llamada");
@@ -408,12 +420,26 @@ $(document).ready(function() {
     <?php endif; ?>
 });
 
-$(document).ready(function() {
-    $('.select2').select2({
-        width: '100%',
-        height: '150%',
-        placeholder: "-- Seleccionar una actividad --",
-        allowClear: true
-    });
+
+$('#giro').select2({
+    placeholder: "-- SELECCIONE ACTIVIDAD --",
+    minimumInputLength: 2,
+    ajax: {
+        url: 'buscar_actividades.php',
+        dataType: 'json',
+        delay: 250,
+        data: function(params) {
+            return {
+                term: params.term // término de búsqueda
+            };
+        },
+        processResults: function(data) {
+            return {
+                results: data.results
+            };
+        },
+        cache: true
+    },
+    width: '100%'
 });
 </script>

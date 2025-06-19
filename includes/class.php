@@ -91,6 +91,7 @@ class Action
 		$txtdato5 = $_POST['dato5'];
 		$txtdato6 = $_POST['dato6'];
 		$txtdato7 = $_POST['dato7'];
+		$txtdato8 = $_POST['dato8'];
 
 		// Construye la cadena de datos correctamente
 		$data = " dni = '$txtdni'";
@@ -110,7 +111,7 @@ class Action
 		$data .= ", dato5 = '$txtdato5'";
 		$data .= ", dato6 = '$txtdato6'";
 		$data .= ", dato7 = '$txtdato7'";
-		$data .= ", dato8 = 'ND'";
+		$data .= ", dato8 = '$txtdato8'";
 
 		// Evita inyección SQL usando consultas preparadas
 		$id = 1;
@@ -735,6 +736,18 @@ class Action
 		}
 		return $pago;
 	}
+	public function ListarCtaContingencias()
+	{
+		$sql = "SELECT * FROM cta_contingencias";
+		$result = mysqli_query($this->dbh, $sql);
+		$pago = array();
+		if ($result) {
+			while ($row = mysqli_fetch_assoc($result)) {
+				$pago[] = $row;
+			}
+		}
+		return $pago;
+	}
 	public function Listarconsecutivos()
 	{
 		$sql = "SELECT * FROM consecutivos";
@@ -918,20 +931,22 @@ class Action
 
 		$save = $this->dbh->query("UPDATE factura SET " . $data . " WHERE id = $id");
 		if ($save) {
-			// Construir la URL del ticket
-			$ticket_url = "ticket.php?id=" . $id;
-			$facturaElectronica = "facturaElectronica.php?id=" . $id . "&codigo=0";
+			$factura = $this->dbh->query("SELECT * FROM factura WHERE id = $id");
+			if ($factura && $factura->num_rows > 0) {
+				$row = $factura->fetch_assoc();
 
-			echo json_encode([
-				'success' => true,
-				'ticket_url' => $ticket_url,
-				'facturaElectronica' => $facturaElectronica
-			]);
-		} else {
-			// Devolver un JSON con success = false
-			echo json_encode(['success' => false, 'message' => 'Error al actualizar la factura.']);
+				echo json_encode([
+					'success' => true,
+					'message' => 'Venta Registrada correctamente. ',
+					"idfactura" => $row['id'],
+					"tipodocfac" => $row['tipofactura'],
+				]);
+			} else {
+				// Devolver un JSON con success = false
+				echo json_encode(['success' => false, 'message' => 'Error al actualizar la factura.']);
+			}
+			exit;
 		}
-		exit;
 	}
 
 	private function generateCorrelativo($prefix)
@@ -1150,4 +1165,22 @@ class Action
 		exit;
 	}
 	#endregion
+	public function facturas()
+	{
+		$id = $_POST['idfacturaV'];
+		$factura = $this->dbh->query("SELECT * FROM factura WHERE id = $id");
+		if ($factura && $factura->num_rows > 0) {
+			$row = $factura->fetch_assoc();
+
+			echo json_encode([
+				'success' => true,
+				'message' => 'Venta Registrada correctamente. ',
+				"idfactura" => $row['id']
+			]);
+		} else {
+			// Devolver un JSON con success = false
+			echo json_encode(['success' => false, 'message' => 'Error al actualizar la factura.']);
+		}
+		exit;
+	}
 }

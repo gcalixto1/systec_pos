@@ -15,26 +15,28 @@ if (!isset($_SESSION['login_idusuario'])) {
     <title>systec POS</title>
     <script src="assets/vendor/jquery/jquery.min.js"></script>
     <script src="assets/DataTables/datatables.min.js"></script>
-    <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-    <script src="assets/vendor/jquery.easing/jquery.easing.min.js"></script>
-    <script src="assets/vendor/php-email-form/validate.js"></script>
-    <script src="assets/vendor/venobox/venobox.min.js"></script>
-    <script src="assets/vendor/waypoints/jquery.waypoints.min.js"></script>
-    <script src="assets/vendor/counterup/counterup.min.js"></script>
-    <script src="assets/vendor/owl.carousel/owl.carousel.min.js"></script>
-    <script src="assets/vendor/bootstrap-datepicker/js/bootstrap-datepicker.min.js"></script>
-    <script type="text/javascript" src="assets/js/select2.min.js"></script>
-    <script type="text/javascript" src="assets/js/jquery.datetimepicker.full.min.js"></script>
     <script type="text/javascript" src="assets/font-awesome/js/all.min.js"></script>
-    <script type="text/javascript" src="assets/js/jquery-te-1.4.0.min.js" charset="utf-8"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="assets/DataTables/datatables.min.css">
     <link rel="stylesheet" href="assets/css/select2.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
 
-
-
 </head>
+<style>
+    body {
+        background: #80808045;
+    }
+
+    .modal-dialog.large {
+        width: 80% !important;
+        max-width: unset;
+    }
+
+    .modal-dialog.mid-large {
+        width: 50% !important;
+        max-width: unset;
+    }
+</style>
 
 <body>
 
@@ -121,21 +123,6 @@ if (!isset($_SESSION['login_idusuario'])) {
 
     <div class="modal fade" id="uni_modal_documentos" role='dialog'>
         <div class="modal-dialog modal-md" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title"></h5>
-                    <button type="button" class="btn btn-default" data-dismiss="modal"><i class="fa fa-times"></i>
-                        Cerrar</button>
-                </div>
-                <div class="modal-body">
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal fade" id="uni_modal_notasCredito" tabindex="-1" role="dialog"
-        aria-labelledby="uni_modal_notasCredito" aria-hidden="true">
-        <div class="modal-dialog modal-xl" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title"></h5>
@@ -294,45 +281,6 @@ if (!isset($_SESSION['login_idusuario'])) {
             }
         })
     }
-    window.uni_modal_notasCredito = function ($title1 = '', $url1 = '', $size1 = "") {
-        start_load()
-        $.ajax({
-            url: $url1,
-            error: err => {
-                console.log(err)
-                alert("Ocurrió un error")
-            },
-            success: function (resp1) {
-                if (resp1) {
-                    $('#uni_modal_notasCredito .modal-title').html($title1)
-                    $('#uni_modal_notasCredito .modal-body').html(resp1)
-                    if ($size1 != '') {
-                        $('#uni_modal_notasCredito .modal-dialog').addClass($size1)
-                    } else {
-                        $('#uni_modal_notasCredito .modal-dialog').removeAttr("class").addClass(
-                            "modal-dialog modal-xl")
-                    }
-                    $('#uni_modal_notasCredito').modal('show')
-
-                    setTimeout(function () {
-                        if ($.fn.DataTable.isDataTable('#tablaVentas')) {
-                            $('#tablaVentas').DataTable().destroy();
-                        }
-                        $('#tablaVentas').DataTable({
-                            language: {
-                                url: '//cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json'
-                            },
-                            order: [
-                                [0, 'desc']
-                            ]
-                        });
-                    }, 200)
-                    end_load()
-                }
-            }
-        })
-    }
-
     window._conf = function ($msg = '', $func = '', $params = []) {
         $('#confirm_modal #confirm').attr('onclick', $func + "(" + $params.join(',') + ")")
         $('#confirm_modal .modal-body').html($msg)

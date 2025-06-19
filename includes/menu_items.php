@@ -1,11 +1,3 @@
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Punto de venta</title>
-<!-- Agrega tus enlaces CSS aquí -->
-<link rel="stylesheet" href="assets/css/style_Menu.css">
-<link href="assets/vendor/icofont/icofont.min.css" rel="stylesheet">
-<link href="assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
-<link href="assets/DataTables/dataTables.min.css" rel="stylesheet">
 <?php
 include('conexionfin.php');
 $rol_actual = $_SESSION['login_rol'];
@@ -68,9 +60,6 @@ function imprimirMenu($menu_arbol)
     <title>Punto de venta</title>
     <!-- Agrega tus enlaces CSS aquí -->
     <link rel="stylesheet" href="assets/css/style_Menu.css">
-    <link href="assets/vendor/icofont/icofont.min.css" rel="stylesheet">
-    <link href="assets/vendor/boxicons/css/boxicons.min.css" rel="stylesheet">
-    <link href="assets/DataTables/dataTables.min.css" rel="stylesheet">
 </head>
 
 <body>
@@ -94,7 +83,7 @@ function imprimirMenu($menu_arbol)
                 <div class="footer">
                     <p>&copy;
                         <script>
-                        document.write(new Date().getFullYear());
+                            document.write(new Date().getFullYear());
                         </script>
                     </p>
                 </div>
@@ -127,12 +116,12 @@ function imprimirMenu($menu_arbol)
     <script src="assets/js_Menu/bootstrap.min.js"></script>
     <script src="assets/js_Menu/main.js"></script>
     <script>
-    $(document).ready(function() {
-        $('.has-arrow').click(function() {
-            $(this).next('.collapse').slideToggle();
+        $(document).ready(function () {
+            $('.has-arrow').click(function () {
+                $(this).next('.collapse').slideToggle();
+            });
         });
-    });
-    $('.nav-<?php echo isset($_GET['page']) ? $_GET['page'] : '' ?>').addClass('active')
+        $('.nav-<?php echo isset($_GET['page']) ? $_GET['page'] : '' ?>').addClass('active')
     </script>
 </body>
 

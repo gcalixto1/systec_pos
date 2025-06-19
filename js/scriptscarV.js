@@ -118,7 +118,17 @@ document.getElementById('saveventa').addEventListener('submit', function(event) 
             let response = JSON.parse(resp);
             let idfactura = response.idfactura;
             if (response.success) {
-                uni_modal_generador("Cobrar venta", "ventas.php?idfactura=" + idfactura);
+                Swal.fire({
+                    title: 'Éxito!',
+                    text: 'El registro se guardó con éxito.',
+                    icon: 'success',
+                    confirmButtonColor: '#28a745',
+                    confirmButtonText: 'OK'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        location.reload();
+                    }
+                });
                 end_load();
             }
         }

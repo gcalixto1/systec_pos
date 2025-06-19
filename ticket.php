@@ -23,7 +23,7 @@ if (!$data || json_last_error() !== JSON_ERROR_NONE) {
     die("Error al decodificar el JSON");
 }
 
-// === Extraer campos importantes ===
+// // === Extraer campos importantes ===
 $ident = $data['identificacion'];
 $emisor = $data['emisor'];
 $receptor = $data['receptor'];
@@ -45,7 +45,7 @@ $detalle = mysqli_query($conexion, "
 ");
 
 // === Generar QR ===
-$contenidoQR = "https://admin.factura.gob.sv/consultaPublica?ambiente=00&codGen={$ident['codigoGeneracion']}&fechaEmi={$ident['fecEmi']}";
+$contenidoQR = "https://admin.factura.gob.sv/consultaPublica?ambiente=" + MH_AMBIENTE + "&codGen={$ident['codigoGeneracion']}&fechaEmi={$ident['fecEmi']}";
 $archivoQR = 'qr_temp.png';
 QRcode::png($contenidoQR, $archivoQR, QR_ECLEVEL_H, 4);
 

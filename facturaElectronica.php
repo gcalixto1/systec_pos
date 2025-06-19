@@ -64,7 +64,7 @@ if (is_array($documentosRelacionados) && count($documentosRelacionados) > 0) {
     $fechaDocRel = '';
 }
 // === Generar QR ===
-$contenidoQR = "https://admin.factura.gob.sv/consultaPublica?ambiente=00&codGen={$ident['codigoGeneracion']}&fechaEmi={$ident['fecEmi']}";
+$contenidoQR = "https://admin.factura.gob.sv/consultaPublica?ambiente=" + MH_AMBIENTE + "&codGen={$ident['codigoGeneracion']}&fechaEmi={$ident['fecEmi']}";
 $archivoQR = 'qr_temp.png';
 QRcode::png($contenidoQR, $archivoQR, QR_ECLEVEL_H, 4);
 
