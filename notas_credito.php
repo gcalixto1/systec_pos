@@ -41,7 +41,7 @@ $codigoGeneracion = strtoupper(vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2he
             <div class="form-body">
                 <div class="card-body">
                     <div class="row">
-                        <input type="hidden" name="codigoGeneracion" value="<?php echo $codigoGeneracion; ?>">
+                        <input type="text" hidden name="codigoGeneracion" value="<?php echo $codigoGeneracion; ?>">
                         <div class="form-group col-md-3">
                             <label for="dni">Número de Documento</label>
                             <div class="input-group">
@@ -416,11 +416,11 @@ $('#tablaVentas').DataTable({
     }
 });
 
-// Acción al hacer clic en "Seleccionar"
-$(document).on('click', '.seleccionar_factura', function() {
-    var codigo = $(this).data('codigo');
-    $('#modalFacturas').modal('hide');
-});
+// // Acción al hacer clic en "Seleccionar"
+// $(document).on('click', '.seleccionar_factura', function() {
+//     var codigo = $(this).data('codigo');
+//     $('#modalFacturas').modal('hide');
+// });
 
 $('#modalFacturas').on('show.bs.modal', function(event) {
     const button = $(event.relatedTarget);

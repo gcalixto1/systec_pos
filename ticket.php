@@ -45,7 +45,7 @@ $detalle = mysqli_query($conexion, "
 ");
 
 // === Generar QR ===
-$contenidoQR = "https://admin.factura.gob.sv/consultaPublica?ambiente=" + MH_AMBIENTE + "&codGen={$ident['codigoGeneracion']}&fechaEmi={$ident['fecEmi']}";
+$contenidoQR = "https://admin.factura.gob.sv/consultaPublica?ambiente={$ident['codigoGeneracion']}&codGen={$ident['codigoGeneracion']}&fechaEmi={$ident['fecEmi']}";
 $archivoQR = 'qr_temp.png';
 QRcode::png($contenidoQR, $archivoQR, QR_ECLEVEL_H, 4);
 

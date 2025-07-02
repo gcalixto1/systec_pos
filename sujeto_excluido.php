@@ -206,28 +206,30 @@ $codigoGeneracion = strtoupper(vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2he
         actualizarTabla();
     }
 
-    $('#proveedor').select2({
-        placeholder: "-- SELECCIONE --",
-        width: '100%',
-        ajax: {
-            url: 'buscar_proveedores.php',
-            dataType: 'json',
-            delay: 250,
-            data: function (params) {
-                return {
-                    q: params.term
-                };
-            },
-            processResults: function (data) {
-                return {
-                    results: data.results
-                };
-            },
-            cache: true
-        }
-    });
+
 
     $(document).ready(function () {
+        $('#proveedor').select2({
+            placeholder: "-- SELECCIONE --",
+            width: '100%',
+            ajax: {
+                url: 'buscar_proveedores.php',
+                dataType: 'json',
+                delay: 200,
+                data: function (params) {
+                    return {
+                        q: params.term
+                    };
+                },
+                processResults: function (data) {
+                    return {
+                        results: data.results
+                    };
+                },
+                cache: true
+            }
+        });
+
         function showSpinner() {
             $('#spinner').show();
         }

@@ -1028,16 +1028,56 @@ class Action
 
 		$data = "Observacion = '$observaciones'";
 		$data .= ", monto = '$monto'";
-		$data .= ", codigoGeneracion = '$codigo'";
+		$data .= ", codigoGeneracion = '$codigoGeneracionP'";
 		$data .= ", id_usuario = '$idusuario'";
 		$data .= ", numeroDocumento = '$numeroDocumento'";
 
 		$save = $this->dbh->query("INSERT notas_credito SET " . $data);
 		if ($save) {
 
-			$facturaNC = "dteNC.php?codigo=" . $codigo . "&codigoGeneracion=" . $codigo;
+			$facturaNC = "dteNC.php?codigo=" . $codigo . "&codigoGeneracion=" . $codigoGeneracionP;
+			$facturaElectronica = "facturaElectronica.php?codigo=" . $codigoGeneracionP;
 
-			$facturaElectronica = "facturaElectronica.php?codigo=" . $codigo;
+			echo json_encode([
+				'success' => true,
+				'facturaNC' => $facturaNC,
+				'facturaElectronica' => $facturaElectronica
+			]);
+		} else {
+			// Devolver un JSON con success = false
+			echo json_encode(['success' => false, 'message' => 'Error al actualizar la factura.']);
+		}
+		exit;
+	}
+	function save_NotaDebito()
+	{
+		extract($_POST);
+
+		$observaciones = $_POST['observaciones'] ?? '';
+		$codigoGeneracionP = $_POST['codigoGeneracion'] ?? '';
+		$monto = $_POST['monto'] ?? '';
+		$documentos = isset($_POST['documentos']) ? json_decode($_POST['documentos'], true) : [];
+		$codigo = "";
+		$idusuario = $_SESSION['login_idusuario'];
+		$numeroDocumento = $this->generateCorrelativo('ndc');
+		// Procesar los documentos
+		foreach ($documentos as $doc) {
+			$codigo = $doc['codigo'];
+			$fecha = $doc['fecha'];
+			// Guardar cada documento relacionado, si aplica
+		}
+
+		$data = "Observacion = '$observaciones'";
+		$data .= ", monto = '$monto'";
+		$data .= ", codigoGeneracion = '$codigoGeneracionP'";
+		$data .= ", id_usuario = '$idusuario'";
+		$data .= ", numeroDocumento = '$numeroDocumento'";
+
+		$save = $this->dbh->query("INSERT notas_credito SET " . $data);
+		if ($save) {
+
+			$facturaNC = "dteND.php?codigo=" . $codigo . "&codigoGeneracion=" . $codigoGeneracionP;
+			$facturaElectronica = "facturaElectronica.php?codigo=" . $codigoGeneracionP;
 
 			echo json_encode([
 				'success' => true,
@@ -1182,5 +1222,38 @@ class Action
 			echo json_encode(['success' => false, 'message' => 'Error al actualizar la factura.']);
 		}
 		exit;
+	}
+	function save_contingencia()
+	{
+		extract($_POST);
+
+		// Sanitización básica
+		$codigo = mysqli_real_escape_string($this->dbh, $codigo);
+		$fchainicia = mysqli_real_escape_string($this->dbh, $fechaIni . ' ' . $horaIni);
+		$fchafin = mysqli_real_escape_string($this->dbh, $fechaFin . ' ' . $horaFin);
+		$responsable = mysqli_real_escape_string($this->dbh, $responsable);
+		$tipoDoc = mysqli_real_escape_string($this->dbh, $documento2);
+		$tcontingencia = mysqli_real_escape_string($this->dbh, $tcontingencia);
+		$tipoF = mysqli_real_escape_string($this->dbh, $tipoF);
+
+		// Construcción de datos para la consulta
+		$data = "fchainicia = '$fchainicia'";
+		$data .= ", fchafin = '$fchafin'";
+		$data .= ", responsable = '$responsable'";
+		$data .= ", doc = '$tipoDoc'";
+		$data .= ", motivo = '$tcontingencia'";
+
+		// Si ya existe una contingencia con ese código, actualiza. Si no, inserta.
+		$check = $this->dbh->query("SELECT id FROM lista_contingencia_dte WHERE codigoGeneracion = '$codigo'");
+		if ($check && $check->num_rows > 0) {
+			$save = $this->dbh->query("UPDATE lista_contingencia_dte SET $data WHERE codigoGeneracion = '$codigo'");
+		} else {
+			$data .= ", codigoGeneracion = '$codigo'";
+			$save = $this->dbh->query("INSERT INTO lista_contingencia_dte SET $data");
+		}
+		echo json_encode([
+			'success' => true,
+			'message' => 'Venta Registrada correctamente. '
+		]);
 	}
 }
