@@ -2,23 +2,10 @@
 include 'conexionfin.php';
 require_once 'config/config.php'; // Asegúrate de que este archivo tenga las constantes necesarias
 
-// $idfactura = intval($_GET['idfactura']);
-
-// $observaciones = $_POST['observaciones'];
-// $monto = floatval($_POST['monto']);
-// $documentos = json_decode($_POST['documentos'], true);
-$codigo = $_GET['codigo'] ?? '';
-$codigoGeneracion = $_GET['codigoGeneracion'] ?? '';
-
-// echo "<pre>" . print_r($codigoGeneracion) . "</pre>";
-$fecha = "";
-// foreach ($documentos as $doc) {
-//     $codigo = $doc['codigo'];
-//     $fecha = date('d/m/Y H:i', strtotime($doc['fecha']));
-//     // Puedes guardar o usar esta información
-// }
-
-
+$codigo = $_POST['documentos'] ? json_decode($_POST['documentos'], true)[0]['codigo'] ?? '' : '';
+$observaciones = $_POST['descripcion'] ?? '';
+$montoNB = floatval($_POST['monto'] ?? 0);
+$codigoGeneracionNC = $_POST['codigoGeneracion'] ?? '';
 // OBTENER FACTURA
 $query = $conexion->query("SELECT factura.id, factura.tipofactura, factura.numerofactura, 
                                     factura.subtotal, factura.iva_impuesto, factura.totalpagar, 
@@ -57,9 +44,9 @@ $rowconsecutivo = $resultadoconsecutivo->fetch_assoc();
 $number = intval(substr($rowconsecutivo['last_id'], strlen("ndd")));
 $newNumber = $number + 1;
 
-$monto = $factura['totalpagar'];
+$monto = $montoNB;
 $observaciones = $observaciones . " " . $factura['numerofactura'];
-$montoiva = round($monto / 1.13, 2);
+$montoiva = round($montoNB / 1.13, 2);
 $ivaItem = round($montoiva * 0.13, 2);
 $items[] = [
     "numItem" => $numItem++,
@@ -70,14 +57,14 @@ $items[] = [
     "uniMedida" => 99,
     "codTributo" => null,
     "descripcion" => $observaciones,
-    "precioUni" => round($monto / 1.13, 2),
+    "precioUni" => round($montoNB / 1.13, 2),
     "montoDescu" => 0,
     "ventaNoSuj" => 0,
     "ventaExenta" => 0,
-    "ventaGravada" => round($monto / 1.13, 2),
+    "ventaGravada" => round($montoNB / 1.13, 2),
     "tributos" => ["20"]
 ];
-$totalGravada += $monto;
+$totalGravada += $montoNB;
 $totalIva += $ivaItem;
 
 // OBTENER TOKEN DE HACIENDA
@@ -103,7 +90,7 @@ $facturaJson = [
             "ambiente" => MH_AMBIENTE,
             "tipoDte" => "06",
             "numeroControl" => "DTE-06-M001P001-" . str_pad($newNumber, 15, "0", STR_PAD_LEFT),
-            "codigoGeneracion" => $codigoGeneracion,
+            "codigoGeneracion" => $codigoGeneracionNC,
             "tipoModelo" => 1,
             "tipoOperacion" => 1,
             "tipoContingencia" => null,
@@ -157,8 +144,8 @@ $facturaJson = [
         "resumen" => [
             "totalNoSuj" => 0,
             "totalExenta" => 0,
-            "totalGravada" => round($monto / 1.13, 2),
-            "subTotalVentas" => round($monto / 1.13, 2),
+            "totalGravada" => round($montoNB / 1.13, 2),
+            "subTotalVentas" => round($montoNB / 1.13, 2),
             "descuNoSuj" => 0,
             "descuExenta" => 0,
             "descuGravada" => 0,
@@ -170,11 +157,11 @@ $facturaJson = [
                     "valor" => round($totalIva, 2)
                 ]
             ],
-            "subTotal" => round($monto / 1.13, 2),
+            "subTotal" => round($montoNB / 1.13, 2),
             "ivaPerci1" => 0,
             "ivaRete1" => 0,
             "reteRenta" => 0,
-            "montoTotalOperacion" => round($monto / 1.13, 2),
+            "montoTotalOperacion" => round($montoNB / 1.13, 2),
             "totalLetras" => $factura['letras'],
             "condicionOperacion" => 1,
             "numPagoElectronico" => null
@@ -215,7 +202,12 @@ $response = [
 ];
 // SI FIRMA CORRECTAMENTE, ENVIAR A HACIENDA
 if ($httpCode === 200) {
-    include 'recepciondteND.php'; // Enviar automáticamente a Hacienda después de firmar
+    include 'recepciondteND.php';
+    echo json_encode([
+        'success' => true,
+        'codigo_generacion' => $codigoGeneracion
+    ]);
+    exit; // Enviar automáticamente a Hacienda después de firmar
 } else {
     echo json_encode(['success' => false, 'message' => 'Error al firmar documento', 'detalle' => $response]);
 }

@@ -32,7 +32,7 @@ if ($id) {
     $sql = "SELECT correo_enviado, selloRecibido, jsondte 
             FROM respuestadte 
             INNER JOIN notas_debito ON notas_debito.codigoGeneracion = respuestadte.codigoGeneracion 
-            WHERE notas_debito.codigoGeneracion = '$codigo'";
+            WHERE notas_debito.codigoGeneracion = '$codigoDebito'";
 
 
 } else if ($codigoSE) {

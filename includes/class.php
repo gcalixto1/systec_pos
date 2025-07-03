@@ -1035,13 +1035,10 @@ class Action
 		$save = $this->dbh->query("INSERT notas_credito SET " . $data);
 		if ($save) {
 
-			$facturaNC = "dteNC.php?codigo=" . $codigo . "&codigoGeneracion=" . $codigoGeneracionP;
-			$facturaElectronica = "facturaElectronica.php?codigo=" . $codigoGeneracionP;
-
 			echo json_encode([
 				'success' => true,
-				'facturaNC' => $facturaNC,
-				'facturaElectronica' => $facturaElectronica
+				'codigoNC' => $codigoGeneracionP,
+				'message' => 'Registro de nota de crédito guardado correctamente.',
 			]);
 		} else {
 			// Devolver un JSON con success = false
@@ -1059,7 +1056,7 @@ class Action
 		$documentos = isset($_POST['documentos']) ? json_decode($_POST['documentos'], true) : [];
 		$codigo = "";
 		$idusuario = $_SESSION['login_idusuario'];
-		$numeroDocumento = $this->generateCorrelativo('ndc');
+		$numeroDocumento = $this->generateCorrelativo('ndd');
 		// Procesar los documentos
 		foreach ($documentos as $doc) {
 			$codigo = $doc['codigo'];
@@ -1073,16 +1070,12 @@ class Action
 		$data .= ", id_usuario = '$idusuario'";
 		$data .= ", numeroDocumento = '$numeroDocumento'";
 
-		$save = $this->dbh->query("INSERT notas_credito SET " . $data);
+		$save = $this->dbh->query("INSERT notas_debito SET " . $data);
 		if ($save) {
-
-			$facturaNC = "dteND.php?codigo=" . $codigo . "&codigoGeneracion=" . $codigoGeneracionP;
-			$facturaElectronica = "facturaElectronica.php?codigo=" . $codigoGeneracionP;
-
 			echo json_encode([
 				'success' => true,
-				'facturaNC' => $facturaNC,
-				'facturaElectronica' => $facturaElectronica
+				'codigoNotaDebito' => $codigoGeneracionP,
+				'message' => 'Registro de nota de débito guardado correctamente.',
 			]);
 		} else {
 			// Devolver un JSON con success = false
