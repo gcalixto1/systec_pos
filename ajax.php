@@ -131,6 +131,11 @@ if ($action == 'saveNotasCredito') {
 	if ($save)
 		echo $save;
 }
+if ($action == 'saveNotasDebito') {
+	$save = $crud->save_NotaDebito();
+	if ($save)
+		echo $save;
+}
 
 if ($action == 'saveInvalidacion') {
 	$save = $crud->save_Invalidacion();
@@ -139,6 +144,11 @@ if ($action == 'saveInvalidacion') {
 }
 if ($action == 'save_sujetoExcluido') {
 	$save = $crud->save_sujetoExcluido();
+	if ($save)
+		echo $save;
+}
+if ($action == 'save_contingencia') {
+	$save = $crud->save_contingencia();
 	if ($save)
 		echo $save;
 }

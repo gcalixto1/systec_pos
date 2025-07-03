@@ -2,22 +2,10 @@
 include 'conexionfin.php';
 require_once 'config/config.php'; // Asegúrate de que este archivo tenga las constantes necesarias
 
-// $idfactura = intval($_GET['idfactura']);
-
-// $observaciones = $_POST['observaciones'];
-// $monto = floatval($_POST['monto']);
-// $documentos = json_decode($_POST['documentos'], true);
-$codigo = $_GET['codigo'] ?? '';
-$codigoGeneracion = $_GET['codigoGeneracion'] ?? '';
-
-// echo "<pre>" . print_r($codigoGeneracion) . "</pre>";
-$fecha = "";
-// foreach ($documentos as $doc) {
-//     $codigo = $doc['codigo'];
-//     $fecha = date('d/m/Y H:i', strtotime($doc['fecha']));
-//     // Puedes guardar o usar esta información
-// }
-
+$codigo = $_POST['documentos'] ? json_decode($_POST['documentos'], true)[0]['codigo'] ?? '' : '';
+$observaciones = $_POST['descripcion'] ?? '';
+$monto = floatval($_POST['monto'] ?? 0);
+$codigoGeneracionNC = $_POST['codigoGeneracion'] ?? '';
 
 // OBTENER FACTURA
 $query = $conexion->query("SELECT factura.id, factura.tipofactura, factura.numerofactura, 
@@ -91,7 +79,7 @@ if (!$token) {
 date_default_timezone_set("America/El_Salvador");
 $fechaEmision = date("Y-m-d");  // Formato: 2025-04-18
 $horaEmision = date("H:i:s");
-
+$codigoGeneracion = $codigoGeneracionNC;
 // ARMAR JSON PARA EL FIRMADOR
 $facturaJson = [
     "nit" => MH_USER,
@@ -103,7 +91,7 @@ $facturaJson = [
             "ambiente" => MH_AMBIENTE,
             "tipoDte" => "05",
             "numeroControl" => "DTE-05-M001P001-" . str_pad($newNumber, 15, "0", STR_PAD_LEFT),
-            "codigoGeneracion" => $codigo,
+            "codigoGeneracion" => $codigoGeneracion,
             "tipoModelo" => 1,
             "tipoOperacion" => 1,
             "tipoContingencia" => null,
@@ -214,7 +202,12 @@ $response = [
 ];
 // SI FIRMA CORRECTAMENTE, ENVIAR A HACIENDA
 if ($httpCode === 200) {
-    include 'recepciondteNC.php'; // Enviar automáticamente a Hacienda después de firmar
+    include 'recepciondteNC.php';
+    echo json_encode([
+        'success' => true,
+        'codigo_generacion' => $codigoGeneracion
+    ]);
+    exit; // Enviar automáticamente a Hacienda después de firmar
 } else {
     echo json_encode(['success' => false, 'message' => 'Error al firmar documento', 'detalle' => $response]);
 }

@@ -41,7 +41,7 @@ $codigoGeneracion = strtoupper(vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2he
             <div class="form-body">
                 <div class="card-body">
                     <div class="row">
-                        <input type="hidden" name="codigoGeneracion" value="<?php echo $codigoGeneracion; ?>">
+                        <input type="text" hidden name="codigoGeneracion" value="<?php echo $codigoGeneracion; ?>">
                         <div class="form-group col-md-3">
                             <label for="dni">Número de Documento</label>
                             <div class="input-group">
@@ -203,95 +203,122 @@ $codigoGeneracion = strtoupper(vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2he
 $('#savecliente').submit(function(e) {
     e.preventDefault();
 
-    // Validaciones (puedes añadir más si necesitas)
-    var isValid = true;
+    // Mostrar spinner
+    function showSpinner() {
+        $('#spinner').show();
+    }
 
-    if (isValid) {
-        start_load();
+    // Ocultar spinner
+    function hideSpinner() {
+        $('#spinner').hide();
+    }
 
-        const documentos = [];
-        $('#tablaDocumentosRelacionados tbody tr').each(function() {
-            const codigo = $(this).find('td').eq(2).text().trim();
-            const fecha = $(this).find('td').eq(3).text().trim();
-            documentos.push({
-                codigo,
-                fecha
-            });
+    // Validación simple (puedes agregar más campos si es necesario)
+    const monto = $('#monto').val().trim();
+    const descripcion = $('#descripcion').val().trim();
+    if (!monto || !descripcion) {
+        Swal.fire({
+            title: 'Campos obligatorios',
+            text: 'Debes completar todos los campos requeridos.',
+            icon: 'warning'
         });
+        return;
+    }
 
-        const observaciones = $('#descripcion').val().trim();
-        const monto = $('#monto').val().trim();
+    showSpinner();
 
-        $.ajax({
-            url: 'ajax.php?action=saveNotasCredito',
-            method: 'POST',
-            data: {
-                codigoGeneracion: $('input[name="codigoGeneracion"]').val(),
-                observaciones: observaciones,
-                monto: monto,
-                documentos: JSON.stringify(documentos)
-                // Agrega aquí más campos si es necesario
-            },
-            success: function(resp) {
-                resp = JSON.parse(resp);
-                if (resp.success) {
-                    Swal.fire({
-                        title: '¡Éxito!',
-                        text: 'Nota de crédito creada exitosamente',
-                        icon: 'success',
-                        confirmButtonColor: '#28a745',
-                        confirmButtonText: 'OK'
-                    }).then((result) => {
-                        const win1 = window.open(resp.facturaNC, '_blank');
-                        let win2;
+    // Recopilar documentos relacionados
+    const documentos = [];
+    $('#tablaDocumentosRelacionados tbody tr').each(function() {
+        const codigo = $(this).find('td').eq(2).text().trim();
+        const fecha = $(this).find('td').eq(3).text().trim();
+        documentos.push({
+            codigo,
+            fecha
+        });
+    });
 
-                        if (!win1) {
-                            alert(
-                                "Por favor habilita las ventanas emergentes (pop-ups) para este sitio."
-                            );
+    // Preparar FormData
+    const formElement = document.getElementById('savecliente');
+    const formData = new FormData(formElement);
+    formData.append('documentos', JSON.stringify(documentos));
+
+    // Clonamos formData para la segunda petición (DTE)
+    const formData2 = new FormData(formElement);
+    formData2.append('documentos', JSON.stringify(documentos));
+
+    // Enviar primera petición (guardar en BD)
+    $.ajax({
+        url: 'ajax.php?action=saveNotasCredito',
+        method: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        dataType: 'json',
+        success: function(resp) {
+            if (resp.success) {
+                // Enviar segunda petición (procesar DTE)
+                $.ajax({
+                    url: 'dteNC.php',
+                    method: 'POST',
+                    data: formData2,
+                    processData: false,
+                    contentType: false,
+                    dataType: 'json',
+                    success: function(respDte) {
+                        hideSpinner();
+                        if (respDte.success) {
+                            const codigo = respDte.codigo_generacion || '';
+                            Swal.fire({
+                                title: '¡Éxito!',
+                                text: 'NOTA DE CRÉDITO guardada y procesada correctamente.',
+                                icon: 'success',
+                                confirmButtonText: 'Ver Comprobante'
+                            }).then(() => {
+                                window.open(
+                                    `facturaElectronica.php?codigo=${encodeURIComponent(codigo)}&tipo=NC`,
+                                    '_blank'
+                                );
+                                location.reload();
+                            });
                         } else {
-                            // Verificar cada 500ms si la ventana fue cerrada
-                            const checkClosed = setInterval(() => {
-                                if (win1.closed) {
-                                    clearInterval(checkClosed);
-                                    // Cuando se cierre la ventana 1, abrir la factura principal
-                                    win2 = window.open(resp.facturaElectronica,
-                                        '_blank');
-
-                                    if (!win2) {
-                                        alert(
-                                            "No se pudo abrir la factura electrónica. Habilita los pop-ups."
-                                        );
-                                    } else {
-                                        // Finalmente, puedes refrescar o hacer otra acción
-                                        setTimeout(() => location.reload(), 500);
-                                    }
-                                }
-                            }, 500);
+                            Swal.fire({
+                                title: 'Error en DTE',
+                                text: respDte.message ||
+                                    'Ocurrió un error al procesar el DTE.',
+                                icon: 'error'
+                            });
                         }
-                    });
-                } else {
-                    Swal.fire({
-                        title: 'Error',
-                        text: resp.message || 'Ocurrió un error al registrar la venta.',
-                        icon: 'error',
-                        confirmButtonColor: '#d33',
-                        confirmButtonText: 'OK'
-                    });
-                }
-            },
-            error: function() {
+                    },
+                    error: function() {
+                        hideSpinner();
+                        Swal.fire({
+                            title: 'Error',
+                            text: 'No se pudo procesar el DTE.',
+                            icon: 'error'
+                        });
+                    }
+                });
+            } else {
+                hideSpinner();
                 Swal.fire({
                     title: 'Error',
-                    text: 'No se pudo conectar con el servidor.',
-                    icon: 'error',
-                    confirmButtonColor: '#d33',
-                    confirmButtonText: 'OK'
+                    text: resp.message || 'Error al guardar la nota de crédito.',
+                    icon: 'error'
                 });
             }
-        });
-    }
+        },
+        error: function() {
+            hideSpinner();
+            Swal.fire({
+                title: 'Error',
+                text: 'No se pudo conectar con el servidor.',
+                icon: 'error'
+            });
+        }
+    });
 });
+
 
 
 $('#new_NC').click(function() {
@@ -416,11 +443,11 @@ $('#tablaVentas').DataTable({
     }
 });
 
-// Acción al hacer clic en "Seleccionar"
-$(document).on('click', '.seleccionar_factura', function() {
-    var codigo = $(this).data('codigo');
-    $('#modalFacturas').modal('hide');
-});
+// // Acción al hacer clic en "Seleccionar"
+// $(document).on('click', '.seleccionar_factura', function() {
+//     var codigo = $(this).data('codigo');
+//     $('#modalFacturas').modal('hide');
+// });
 
 $('#modalFacturas').on('show.bs.modal', function(event) {
     const button = $(event.relatedTarget);

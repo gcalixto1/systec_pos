@@ -1,4 +1,8 @@
-<?php include 'conexionfin.php'; ?>
+<?php include 'conexionfin.php';
+require_once("includes/class.php");
+$pro = new Action();
+$documentos = $pro->ListarDocumentos();
+?>
 
 <form class="form form-material" method="post" action="#" name="saveSujetoExcluido" id="saveSujetoExcluido">
     <div class="container-fluid">
@@ -13,21 +17,42 @@
             <h4 class="card-title text-black"><i class="fa fa-file-alt"></i> Contingencias</h4>
         </div>
         <div class="row">
-            <div class="form-group col-md-3">
+            <div class="form-group col-md-6">
                 <label>Fecha Inicio Contingencia:</label>
                 <input type="date" class="form-control" name="fechaIni" value="<?= date('Y-m-d') ?>">
             </div>
-            <div class="form-group col-md-3">
+            <div class="form-group col-md-6">
+                <label>Hora Inicio Contingencia:</label>
+                <input type="time" class="form-control" name="horaIni" value="00:00:59">
+            </div>
+            <div class="form-group col-md-6">
                 <label>Fecha Fin Contingencia:</label>
                 <input type="date" class="form-control" name="fechaFin" value="<?= date('Y-m-d') ?>">
             </div>
-            <div class="form-group col-md-3">
-                <label>Hora Inicio Contingencia:</label>
-                <input type="time" class="form-control" name="horaIni" value="<?= date('H:i') ?>">
+            <div class="form-group col-md-6">
+                <label>Hora Fin Contingencia:</label>
+                <input type="time" class="form-control" name="horaFin" value="23:59:59">
+            </div>
+            <div class="form-group col-md-6">
+                <label for="direccion">Nombre del Responsable</label>
+                <input type="text" name="responsable" id="responsable" class="form-control"
+                    value="<?php echo isset($meta['responsable']) ? htmlspecialchars($meta['responsable']) : ''; ?>"
+                    required>
             </div>
             <div class="form-group col-md-3">
-                <label>Hora Fin Contingencia:</label>
-                <input type="time" class="form-control" name="horaFin" value="<?= date('H:i') ?>">
+                <label for="tipoDoc">Tipo Documento</label>
+                <select name="tipoDoc" id="tipoDoc" class="form-control" required>
+                    <option value=""></option>
+                    <?php foreach ($documentos as $doc): ?>
+                        <option value="<?php echo $doc['codigo']; ?>" <?php echo (isset($meta['tipoDocumento']) && $meta['tipoDocumento'] == $doc['codigo']) ? 'selected' : ''; ?>>
+                            <?php echo $doc['valor']; ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+            <div class="form-group col-md-3">
+                <label for="name">Documento</label>
+                <input type="text" name="documento2" id="documento2" class="form-control">
             </div>
             <div class="form-group col-md-3">
                 <label>Tipo de Contingencia :</label>
@@ -43,7 +68,22 @@
                     ?>
                 </select>
             </div>
+            <div class="form-group col-md-3"></div>
+            <div class="form-group col-md-3">
+                <label for="codigo">Codigo Generacion Contingencia</label>
+                <input name="codigo" id="codigo" class="form-control" rows="3" required />
+            </div>
+            <div class="form-group col-md-3">
+                <label for="tipoF">Tipo de Documento de Contingencia</label>
+                <input name="tipoF" id="tipoF" class="form-control" rows="3" required />
+            </div>
 
+            <div class="form-group col-md-6">
+                <button class="btn btn-primary btn-md" type="button" data-toggle="modal" data-target="#modalFacturas"
+                    data-dni="<?= $documento ?>">
+                    <i class="fas fa-plus"></i> Seleccionar documento para contingencia
+                </button>
+            </div>
             <div class="form-group col-md-6"></div>
             <div class="form-group col-md-12"></div>
             <div class="form-group col-md-12"></div>
@@ -56,9 +96,126 @@
     </div>
 </form>
 
+<div class="modal fade" id="modalFacturas" tabindex="-1" role="dialog" aria-labelledby="modalFacturasLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalFacturasLabel">Documentos Relacionados</h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Cerrar">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="contenidoModalFacturas">
+                <div class="text-center">
+                    <i class="fa fa-spinner fa-spin fa-2x"></i> Cargando datos...
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 
-<!-- JS -->
-<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.4/dist/jquery.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    $('#modalFacturas').on('show.bs.modal', function (event) {
+        const button = $(event.relatedTarget);
+
+        $('#contenidoModalFacturas').html(
+            '<div class="text-center"><i class="fa fa-spinner fa-spin fa-2x"></i> Cargando...</div>');
+
+        $.ajax({
+            url: 'lista_ventas_contingencias.php',
+            method: 'GET',
+            data: {
+                documento: '00000000'
+            },
+            success: function (data) {
+                $('#contenidoModalFacturas').html(data);
+            },
+            error: function () {
+                $('#contenidoModalFacturas').html(
+                    '<div class="alert alert-danger">Error al cargar los datos.</div>');
+            }
+        });
+    });
+
+    $('#saveSujetoExcluido').submit(function (e) {
+        e.preventDefault();
+        start_load();
+
+        let formElement = document.getElementById('saveSujetoExcluido');
+        let formData = new FormData(formElement);
+
+        $.ajax({
+            url: 'ajax.php?action=save_contingencia',
+            method: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            dataType: 'json',
+            success: function (resp) {
+                if (resp.success) {
+                    $.ajax({
+                        url: 'dteCON.php',
+                        method: 'POST',
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        dataType: 'json',
+                        success: function (respDte) {
+                            hideSpinner();
+                            if (respDte.success) {
+                                let codigo = respDte
+                                    .codigo_generacion; // Asegurate de que dteSE.php devuelve esto
+                                Swal.fire({
+                                    title: 'Éxito!',
+                                    text: 'Sujeto excluido guardado y procesado correctamente.',
+                                    icon: 'success',
+                                    confirmButtonColor: '#28a745',
+                                    confirmButtonText: 'Ver Comprobante'
+                                }).then(() => {
+                                    window.open(
+                                        'facturaElectronica.php?codigoSE=' +
+                                        encodeURIComponent(codigo) +
+                                        '&tipo=SE',
+                                        '_blank' // Esto abre en una nueva pestaña o ventana, dependiendo del navegador
+                                    );
+                                });
+                            } else {
+                                Swal.fire({
+                                    title: 'Error en DTE',
+                                    text: respDte.message ||
+                                        'Ocurrió un error al procesar el DTE.',
+                                    icon: 'error'
+                                });
+                            }
+                        },
+                        error: function () {
+                            hideSpinner();
+                            Swal.fire({
+                                title: 'Error',
+                                text: 'Error al enviar el sujeto excluido al DTE.',
+                                icon: 'error'
+                            });
+                        }
+                    });
+                } else {
+                    hideSpinner();
+                    Swal.fire({
+                        title: 'Error',
+                        text: resp.message || 'Error al guardar sujeto excluido.',
+                        icon: 'error'
+                    });
+                }
+            },
+            error: function () {
+                hideSpinner();
+                Swal.fire({
+                    title: 'Error',
+                    text: 'No se pudo conectar con el servidor.',
+                    icon: 'error'
+                });
+            }
+        });
+    });
+</script>

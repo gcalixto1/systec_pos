@@ -167,7 +167,7 @@ include('conexionfin.php');
         <div class="product-grid" id="productContainer">
             <?php
             // Consulta para obtener los productos desde la base de datos
-            $productos = $conexion->query("SELECT * FROM producto LIMIT 20");
+            $productos = $conexion->query("SELECT * FROM producto");
 
             while ($producto = $productos->fetch_assoc()): ?>
                 <div class="product-card"
