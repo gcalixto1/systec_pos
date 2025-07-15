@@ -116,8 +116,8 @@ $facturaJson = [
             "codPuntoVenta" => null
         ],
         "receptor" => [
-            "nit" => $factura['dni'],
-            "nrc" => $factura['dato1'],
+            "nit" => str_replace('-', '', $factura['dni']),
+            "nrc" => str_replace('-', '', $factura['dato1']),
             "nombre" => $factura['nombre'],
             "nombreComercial" => $factura['dato2'],
             "codActividad" => $factura['dato3'],

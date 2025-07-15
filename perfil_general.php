@@ -171,7 +171,7 @@ $giroSeleccionado = isset($meta['giro']) ? $meta['giro'] : '';
 
                             </div>
                         </div>
-                        <div class="col-md-3">
+                        <div class="col-md-2">
                             <div class="form-group has-feedback">
                                 <label>Moneda:</label>
                                 <input type="text" name="moneda" class="form-control"
@@ -180,7 +180,7 @@ $giroSeleccionado = isset($meta['giro']) ? $meta['giro'] : '';
 
                             </div>
                         </div>
-                        <div class="form-group col-md-3">
+                        <div class="form-group col-md-2">
                             <label class="control-label">Impresora</label>
                             <select name="impresion" id="impresion" class="form-control" required aria-required="true">
                                 <option value="">-- SELECCIONE --</option>
@@ -190,8 +190,8 @@ $giroSeleccionado = isset($meta['giro']) ? $meta['giro'] : '';
                                     Impresion 80mm</option>
                             </select>
                         </div>
-                        <div class="form-group col-md-3">
-                            <label class="control-label">Ambierte</label>
+                        <div class="form-group col-md-2">
+                            <label class="control-label">Ambiente</label>
                             <select name="dato8" id="dato8" class="form-control" required aria-required="true">
                                 <option value="">-- SELECCIONE --</option>
                                 <option value="00" <?php echo ($meta['dato8'] == "00") ? "selected" : ""; ?>>
@@ -199,6 +199,18 @@ $giroSeleccionado = isset($meta['giro']) ? $meta['giro'] : '';
                                 <option value="01" <?php echo ($meta['dato8'] == "01") ? "selected" : ""; ?>>
                                     Ambiente de producción</option>
                             </select>
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label class="control-label">Clave Privada</label>
+                            <input type="text" name="clavePRIV" id="clavePRIV" class="form-control"
+                                value="<?php echo isset($meta['clavePRIV']) ? htmlspecialchars($meta['clavePRIV']) : ''; ?>"
+                                required>
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label class="control-label">Clave API</label>
+                            <input type="text" name="claveAPI" id="claveAPI" class="form-control"
+                                value="<?php echo isset($meta['claveAPI']) ? htmlspecialchars($meta['claveAPI']) : ''; ?>"
+                                required>
                         </div>
                     </div>
                     <div class="row">

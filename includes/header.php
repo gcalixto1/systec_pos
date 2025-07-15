@@ -11,14 +11,14 @@ $dirEmpresa = '';
 $igv = '';
 
 
-$qry_top_products = mysqli_query($conexion, "SELECT p.descripcion, coalesce(SUM(df.cantidad), 0) AS cantidad FROM detallefactura df INNER JOIN producto p ON df.cod_producto = p.codBarra GROUP BY p.descripcion ORDER BY cantidad DESC LIMIT 5;");
+$qry_top_products = mysqli_query($conexion, "SELECT p.descripcion, coalesce(SUM(df.cantidad), 0) AS cantidad FROM detallefactura df INNER JOIN producto p ON df.cod_producto = p.codproducto  GROUP BY p.descripcion ORDER BY cantidad DESC LIMIT 5;");
 $product_names = array();
 $product_quantities = array();
 
 // Recorrer los resultados de los productos más vendidos
 while ($row = mysqli_fetch_assoc($qry_top_products)) {
-    $product_names[] = $row['descripcion'];
-    $product_quantities[] = $row['cantidad'];
+	$product_names[] = $row['descripcion'];
+	$product_quantities[] = $row['cantidad'];
 }
 
 
@@ -28,29 +28,29 @@ $venmes = $venta->SumaVentas();
 $query_empresa = mysqli_query($conexion, "SELECT * FROM configuracion");
 $row_empresa = mysqli_num_rows($query_empresa);
 if ($row_empresa > 0) {
-    if ($infoEmpresa = mysqli_fetch_assoc($query_empresa)) {
-        $dni = $infoEmpresa['dni'];
-        $nombre_empresa = $infoEmpresa['nombre'];
-        $razonSocial = $infoEmpresa['razon_social'];
-        $telEmpresa = $infoEmpresa['telefono'];
-        $emailEmpresa = $infoEmpresa['email'];
-        $dirEmpresa = $infoEmpresa['direccion'];
-        $igv = $infoEmpresa['igv'];
-        $impresion = $infoEmpresa['impresion'];
-    }
+	if ($infoEmpresa = mysqli_fetch_assoc($query_empresa)) {
+		$dni = $infoEmpresa['dni'];
+		$nombre_empresa = $infoEmpresa['nombre'];
+		$razonSocial = $infoEmpresa['razon_social'];
+		$telEmpresa = $infoEmpresa['telefono'];
+		$emailEmpresa = $infoEmpresa['email'];
+		$dirEmpresa = $infoEmpresa['direccion'];
+		$igv = $infoEmpresa['igv'];
+		$impresion = $infoEmpresa['impresion'];
+	}
 }
 $query_data = mysqli_query($conexion, "SELECT 
     (SELECT COUNT(*) FROM usuario) AS usuarios,
     (SELECT COUNT(*) FROM cliente) AS clientes,
     (SELECT COUNT(*) FROM proveedor) AS proveedores,
     (SELECT COUNT(*) FROM producto) AS productos,
-    (SELECT COUNT(*) FROM factura WHERE fechafactura >= CURDATE()) AS ventas,
-    (SELECT IFNULL(SUM(totalpagar), 0.00) FROM factura WHERE DATE(fechafactura) = CURDATE()) AS total_dia,
-    (SELECT IFNULL(SUM(totalpagar), 0.00) FROM factura WHERE YEAR(fechafactura) = YEAR(CURDATE()) AND MONTH(fechafactura) = MONTH(CURDATE())) AS total_mes,
+    (SELECT COUNT(*) FROM factura WHERE estado = 'Pagado' and fechafactura >= CURDATE()) AS ventas,
+    (SELECT IFNULL(SUM(totalpagar), 0.00) FROM factura WHERE estado = 'Pagado' and DATE(fechafactura) = CURDATE()) AS total_dia,
+    (SELECT IFNULL(SUM(totalpagar), 0.00) FROM factura WHERE estado = 'Pagado' and YEAR(fechafactura) = YEAR(CURDATE()) AND MONTH(fechafactura) = MONTH(CURDATE())) AS total_mes,
     (SELECT COUNT(*) FROM producto WHERE existencia < exis_min) AS producto_minimo;");
 $result_data = mysqli_num_rows($query_data);
 if ($result_data > 0) {
-    $data = mysqli_fetch_assoc($query_data);
+	$data = mysqli_fetch_assoc($query_data);
 }
 ?>
 <!DOCTYPE html>
@@ -73,14 +73,14 @@ if ($result_data > 0) {
 
 	$query_data = mysqli_query($conexion, "
 	SELECT 
-		(SELECT COUNT(*) FROM usuario) AS usuarios,
-		(SELECT COUNT(*) FROM cliente) AS clientes,
-		(SELECT COUNT(*) FROM proveedor) AS proveedores,
-		(SELECT COUNT(*) FROM producto) AS productos,
-		(SELECT COUNT(*) FROM factura WHERE fechafactura >= CURDATE()) AS ventas,
-		(SELECT IFNULL(SUM(totalpagar), 0.00) FROM factura WHERE DATE(fechafactura) = CURDATE()) AS total_dia,
-		(SELECT IFNULL(SUM(totalpagar), 0.00) FROM factura WHERE YEAR(fechafactura) = YEAR(CURDATE()) AND MONTH(fechafactura) = MONTH(CURDATE())) AS total_mes,
-		(SELECT COUNT(*) FROM producto WHERE existencia < exis_min) AS producto_minimo,
+    	(SELECT COUNT(*) FROM usuario) AS usuarios,
+    	(SELECT COUNT(*) FROM cliente) AS clientes,
+    	(SELECT COUNT(*) FROM proveedor) AS proveedores,
+    	(SELECT COUNT(*) FROM producto) AS productos,
+    	(SELECT COUNT(*) FROM factura WHERE estado = 'Pagado' and fechafactura >= CURDATE()) AS ventas,
+    	(SELECT IFNULL(SUM(totalpagar), 0.00) FROM factura WHERE estado = 'Pagado' and DATE(fechafactura) = CURDATE()) AS total_dia,
+    	(SELECT IFNULL(SUM(totalpagar), 0.00) FROM factura WHERE estado = 'Pagado' and YEAR(fechafactura) = YEAR(CURDATE()) AND MONTH(fechafactura) = MONTH(CURDATE())) AS total_mes,
+    	(SELECT COUNT(*) FROM producto WHERE existencia < exis_min) AS producto_minimo,
 		GROUP_CONCAT(JSON_OBJECT('semana', semana_mes, 'ventas', total_ventas)) AS ventas_semanales
 	FROM (
 		SELECT 

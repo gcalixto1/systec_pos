@@ -92,6 +92,8 @@ class Action
 		$txtdato6 = $_POST['dato6'];
 		$txtdato7 = $_POST['dato7'];
 		$txtdato8 = $_POST['dato8'];
+		$txtClavePRIV = $_POST['clavePRIV'];
+		$txtClaveAPI = $_POST['claveAPI'];
 
 		// Construye la cadena de datos correctamente
 		$data = " dni = '$txtdni'";
@@ -112,6 +114,8 @@ class Action
 		$data .= ", dato6 = '$txtdato6'";
 		$data .= ", dato7 = '$txtdato7'";
 		$data .= ", dato8 = '$txtdato8'";
+		$data .= ", clavePRIV = '$txtClavePRIV'";
+		$data .= ", claveAPI = '$txtClaveAPI'";
 
 		// Evita inyección SQL usando consultas preparadas
 		$id = 1;
@@ -160,6 +164,23 @@ class Action
 		$sql = "SELECT * FROM actividad_economica";
 		if (!empty($busqueda)) {
 			$sql .= " WHERE descripcion LIKE '%$busqueda%' OR codigo LIKE '%$busqueda%'";
+		}
+
+		$result = mysqli_query($this->dbh, $sql);
+		$actividades = array();
+		if ($result) {
+			while ($row = mysqli_fetch_assoc($result)) {
+				$actividades[] = $row;
+			}
+		}
+		return $actividades;
+	}
+	public function ListarProveedoresSE($busqueda = '')
+	{
+		$busqueda = mysqli_real_escape_string($this->dbh, $busqueda);
+		$sql = "SELECT * FROM proveedor";
+		if (!empty($busqueda)) {
+			$sql .= " WHERE proveedor LIKE '%$busqueda%' OR idproveedor LIKE '%$busqueda%'";
 		}
 
 		$result = mysqli_query($this->dbh, $sql);
@@ -750,7 +771,7 @@ class Action
 	}
 	public function Listarconsecutivos()
 	{
-		$sql = "SELECT * FROM consecutivos";
+		$sql = "SELECT * FROM consecutivos where idconsecutivos in(1,2);";
 		$result = mysqli_query($this->dbh, $sql);
 		$pago = array();
 		if ($result) {

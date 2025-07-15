@@ -4,12 +4,17 @@ const subtotalElement = document.getElementById('subtotal');
 const igvElement = document.getElementById('igv');
 const totalElement = document.getElementById('total');
 
-function addToCart(codproducto, descripcion, precio) {
+function addToCart(codproducto, descripcion, precio, cantidad = 1) {
     const existingProduct = cart.find(item => item.codproducto === codproducto);
     if (existingProduct) {
-        existingProduct.cantidad++;
+        existingProduct.cantidad = parseFloat((parseFloat(existingProduct.cantidad) + parseFloat(cantidad)).toFixed(2));
     } else {
-        cart.push({ codproducto, descripcion, precio, cantidad: 1 });
+        cart.push({ 
+            codproducto, 
+            descripcion, 
+            precio: parseFloat(precio), 
+            cantidad: parseFloat(cantidad).toFixed(2) 
+        });
     }
     renderCart();
 }
@@ -22,34 +27,37 @@ function removeFromCart(codproducto) {
 function updatecantidad(codproducto, change) {
     const product = cart.find(item => item.codproducto === codproducto);
     if (product) {
-        product.cantidad += change;
-        if (product.cantidad <= 0) {
-            removeFromCart(codproducto);
-        } else {
-            renderCart();
-        }
+        let nuevaCantidad = parseFloat(product.cantidad) + parseFloat(change);
+        if (nuevaCantidad <= 0) nuevaCantidad = 0.1;
+        product.cantidad = parseFloat(nuevaCantidad.toFixed(2));
+        renderCart();
     }
-} 
+}
 
 function handleManualChangeCantidad(input, codproducto) {
-    const value = parseInt(input.value);
+    const value = parseFloat(input.value);
     const product = cart.find(item => item.codproducto === codproducto);
     if (product) {
         if (!isNaN(value) && value > 0) {
-            product.cantidad = value;
+            product.cantidad = parseFloat(value.toFixed(2));
             renderCart();
         } else {
-            removeFromCart(codproducto);
+            input.value = parseFloat(product.cantidad).toFixed(2);
         }
     }
 }
 
 function handleManualChangePrecio(input, codproducto) {
-    const value = parseFloat(input.value);
+   const value = parseFloat(input.value);
     const product = cart.find(item => item.codproducto === codproducto);
-    if (product && !isNaN(value) && value >= 0) {
-        product.precio = value;
-        renderCart();
+    if (product) {
+        if (!isNaN(value) && value >= 0) {
+            product.precio = parseFloat(value.toFixed(2));
+            input.value = product.precio.toFixed(2); // Asegura que el input también refleje el nuevo valor formateado
+            renderCart();
+        } else {
+            input.value = product.precio.toFixed(2); // Restaura si es inválido
+        }
     }
 }
 
@@ -58,7 +66,9 @@ function renderCart() {
     let subtotal = 0;
 
     cart.forEach((item, index) => {
-        const total = item.precio * item.cantidad;
+        const cantidad = parseFloat(item.cantidad);
+        const precio = parseFloat(item.precio);
+        const total = cantidad * precio;
         subtotal += total;
 
         cartItems.innerHTML += `
@@ -68,17 +78,17 @@ function renderCart() {
                 <td hidden>${item.codBarra || ''}</td>
                 <td>
                     <div class="input-group" style="max-width: 130px;">
-                        <div class="input-group-prepend" style="cursor: pointer;" onclick="updatecantidad(${item.codproducto}, -1)">
+                        <div class="input-group-prepend" style="cursor: pointer;" onclick="updatecantidad(${item.codproducto}, -0.1)">
                             <span class="input-group-text">-</span>
                         </div>
-                        <input type="number" class="form-control" value="${item.cantidad}" onchange="handleManualChangeCantidad(this, ${item.codproducto})">
-                        <div class="input-group-append" style="cursor: pointer;" onclick="updatecantidad(${item.codproducto}, 1)">
+                        <input type="number" step="0.01" min="0.1" class="form-control" value="${cantidad.toFixed(2)}" onchange="handleManualChangeCantidad(this, ${item.codproducto})">
+                        <div class="input-group-append" style="cursor: pointer;" onclick="updatecantidad(${item.codproducto}, 0.1)">
                             <span class="input-group-text">+</span>
                         </div>
                     </div>
                 </td>
                 <td>
-                    <input type="number" class="form-control" value="${item.precio.toFixed(2)}" onchange="handleManualChangePrecio(this, ${item.codproducto})" style="max-width: 100px;">
+                    <input type="number" step="0.01" class="form-control" value="${precio.toFixed(2)}" onchange="handleManualChangePrecio(this, ${item.codproducto})" style="max-width: 100px;">
                 </td>
                 <td>${total.toFixed(2)}</td>
                 <td><button class="btn btn-danger" onclick="removeFromCart(${item.codproducto})">X</button></td>
@@ -90,10 +100,17 @@ function renderCart() {
     const igv = sbTotal * 0.13;
     const total = sbTotal + igv;
 
-    subtotalElement.textContent = `${sbTotal.toFixed(2)}`;
-    igvElement.textContent = `${igv.toFixed(2)}`;
-    totalElement.textContent = `${total.toFixed(2)}`;
+    subtotalElement.textContent = sbTotal.toFixed(2);
+    igvElement.textContent = igv.toFixed(2);
+    totalElement.textContent = total.toFixed(2);
 }
+
+// Bloquea Enter dentro de campos numéricos
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'Enter' && document.activeElement.type === 'number') {
+        event.preventDefault();
+    }
+});
 
 document.getElementById('saveventa').addEventListener('submit', function(event) {
     event.preventDefault();

@@ -8,31 +8,36 @@ $newNumber = $number + 1;
 $newValor = str_pad($newNumber, 15, '0', STR_PAD_LEFT);
 
 $codigoGeneracion = strtoupper(vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex(random_bytes(16)), 4)));
+require_once("includes/class.php");
+$pro = new Action();
+
+$busqueda = isset($_GET['buscar']) ? trim($_GET['buscar']) : '';
+$actividades = $pro->ListarProveedoresSE($busqueda);
 ?>
 <style>
-    .summary-box {
-        background: #f8f9fa;
-        border: 1px solid #ddd;
-        text-align: right;
-        margin-top: 10px;
-        max-width: auto;
-    }
+.summary-box {
+    background: #f8f9fa;
+    border: 1px solid #ddd;
+    text-align: right;
+    margin-top: 10px;
+    max-width: auto;
+}
 
-    .summary-box strong {
-        display: inline-block;
-        font-size: 16px;
-        min-width: 180px;
-    }
+.summary-box strong {
+    display: inline-block;
+    font-size: 16px;
+    min-width: 180px;
+}
 
-    .summary-box label {
-        font-size: 19px;
-        font-weight: normal;
-    }
+.summary-box label {
+    font-size: 19px;
+    font-weight: normal;
+}
 
-    .table-container {
-        max-width: auto;
-        margin: auto;
-    }
+.table-container {
+    max-width: auto;
+    margin: auto;
+}
 </style>
 
 <form class="form form-material" method="post" action="#" name="saveSujetoExcluido" id="saveSujetoExcluido">
@@ -50,7 +55,15 @@ $codigoGeneracion = strtoupper(vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2he
         <div class="row">
             <div class="form-group col-md-3">
                 <label>Proveedor</label>
-                <select name="proveedor" id="proveedor" class="form-control select2" required></select>
+                <select name="proveedor" id="proveedor" class="form-control" required>
+                    <option value="">-- SELECCIONE --</option>
+                    <?php foreach ($actividades as $act): ?>
+                    <option value="<?php echo $act['idproveedor']; ?>"
+                        <?php echo (isset($meta['proveedor']) && $meta['idproveedor'] == $act['idproveedor']) ? 'selected' : ''; ?>>
+                        <?php echo $act['proveedor']; ?>
+                    </option>
+                    <?php endforeach; ?>
+                </select>
             </div>
             <div class="form-group col-md-3">
                 <label>Fecha:</label>
@@ -151,200 +164,201 @@ $codigoGeneracion = strtoupper(vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2he
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-    let items = [];
+let items = [];
 
-    function agregarItem() {
-        let detalle = $('#detalle').val();
-        let cantidad = parseFloat($('#cantidad').val());
-        let precio = parseFloat($('#precio').val());
-        let renta = parseFloat($('#renta').val());
+function agregarItem() {
+    let detalle = $('#detalle').val();
+    let cantidad = parseFloat($('#cantidad').val());
+    let precio = parseFloat($('#precio').val());
+    let renta = parseFloat($('#renta').val());
 
-        if (!detalle || isNaN(cantidad) || isNaN(precio)) return;
+    if (!detalle || isNaN(cantidad) || isNaN(precio)) return;
 
-        let subtotal = cantidad * precio;
-        let rentaVal = subtotal * (renta / 100);
+    let subtotal = cantidad * precio;
+    let rentaVal = subtotal * (renta / 100);
 
-        items.push({
-            detalle,
-            cantidad,
-            precio,
-            renta,
-            subtotal
-        });
+    items.push({
+        detalle,
+        cantidad,
+        precio,
+        renta,
+        subtotal
+    });
 
-        actualizarTabla();
-        $('#modalFacturas').modal('hide');
-        $('#detalle, #cantidad, #precio, #renta').val('');
-    }
+    actualizarTabla();
+    $('#modalFacturas').modal('hide');
+    $('#detalle, #cantidad, #precio, #renta').val('');
+}
 
-    function actualizarTabla() {
-        let tbody = $('#tablaItems tbody');
-        tbody.empty();
-        let total = 0;
-        let totalRenta = 0;
+function actualizarTabla() {
+    let tbody = $('#tablaItems tbody');
+    tbody.empty();
+    let total = 0;
+    let totalRenta = 0;
 
-        items.forEach((item, i) => {
-            let row = `<tr>
+    items.forEach((item, i) => {
+        let row = `<tr>
                 <td>${item.detalle}</td>
                 <td>${item.cantidad}</td>
                 <td>$${item.precio.toFixed(2)}</td>
                 <td>$${(item.subtotal * (item.renta / 100)).toFixed(2)}</td>
                 <td>$${item.subtotal.toFixed(2)}</td>
             </tr>`;
-            tbody.append(row);
-            total += item.subtotal;
-            totalRenta += item.subtotal * (item.renta / 100);
-        });
+        tbody.append(row);
+        total += item.subtotal;
+        totalRenta += item.subtotal * (item.renta / 100);
+    });
 
-        $('#sumaTotal').text(total.toFixed(2));
-        $('#totalRenta').text(totalRenta.toFixed(2));
-        $('#granTotal').text((total - totalRenta).toFixed(2));
+    $('#sumaTotal').text(total.toFixed(2));
+    $('#totalRenta').text(totalRenta.toFixed(2));
+    $('#granTotal').text((total - totalRenta).toFixed(2));
+}
+
+function eliminarItem(index) {
+    items.splice(index, 1);
+    actualizarTabla();
+}
+
+
+
+$(document).ready(function() {
+
+    function showSpinner() {
+        $('#spinner').show();
     }
 
-    function eliminarItem(index) {
-        items.splice(index, 1);
-        actualizarTabla();
+    function hideSpinner() {
+        $('#spinner').hide();
     }
 
+    $('#saveSujetoExcluido').submit(function(e) {
+        e.preventDefault();
 
-
-    $(document).ready(function () {
-        $('#proveedor').select2({
-            placeholder: "-- SELECCIONE --",
-            width: '100%',
-            ajax: {
-                url: 'buscar_proveedores.php',
-                dataType: 'json',
-                delay: 200,
-                data: function (params) {
-                    return {
-                        q: params.term
-                    };
-                },
-                processResults: function (data) {
-                    return {
-                        results: data.results
-                    };
-                },
-                cache: true
-            }
-        });
-
-        function showSpinner() {
-            $('#spinner').show();
-        }
-
-        function hideSpinner() {
-            $('#spinner').hide();
-        }
-
-        $('#saveSujetoExcluido').submit(function (e) {
-            e.preventDefault();
-
-            var isValid = true;
-            $('#saveSujetoExcluido input[required], #saveSujetoExcluido select[required]').each(function () {
-                if (!$(this).val() || $(this).val().trim() === '' || $(this).val() === '0') {
-                    isValid = false;
-                    Swal.fire({
-                        title: 'Error!',
-                        text: 'Todos los campos son obligatorios.',
-                        icon: 'error',
-                        confirmButtonColor: '#d33',
-                        confirmButtonText: 'OK'
-                    });
-                    return false;
-                }
-            });
-
-            if (!isValid) return;
-
-            if (items.length === 0) {
+        var isValid = true;
+        $('#saveSujetoExcluido input[required], #saveSujetoExcluido select[required]').each(function() {
+            if (!$(this).val() || $(this).val().trim() === '' || $(this).val() === '0') {
+                isValid = false;
                 Swal.fire({
                     title: 'Error!',
-                    text: 'Debés agregar al menos un ítem.',
+                    text: 'Todos los campos son obligatorios.',
                     icon: 'error',
-                    confirmButtonColor: '#d33'
+                    confirmButtonColor: '#d33',
+                    confirmButtonText: 'OK'
                 });
-                return;
+                return false;
             }
+        });
 
-            showSpinner();
+        if (!isValid) return;
 
-            let formElement = document.getElementById('saveSujetoExcluido');
-            let formData = new FormData(formElement);
-            formData.append('items', JSON.stringify(items));
+        if (items.length === 0) {
+            Swal.fire({
+                title: 'Error!',
+                text: 'Debés agregar al menos un ítem.',
+                icon: 'error',
+                confirmButtonColor: '#d33'
+            });
+            return;
+        }
 
-            $.ajax({
-                url: 'ajax.php?action=save_sujetoExcluido',
-                method: 'POST',
-                data: formData,
-                processData: false,
-                contentType: false,
-                dataType: 'json',
-                success: function (resp) {
-                    if (resp.success) {
-                        $.ajax({
-                            url: 'dteSE.php',
-                            method: 'POST',
-                            data: formData,
-                            processData: false,
-                            contentType: false,
-                            dataType: 'json',
-                            success: function (respDte) {
-                                hideSpinner();
-                                if (respDte.success) {
-                                    let codigo = respDte
-                                        .codigo_generacion; // Asegurate de que dteSE.php devuelve esto
-                                    Swal.fire({
-                                        title: 'Éxito!',
-                                        text: 'Sujeto excluido guardado y procesado correctamente.',
-                                        icon: 'success',
-                                        confirmButtonColor: '#28a745',
-                                        confirmButtonText: 'Ver Comprobante'
-                                    }).then(() => {
-                                        window.open(
-                                            'facturaElectronica.php?codigoSE=' +
-                                            encodeURIComponent(codigo) +
-                                            '&tipo=SE',
-                                            '_blank' // Esto abre en una nueva pestaña o ventana, dependiendo del navegador
-                                        );
-                                    });
-                                } else {
-                                    Swal.fire({
-                                        title: 'Error en DTE',
-                                        text: respDte.message ||
-                                            'Ocurrió un error al procesar el DTE.',
-                                        icon: 'error'
-                                    });
-                                }
-                            },
-                            error: function () {
-                                hideSpinner();
+        showSpinner();
+
+        let formElement = document.getElementById('saveSujetoExcluido');
+        let formData = new FormData(formElement);
+        formData.append('items', JSON.stringify(items));
+
+        $.ajax({
+            url: 'ajax.php?action=save_sujetoExcluido',
+            method: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            dataType: 'json',
+            success: function(resp) {
+                if (resp.success) {
+                    $.ajax({
+                        url: 'dteSE.php',
+                        method: 'POST',
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        dataType: 'json',
+                        success: function(respDte) {
+                            hideSpinner();
+                            if (respDte.success) {
+                                let codigo = respDte
+                                    .codigo_generacion; // Asegurate de que dteSE.php devuelve esto
                                 Swal.fire({
-                                    title: 'Error',
-                                    text: 'Error al enviar el sujeto excluido al DTE.',
+                                    title: 'Éxito!',
+                                    text: 'Sujeto excluido guardado y procesado correctamente.',
+                                    icon: 'success',
+                                    confirmButtonColor: '#28a745',
+                                    confirmButtonText: 'Ver Comprobante'
+                                }).then(() => {
+                                    window.open(
+                                        'facturaElectronica.php?codigoSE=' +
+                                        encodeURIComponent(codigo) +
+                                        '&tipo=SE',
+                                        '_blank' // Esto abre en una nueva pestaña o ventana, dependiendo del navegador
+                                    );
+                                });
+                            } else {
+                                Swal.fire({
+                                    title: 'Error en DTE',
+                                    text: respDte.message ||
+                                        'Ocurrió un error al procesar el DTE.',
                                     icon: 'error'
                                 });
                             }
-                        });
-                    } else {
-                        hideSpinner();
-                        Swal.fire({
-                            title: 'Error',
-                            text: resp.message || 'Error al guardar sujeto excluido.',
-                            icon: 'error'
-                        });
-                    }
-                },
-                error: function () {
+                        },
+                        error: function() {
+                            hideSpinner();
+                            Swal.fire({
+                                title: 'Error',
+                                text: 'Error al enviar el sujeto excluido al DTE.',
+                                icon: 'error'
+                            });
+                        }
+                    });
+                } else {
                     hideSpinner();
                     Swal.fire({
                         title: 'Error',
-                        text: 'No se pudo conectar con el servidor.',
+                        text: resp.message || 'Error al guardar sujeto excluido.',
                         icon: 'error'
                     });
                 }
-            });
+            },
+            error: function() {
+                hideSpinner();
+                Swal.fire({
+                    title: 'Error',
+                    text: 'No se pudo conectar con el servidor.',
+                    icon: 'error'
+                });
+            }
         });
     });
+});
+$('#proveedor').select2({
+    placeholder: "-- SELECCIONE PROVEEDOR --",
+    minimumInputLength: 2,
+    ajax: {
+        url: 'buscar_proveedores.php',
+        dataType: 'json',
+        delay: 250,
+        data: function(params) {
+            return {
+                term: params.term // término de búsqueda
+            };
+        },
+        processResults: function(data) {
+            return {
+                results: data.results
+            };
+        },
+        cache: true
+    },
+    width: '100%'
+});
 </script>

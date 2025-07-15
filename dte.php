@@ -48,13 +48,13 @@ while ($row = $detalle->fetch_assoc()) {
         "codTributo" => null,
         "ventaNoSuj" => 0,
         "ventaExenta" => 0,
-        "ventaGravada" => $monto,
+        "ventaGravada" => round($monto, 2),
         "ivaItem" => $ivaItem,
         "tributos" => null,
-        "psv" => $monto,
+        "psv" => round($monto, 2),
         "noGravado" => 0
     ];
-    $totalGravada += $monto;
+    $totalGravada += round($monto, 2);
     $totalIva += $ivaItem;
 }
 
