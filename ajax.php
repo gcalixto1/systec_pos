@@ -74,6 +74,11 @@ if ($action == 'save_categorias') {
 	if ($save)
 		echo $save;
 }
+if ($action == 'delete_categoria') {
+	$save = $crud->delete_categoria();
+	if ($save)
+		echo $save;
+}
 if ($action == 'save_presentacion') {
 	$save = $crud->save_presentacion();
 	if ($save)

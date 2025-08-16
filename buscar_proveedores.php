@@ -1,21 +1,41 @@
 <?php
-include 'conexionfin.php'; // conexión a tu base de datos
+// Conexión a tu base de datos
+include 'conexionfin.php'; // asegúrate de que define $conexion como un objeto mysqli válido
 
-$term = isset($_GET['q']) ? $_GET['q'] : '';
+$term = $_GET['term'] ?? '';
+$search = "%$term%";
 
-$sql = "SELECT idproveedor, proveedor FROM proveedor WHERE proveedor LIKE ? LIMIT 20";
+// Verifica que la conexión esté bien
+if (!$conexion) {
+    die("Error de conexión: " . mysqli_connect_error());
+}
+
+$sql = "SELECT idproveedor, proveedor FROM proveedor WHERE proveedor LIKE ?";
+
+// Preparar la consulta
 $stmt = $conexion->prepare($sql);
-$searchTerm = "%{$term}%";
-$stmt->bind_param("s", $searchTerm);
+if (!$stmt) {
+    die("Error al preparar la consulta: " . $conexion->error);
+}
+
+// Ejecutar y procesar resultados
+$stmt->bind_param("s", $search);
 $stmt->execute();
 $result = $stmt->get_result();
 
-$items = [];
+$data = [];
 while ($row = $result->fetch_assoc()) {
-    $items[] = [
+    $data[] = [
         'id' => $row['idproveedor'],
-        'text' => $row['proveedor']
+        'text' => "{$row['proveedor']}"
     ];
 }
 
-echo json_encode(['results' => $items]);
+// Respuesta JSON
+header('Content-Type: application/json');
+echo json_encode(['results' => $data]);
+
+// Limpieza
+$stmt->close();
+$conexion->close();
+?>

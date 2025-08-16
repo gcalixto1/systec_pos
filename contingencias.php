@@ -44,9 +44,10 @@ $documentos = $pro->ListarDocumentos();
                 <select name="tipoDoc" id="tipoDoc" class="form-control" required>
                     <option value=""></option>
                     <?php foreach ($documentos as $doc): ?>
-                        <option value="<?php echo $doc['codigo']; ?>" <?php echo (isset($meta['tipoDocumento']) && $meta['tipoDocumento'] == $doc['codigo']) ? 'selected' : ''; ?>>
-                            <?php echo $doc['valor']; ?>
-                        </option>
+                    <option value="<?php echo $doc['codigo']; ?>"
+                        <?php echo (isset($meta['tipoDocumento']) && $meta['tipoDocumento'] == $doc['codigo']) ? 'selected' : ''; ?>>
+                        <?php echo $doc['valor']; ?>
+                    </option>
                     <?php endforeach; ?>
                 </select>
             </div>
@@ -117,105 +118,98 @@ $documentos = $pro->ListarDocumentos();
 
 
 <script>
-    $('#modalFacturas').on('show.bs.modal', function (event) {
-        const button = $(event.relatedTarget);
+$('#modalFacturas').on('show.bs.modal', function(event) {
+    const button = $(event.relatedTarget);
 
-        $('#contenidoModalFacturas').html(
-            '<div class="text-center"><i class="fa fa-spinner fa-spin fa-2x"></i> Cargando...</div>');
+    $('#contenidoModalFacturas').html(
+        '<div class="text-center"><i class="fa fa-spinner fa-spin fa-2x"></i> Cargando...</div>');
 
-        $.ajax({
-            url: 'lista_ventas_contingencias.php',
-            method: 'GET',
-            data: {
-                documento: '00000000'
-            },
-            success: function (data) {
-                $('#contenidoModalFacturas').html(data);
-            },
-            error: function () {
-                $('#contenidoModalFacturas').html(
-                    '<div class="alert alert-danger">Error al cargar los datos.</div>');
-            }
-        });
+    $.ajax({
+        url: 'lista_ventas_contingencias.php',
+        method: 'GET',
+        data: {
+            documento: '00000000'
+        },
+        success: function(data) {
+            $('#contenidoModalFacturas').html(data);
+        },
+        error: function() {
+            $('#contenidoModalFacturas').html(
+                '<div class="alert alert-danger">Error al cargar los datos.</div>');
+        }
     });
+});
 
-    $('#saveSujetoExcluido').submit(function (e) {
-        e.preventDefault();
-        start_load();
+$('#saveSujetoExcluido').submit(function(e) {
+    e.preventDefault();
+    start_load();
 
-        let formElement = document.getElementById('saveSujetoExcluido');
-        let formData = new FormData(formElement);
+    let formElement = document.getElementById('saveSujetoExcluido');
+    let formData = new FormData(formElement);
 
-        $.ajax({
-            url: 'ajax.php?action=save_contingencia',
-            method: 'POST',
-            data: formData,
-            processData: false,
-            contentType: false,
-            dataType: 'json',
-            success: function (resp) {
-                if (resp.success) {
-                    $.ajax({
-                        url: 'dteCON.php',
-                        method: 'POST',
-                        data: formData,
-                        processData: false,
-                        contentType: false,
-                        dataType: 'json',
-                        success: function (respDte) {
-                            hideSpinner();
-                            if (respDte.success) {
-                                let codigo = respDte
-                                    .codigo_generacion; // Asegurate de que dteSE.php devuelve esto
-                                Swal.fire({
-                                    title: 'Éxito!',
-                                    text: 'Sujeto excluido guardado y procesado correctamente.',
-                                    icon: 'success',
-                                    confirmButtonColor: '#28a745',
-                                    confirmButtonText: 'Ver Comprobante'
-                                }).then(() => {
-                                    window.open(
-                                        'facturaElectronica.php?codigoSE=' +
-                                        encodeURIComponent(codigo) +
-                                        '&tipo=SE',
-                                        '_blank' // Esto abre en una nueva pestaña o ventana, dependiendo del navegador
-                                    );
-                                });
-                            } else {
-                                Swal.fire({
-                                    title: 'Error en DTE',
-                                    text: respDte.message ||
-                                        'Ocurrió un error al procesar el DTE.',
-                                    icon: 'error'
-                                });
-                            }
-                        },
-                        error: function () {
-                            hideSpinner();
+    $.ajax({
+        url: 'ajax.php?action=save_contingencia',
+        method: 'POST',
+        data: formData,
+        processData: false,
+        contentType: false,
+        dataType: 'json',
+        success: function(resp) {
+            if (resp.success) {
+                $.ajax({
+                    url: 'dteCON.php',
+                    method: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    dataType: 'json',
+                    success: function(respDte) {
+                        hideSpinner();
+                        if (respDte.success) {
                             Swal.fire({
-                                title: 'Error',
-                                text: 'Error al enviar el sujeto excluido al DTE.',
+                                title: 'Éxito!',
+                                text: 'Evento de Contingencia guardado y procesado correctamente.',
+                                icon: 'success',
+                                confirmButtonColor: '#28a745',
+                                confirmButtonText: 'OK'
+                            }).then(() => {
+
+                            });
+                        } else {
+                            Swal.fire({
+                                title: 'Error en DTE',
+                                text: respDte.message ||
+                                    'Ocurrió un error al procesar el DTE.',
                                 icon: 'error'
                             });
                         }
-                    });
-                } else {
-                    hideSpinner();
-                    Swal.fire({
-                        title: 'Error',
-                        text: resp.message || 'Error al guardar sujeto excluido.',
-                        icon: 'error'
-                    });
-                }
-            },
-            error: function () {
+                    },
+                    error: function() {
+                        hideSpinner();
+                        Swal.fire({
+                            title: 'Error',
+                            text: 'Error al enviar el sujeto excluido al DTE.',
+                            icon: 'error'
+                        });
+                    }
+                });
+            } else {
                 hideSpinner();
                 Swal.fire({
                     title: 'Error',
-                    text: 'No se pudo conectar con el servidor.',
+                    text: resp.message || 'Error al guardar sujeto excluido.',
                     icon: 'error'
                 });
             }
-        });
+        },
+        error: function() {
+            hideSpinner();
+            Swal.fire({
+                title: 'Error',
+                text: 'No se pudo conectar con el servidor.',
+                icon: 'error'
+            });
+        }
     });
+});
 </script>
