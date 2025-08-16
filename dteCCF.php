@@ -11,12 +11,14 @@ $query = $conexion->query("SELECT factura.id, factura.tipofactura, factura.numer
                                     cliente.nombre, cliente.dni, cliente.telefono, cliente.correo,
                                     cliente.dato1, cliente.dato2, cliente.dato3,
                                     cliente_direccion.departamento, cliente_direccion.municipio, 
-                                    cliente_direccion.complemento, cliente.tipoDocumento, medio_pago.medio_pago
+                                    cliente_direccion.complemento, cliente.tipoDocumento, medio_pago.medio_pago,
+                                    CAST(TRIM(LEADING '0' FROM SUBSTRING(consecutivos.valor, 4)) AS UNSIGNED) AS numero_consecutivo
                                 FROM factura 
                                 INNER JOIN cliente ON cliente.idcliente = factura.idcliente
                                 LEFT JOIN cliente_direccion ON cliente_direccion.cliente_dni = cliente.dni
                                 INNER JOIN medio_pago ON medio_pago.codigo = factura.forma_pago
-                                WHERE factura.id = $idfactura");
+                                INNER JOIN consecutivos ON consecutivos.valor = factura.numerofactura
+                                WHERE factura.id = $idfactura AND CAST(TRIM(LEADING '0' FROM SUBSTRING(consecutivos.valor, 4)) AS UNSIGNED) > 0");
 $factura = $query->fetch_assoc();
 
 $queryEmpresa = $conexion->query("SELECT * FROM configuracion WHERE id = 1");
@@ -45,7 +47,7 @@ while ($row = $detalle->fetch_assoc()) {
         "descripcion" => $row['descripcion'],
         "cantidad" => floatval($row['cantidad']),
         "uniMedida" => 59,
-        "precioUni" => round(floatval($row['precioventa'] / 1.13), 2),
+        "precioUni" => round(floatval($row['precioventa'] / 1.13), 4),
         "montoDescu" => 0,
         "ventaNoSuj" => 0,
         "ventaExenta" => 0,
@@ -84,7 +86,7 @@ $facturaJson = [
             "version" => 3,
             "ambiente" => MH_AMBIENTE,
             "tipoDte" => "03",
-            "numeroControl" => "DTE-03-M001P001-" . str_pad($idfactura, 15, "0", STR_PAD_LEFT),
+            "numeroControl" => "DTE-03-M001P001-" . str_pad($factura['numero_consecutivo'], 15, "0", STR_PAD_LEFT),
             "codigoGeneracion" => $codigoGeneracion,
             "tipoOperacion" => 1,
             "tipoModelo" => 1,

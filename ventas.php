@@ -168,9 +168,7 @@ if (!empty($id)) {
                 success: function (resp) {
                     if (resp.success) {
                         let idfactura = resp.idfactura;
-                        let tipo = resp
-                            .tipodocfac;
-
+                        let tipo = resp.tipodocfac;
                         let urlDTE = tipo === 'ccf' ? 'dteCCF.php' : 'dte.php';
 
                         $.ajax({
@@ -182,9 +180,13 @@ if (!empty($id)) {
                             dataType: 'json',
                             success: function (respDte) {
                                 hideSpinner();
-                                if (respDte.success) {
+
+                                const selloRecepcion = respDte.selloRecepcion || '';
+                                const exito = selloRecepcion.trim() !== '';
+
+                                if (exito) {
                                     Swal.fire({
-                                        title: 'Éxito!',
+                                        title: '¡Éxito!',
                                         text: 'Venta registrada y procesada correctamente.',
                                         icon: 'success',
                                         confirmButtonColor: '#28a745',
@@ -193,16 +195,13 @@ if (!empty($id)) {
                                         const win1 = window.open(
                                             'ticket.php?id=' +
                                             encodeURIComponent(
-                                                idfactura),
-                                            '_blank'
-                                        );
+                                                idfactura), '_blank');
                                         const win2 = window.open(
                                             'facturaElectronica.php?id=' +
                                             encodeURIComponent(
                                                 idfactura) +
-                                            '&codigo=0',
-                                            '_blank'
-                                        );
+                                            '&codigo=0', '_blank');
+
                                         if (!win1 || !win2) {
                                             alert(
                                                 "Por favor habilita las ventanas emergentes (pop-ups) para este sitio."
@@ -216,7 +215,7 @@ if (!empty($id)) {
                                     Swal.fire({
                                         title: 'Error en DTE',
                                         text: respDte.detalle ||
-                                            'Ocurrió un error al procesar el DTE.',
+                                            'Hacienda no devolvió un sello de recepción.',
                                         icon: 'error'
                                     });
                                 }

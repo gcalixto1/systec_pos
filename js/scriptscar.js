@@ -77,14 +77,10 @@ function renderCart() {
                 <td>${item.descripcion}</td>
                 <td hidden>${item.codBarra || ''}</td>
                 <td>
-                    <div class="input-group" style="max-width: 130px;">
-                        <div class="input-group-prepend" style="cursor: pointer;" onclick="updatecantidad(${item.codproducto}, -0.1)">
-                            <span class="input-group-text">-</span>
-                        </div>
+                    <div class="input-group" style="max-width: 100px;">
+                       
                         <input type="number" step="0.01" min="0.1" class="form-control" value="${cantidad.toFixed(2)}" onchange="handleManualChangeCantidad(this, ${item.codproducto})">
-                        <div class="input-group-append" style="cursor: pointer;" onclick="updatecantidad(${item.codproducto}, 0.1)">
-                            <span class="input-group-text">+</span>
-                        </div>
+                    
                     </div>
                 </td>
                 <td>
@@ -140,4 +136,45 @@ document.getElementById('saveventa').addEventListener('submit', function(event) 
             }
         }
     });
+});
+
+document.getElementById('busquedaproductov').addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        const codigo = this.value.trim();
+
+        if (codigo !== "") {
+            fetch('buscar_productoC.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'codigo=' + encodeURIComponent(codigo)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const producto = data.producto;
+                    addToCart(producto.codproducto, producto.descripcion, parseFloat(producto.precio));
+                    this.value = ""; // limpiar campo
+                } else {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Producto no encontrado',
+                        text: data.message || 'No se encontró el producto con ese código.',
+                        confirmButtonText: 'Aceptar'
+                    });
+                }
+            })
+            .catch(err => {
+                console.error("Error al buscar producto:", err);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Ocurrió un error al buscar el producto.',
+                    confirmButtonText: 'Aceptar'
+                });
+            });
+        }
+    }
 });

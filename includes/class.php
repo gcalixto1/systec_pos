@@ -251,7 +251,7 @@ class Action
 	function delete_categoria()
 	{
 		extract($_POST);
-		$delete = $this->dbh->query("DELETE FROM categoria where categoria_id = " . $codcategoria);
+		$delete = $this->dbh->query("DELETE FROM categoria where categoria_id = " . $categoria_id);
 		if ($delete)
 			return 1;
 	}
@@ -512,23 +512,43 @@ class Action
 	#region Producto
 	function save_productos()
 	{
-		extract($_POST);
-		$targetFilePath = "";
-		// Construye la cadena de datos para la consulta
-		$data = "descripcion = '$descripcion'";
-		$data .= ", proveedor = '$proveedor'";
-		$data .= ", precio_compra = '$precio_compra'";
-		$data .= ", precio = '$precio'";
-		$data .= ", existencia = '$existencia'";
-		$data .= ", exis_min = '$exis_min'";
-		$data .= ", codBarra = '$codBarra'";
-		$data .= ", prop1 = '$prop1'";
-		$data .= ", prop2 = '$prop2'";
-		$data .= ", prop3 = '$prop3'";
-		$data .= ", categoria = '$categoria'";
-		$data .= ", fecha_vencimiento = '$fecha_vencimiento'";
+		// Escapar datos recibidos por POST
+		$descripcion = mysqli_real_escape_string($this->dbh, $_POST['descripcion'] ?? '');
+		$proveedor = mysqli_real_escape_string($this->dbh, $_POST['proveedor'] ?? '');
+		$precio_compra = mysqli_real_escape_string($this->dbh, $_POST['precio_compra'] ?? 0);
+		$precio = mysqli_real_escape_string($this->dbh, $_POST['precio'] ?? 0);
+		$existencia = mysqli_real_escape_string($this->dbh, $_POST['existencia'] ?? 0);
+		$exis_min = mysqli_real_escape_string($this->dbh, $_POST['exis_min'] ?? 0);
+		$codBarra = mysqli_real_escape_string($this->dbh, $_POST['codBarra'] ?? '');
+		$prop1 = mysqli_real_escape_string($this->dbh, $_POST['prop1'] ?? '');
+		$prop2 = mysqli_real_escape_string($this->dbh, $_POST['prop2'] ?? '');
+		$prop3 = mysqli_real_escape_string($this->dbh, $_POST['prop3'] ?? '');
+		$categoria = mysqli_real_escape_string($this->dbh, $_POST['categoria'] ?? '');
+		$fecha_vencimiento = mysqli_real_escape_string($this->dbh, $_POST['fecha_vencimiento'] ?? '');
+		$tipo_producto = mysqli_real_escape_string($this->dbh, $_POST['tipo_producto'] ?? '');
+		$exenta = mysqli_real_escape_string($this->dbh, $_POST['exenta'] ?? '0');
+		$iva = mysqli_real_escape_string($this->dbh, $_POST['iva'] ?? '0');
+		$id = mysqli_real_escape_string($this->dbh, $_POST['id'] ?? '');
 
-		if (isset($_FILES['imagen_producto']['name']) && !empty($_FILES['imagen_producto']['name'])) {
+		$targetFilePath = "";
+		$data = "descripcion = '$descripcion',
+             proveedor = '$proveedor',
+             precio_compra = '$precio_compra',
+             precio = '$precio',
+             existencia = '$existencia',
+             exis_min = '$exis_min',
+             codBarra = '$codBarra',
+             prop1 = '$prop1',
+             prop2 = '$prop2',
+             prop3 = '$prop3',
+             categoria = '$categoria',
+             fecha_vencimiento = '$fecha_vencimiento',
+             tipo_producto = '$tipo_producto',
+             exentas = '$exenta',
+             iva = '$iva'";
+
+		// Manejo de imagen
+		if (!empty($_FILES['imagen_producto']['name'])) {
 			$targetDir = "img/productos/";
 			$fileName = uniqid() . "_" . basename($_FILES["imagen_producto"]["name"]);
 			$targetFilePath = $targetDir . $fileName;
@@ -537,40 +557,49 @@ class Action
 			$allowedTypes = ['jpg', 'jpeg', 'png'];
 			if (in_array($fileType, $allowedTypes)) {
 				if (move_uploaded_file($_FILES["imagen_producto"]["tmp_name"], $targetFilePath)) {
-					$data .= ", imagen_producto = '$targetFilePath'";
+					if (!empty($id)) {
+						$result = $this->dbh->query("SELECT imagen_producto FROM producto WHERE codproducto = '$id'");
+						if ($result && $result->num_rows > 0) {
+							$row = $result->fetch_assoc();
+							if ($row['imagen_producto'] !== $targetFilePath) {
+								$data .= ", imagen_producto = '$targetFilePath'";
+							}
+						}
+					} else {
+						$data .= ", imagen_producto = '$targetFilePath'";
+					}
 				} else {
 					echo "Error al subir la imagen.";
 					return 0;
 				}
 			} else {
-				echo "Formato de imagen no permitido.";
+				echo "Formato de imagen no permitido (solo jpg, jpeg, png).";
 				return 0;
 			}
 		} else {
-			$data .= ", imagen_producto = 'img/ninguna.png'";
+			if (empty($id)) {
+				$data .= ", imagen_producto = 'img/ninguna.png'";
+			}
 		}
-		// Evitar inyección SQL con consultas preparadas
-		if (empty($id)) {
 
-			// Inserción de un nuevo producto
-			$save = $this->dbh->query("INSERT INTO producto SET " . $data);
+		// Ejecutar INSERT o UPDATE
+		if (empty($id)) {
+			$save = $this->dbh->query("INSERT INTO producto SET $data");
 			if ($save) {
-				// Registrar en el Kardex productos si es necesario
-				$this->save_kardexproductos();
+				$this->save_kardexproductos(); // Guardar en Kardex
 			}
 		} else {
-			// Actualización de un producto existente
-			$id = mysqli_real_escape_string($this->dbh, $id); // Escapa el ID para seguridad
-			$save = $this->dbh->query("UPDATE producto SET " . $data . " WHERE codproducto = $id");
+			$save = $this->dbh->query("UPDATE producto SET $data WHERE codproducto = '$id'");
 		}
 
 		if ($save) {
-			return 1; // Éxito
+			return 1;
 		} else {
-			echo "Error al guardar los datos en la base de datos.";
-			return 0; // Falla
+			echo "Error al guardar los datos en la base de datos. " . $this->dbh->error;
+			return 0;
 		}
 	}
+
 
 	function delete_producto()
 	{
