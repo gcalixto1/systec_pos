@@ -27,6 +27,8 @@ FROM
     respuestadte r
 INNER JOIN 
     factura f ON f.id = r.id_factura
+LEFT JOIN 
+    invalidaciones i ON i.numeroControl = JSON_UNQUOTE(JSON_EXTRACT(r.jsondte, '$.identificacion.numeroControl'))
 WHERE 
     r.estado = 'PROCESADO'
     AND r.selloRecibido IS NOT NULL
@@ -34,10 +36,12 @@ WHERE
     AND r.descripcionMsg = 'RECIBIDO'
     AND YEAR(f.fechafactura) = $anio
     AND MONTH(f.fechafactura) = $mes
+    AND i.numeroControl IS NULL
     $condicionComprobante
 ORDER BY 
     CAST(JSON_UNQUOTE(JSON_EXTRACT(r.jsondte, '$.identificacion.numeroControl')) AS UNSIGNED) ASC
 ";
+
 
 $result = $conexion->query($sql);
 
