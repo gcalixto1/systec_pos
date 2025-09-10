@@ -117,8 +117,10 @@ $facturaJson = [
             "fecEmi" => $ident['fecEmi'],
             "montoIva" => $ivaInvalidar,
             "codigoGeneracionR" => null,
-            "tipoDocumento" => "36",
-            "numDocumento" => $receptor['nit'],
+            "tipoDocumento" => $receptor['tipo'],
+            "numDocumento" => ($receptor['tipo'] == 13)
+                ? $receptor['numDocumento']
+                : (($receptor['tipo'] == 36) ? $receptor['nit'] : null),
             "nombre" => $receptor['nombre'],
             "telefono" => $receptor['telefono'],
             "correo" => $receptor['correo'],

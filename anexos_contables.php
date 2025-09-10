@@ -29,7 +29,13 @@ $filtroc = isset($_GET['filtroc']) ? $_GET['filtroc'] : '0'; // nuevo
 // ==== CONDICIÓN PARA FILTRO DE COMPROBANTE ====
 $condicionComprobante = "";
 if ($filtroc != "0") {
-    $condicionComprobante = " AND JSON_UNQUOTE(JSON_EXTRACT(r.jsondte, '$.identificacion.tipoDte')) = '$filtroc' ";
+    if ($filtroc == "01") {
+        // Factura Consumidor Final
+        $condicionComprobante = " AND JSON_UNQUOTE(JSON_EXTRACT(r.jsondte, '$.identificacion.tipoDte')) = '01' ";
+    } elseif ($filtroc == "03") {
+        // Comprobante de Crédito Fiscal
+        $condicionComprobante = " AND JSON_UNQUOTE(JSON_EXTRACT(r.jsondte, '$.identificacion.tipoDte')) = '03' ";
+    }
 }
 ?>
 
@@ -42,9 +48,9 @@ if ($filtroc != "0") {
             <label for="anio" class="form-label">Año</label>
             <select class="form-control" name="anio" id="anio">
                 <?php foreach ($anios as $anio): ?>
-                    <option value="<?= $anio ?>" <?= ($anioFiltro == $anio) ? 'selected' : '' ?>>
-                        <?= $anio ?>
-                    </option>
+                <option value="<?= $anio ?>" <?= ($anioFiltro == $anio) ? 'selected' : '' ?>>
+                    <?= $anio ?>
+                </option>
                 <?php endforeach; ?>
             </select>
         </div>
@@ -53,9 +59,9 @@ if ($filtroc != "0") {
             <label for="mes" class="form-label">Mes</label>
             <select class="form-control" name="mes" id="mes">
                 <?php foreach ($meses as $num => $nombre): ?>
-                    <option value="<?= $num ?>" <?= ($mesFiltro == $num) ? 'selected' : '' ?>>
-                        <?= $nombre ?>
-                    </option>
+                <option value="<?= $num ?>" <?= ($mesFiltro == $num) ? 'selected' : '' ?>>
+                    <?= $nombre ?>
+                </option>
                 <?php endforeach; ?>
             </select>
         </div>
@@ -184,31 +190,31 @@ ORDER BY CAST(JSON_UNQUOTE(JSON_EXTRACT(r.jsondte, '$.identificacion.numeroContr
                 $ident = $data['identificacion'] ?? [];
                 $resumen = $data['resumen'] ?? [];
                 ?>
-                <tr>
-                    <td><?= !empty($ident['fecEmi']) ? date('d/m/Y', strtotime($ident['fecEmi'])) : '' ?></td>
-                    <td>4</td>
-                    <td>01</td>
-                    <td>N/A</td>
-                    <td>N/A</td>
-                    <td><?= htmlspecialchars($row['primer_codigo_generacion'] ?? '') ?></td>
-                    <td><?= htmlspecialchars($row['ultimo_codigo_generacion'] ?? '') ?></td>
-                    <td>0.00</td>
-                    <td>0.00</td>
-                    <td>0.00</td>
-                    <td><?= number_format($resumen['ventasExentas'] ?? 0, 2) ?></td>
-                    <td>0.00</td>
-                    <td>0.00</td>
-                    <td><?= number_format($resumen['totalGravada'] ?? 0, 2) ?></td>
-                    <td>0.00</td>
-                    <td>0.00</td>
-                    <td>0.00</td>
-                    <td>0.00</td>
-                    <td>0.00</td>
-                    <td><?= number_format($resumen['totalPagar'] ?? 0, 2) ?></td>
-                    <td>1</td>
-                    <td>3</td>
-                    <td></td>
-                </tr>
+            <tr>
+                <td><?= !empty($ident['fecEmi']) ? date('d/m/Y', strtotime($ident['fecEmi'])) : '' ?></td>
+                <td>4</td>
+                <td><?= htmlspecialchars($ident['tipoDte'] ?? '') ?></td>
+                <td>N/A</td>
+                <td>N/A</td>
+                <td><?= htmlspecialchars($row['primer_codigo_generacion'] ?? '') ?></td>
+                <td><?= htmlspecialchars($row['ultimo_codigo_generacion'] ?? '') ?></td>
+                <td>0.00</td>
+                <td>0.00</td>
+                <td>0.00</td>
+                <td><?= number_format($resumen['ventasExentas'] ?? 0, 2) ?></td>
+                <td>0.00</td>
+                <td>0.00</td>
+                <td><?= number_format($resumen['totalGravada'] ?? 0, 2) ?></td>
+                <td>0.00</td>
+                <td>0.00</td>
+                <td>0.00</td>
+                <td>0.00</td>
+                <td>0.00</td>
+                <td><?= number_format($resumen['totalPagar'] ?? 0, 2) ?></td>
+                <td>1</td>
+                <td>3</td>
+                <td></td>
+            </tr>
             <?php endwhile; ?>
         </tbody>
     </table>
@@ -216,35 +222,43 @@ ORDER BY CAST(JSON_UNQUOTE(JSON_EXTRACT(r.jsondte, '$.identificacion.numeroContr
 </div>
 
 <script>
-    $('#tablaDocumentos').dataTable();
+$('#tablaDocumentos').dataTable();
 
-    function redirigirFiltro() {
-        var anio = document.getElementById('anio').value;
-        var mes = document.getElementById('mes').value;
-        var filtroc = document.getElementById('filtroc').value;
-        window.location.href = "index.php?page=anexos_contables&anio=" + anio + "&mes=" + mes + "&filtroc=" + filtroc;
+function redirigirFiltro() {
+    var anio = document.getElementById('anio').value;
+    var mes = document.getElementById('mes').value;
+    var filtroc = document.getElementById('filtroc').value;
+    window.location.href = "index.php?page=anexos_contables&anio=" + anio + "&mes=" + mes + "&filtroc=" + filtroc;
+}
+
+// Cambiar año o mes => redirigir
+document.getElementById('anio').addEventListener('change', redirigirFiltro);
+document.getElementById('mes').addEventListener('change', redirigirFiltro);
+
+// Botón filtrar => redirigir
+document.getElementById('btnFiltrar').addEventListener('click', redirigirFiltro);
+
+// Exportar Excel con filtro
+document.getElementById('btnExcel').addEventListener('click', function() {
+    var anio = document.getElementById('anio').value;
+    var mes = document.getElementById('mes').value;
+    var filtroc = document.getElementById('filtroc').value;
+    window.location.href = "export_excel.php?anio=" + anio + "&mes=" + mes + "&filtroc=" + filtroc;
+});
+
+// Exportar CSV con filtro
+document.getElementById('btnCsv').addEventListener('click', function() {
+    var anio = document.getElementById('anio').value;
+    var mes = document.getElementById('mes').value;
+    var filtroc = document.getElementById('filtroc').value;
+
+    var archivo = "export_csv.php"; // por defecto
+    if (filtroc === "01") {
+        archivo = "export_csv_cf.php"; // consumidor final
+    } else if (filtroc === "03") {
+        archivo = "export_csv.php"; // comprobante crédito fiscal
     }
 
-    // Cambiar año o mes => redirigir
-    document.getElementById('anio').addEventListener('change', redirigirFiltro);
-    document.getElementById('mes').addEventListener('change', redirigirFiltro);
-
-    // Botón filtrar => redirigir
-    document.getElementById('btnFiltrar').addEventListener('click', redirigirFiltro);
-
-    // Exportar Excel con filtro
-    document.getElementById('btnExcel').addEventListener('click', function () {
-        var anio = document.getElementById('anio').value;
-        var mes = document.getElementById('mes').value;
-        var filtroc = document.getElementById('filtroc').value;
-        window.location.href = "export_excel.php?anio=" + anio + "&mes=" + mes + "&filtroc=" + filtroc;
-    });
-
-    // Exportar CSV con filtro
-    document.getElementById('btnCsv').addEventListener('click', function () {
-        var anio = document.getElementById('anio').value;
-        var mes = document.getElementById('mes').value;
-        var filtroc = document.getElementById('filtroc').value;
-        window.location.href = "export_csv.php?anio=" + anio + "&mes=" + mes + "&filtroc=" + filtroc;
-    });
+    window.location.href = archivo + "?anio=" + anio + "&mes=" + mes + "&filtroc=" + filtroc;
+});
 </script>

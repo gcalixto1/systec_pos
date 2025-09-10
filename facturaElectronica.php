@@ -88,7 +88,7 @@ if ($ident['tipoDte'] == '01') {
 } else if ($ident['tipoDte'] == '06') {
     include('comprobante_notadebito.php');
 } else if ($ident['tipoDte'] == '14') {
-   include('factura_sujetoexcluido.php');
+    include('factura_sujetoexcluido.php');
 }
 
 $nombreArchivo = $ident['numeroControl'] . '.pdf';
@@ -101,6 +101,8 @@ if ($correoEnviado == 0) {
     $mail = new PHPMailer(true);
 
     try {
+        $query = "SELECT * FROM configuracion WHERE id = 1";
+        $resultado = $conexion->query($query);
         // Configuración del servidor SMTP
         $mail->isSMTP();
         $mail->Host = 'smtp.gmail.com';
@@ -111,7 +113,7 @@ if ($correoEnviado == 0) {
         $mail->Port = 587;
 
         // Remitente y receptor
-        $mail->setFrom('alex.calix1992@gmail.com', utf8_decode('Ferretería Fuentes'));
+        $mail->setFrom('alex.calix1992@gmail.com', utf8_decode('SYSTEC - POS'));
         $mail->addAddress($receptor['correo'], 'Cliente');
 
         // Adjuntar PDF
@@ -126,8 +128,8 @@ if ($correoEnviado == 0) {
 
         // Contenido del correo
         $mail->isHTML(true);
-        $mail->Subject = utf8_decode('FERRETERIA FUENTES - Factura Electrónica');
-        $mail->Body = 'Estimado cliente,<br><br>Este correo es generado automaticamente por : <b>FERRETERIA FUENTES</b><br><br>Gracias por su compra.';
+        $mail->Subject = utf8_decode('SYSTEC - Factura Electrónica');
+        $mail->Body = 'Estimado cliente,<br><br>Este correo es generado automaticamente por : <b>SYSTEC</b><br><br>Gracias por su compra.';
 
         $mail->send();
         $pdf->Output('I', $nombreArchivo . '.pdf');
