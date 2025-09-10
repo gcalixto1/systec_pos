@@ -24,19 +24,32 @@ $meses = [
 // ==== FILTROS DESDE GET O POR DEFECTO ====
 $anioFiltro = isset($_GET['anio']) ? (int) $_GET['anio'] : $anio_actual;
 $mesFiltro = isset($_GET['mes']) ? (int) $_GET['mes'] : $mes_actual;
-$filtroc = isset($_GET['filtroc']) ? $_GET['filtroc'] : '0'; // nuevo
+$filtroc = isset($_GET['filtroc']) ? $_GET['filtroc'] : '0';
 
 // ==== CONDICIÓN PARA FILTRO DE COMPROBANTE ====
 $condicionComprobante = "";
-if ($filtroc != "0") {
-    if ($filtroc == "01") {
-        // Factura Consumidor Final
-        $condicionComprobante = " AND JSON_UNQUOTE(JSON_EXTRACT(r.jsondte, '$.identificacion.tipoDte')) = '01' ";
-    } elseif ($filtroc == "03") {
-        // Comprobante de Crédito Fiscal
-        $condicionComprobante = " AND JSON_UNQUOTE(JSON_EXTRACT(r.jsondte, '$.identificacion.tipoDte')) = '03' ";
-    }
+if ($filtroc === "01") {
+    $condicionComprobante = " AND JSON_UNQUOTE(JSON_EXTRACT(r.jsondte, '$.identificacion.tipoDte')) = '01' ";
+} elseif ($filtroc === "03") {
+    $condicionComprobante = " AND JSON_UNQUOTE(JSON_EXTRACT(r.jsondte, '$.identificacion.tipoDte')) = '03' ";
 }
+
+// ==== CONEXIÓN A BASE DE DATOS ====
+include 'conexionfin.php';
+
+// ==== OBTENER DETALLE DEL FILTRO ====
+$sqlDetalle = "
+    SELECT 
+        COUNT(*) AS total_registros,
+        MIN(JSON_UNQUOTE(JSON_EXTRACT(r.jsondte, '$.identificacion.numeroControl'))) AS numero_control_inicial,
+        MAX(JSON_UNQUOTE(JSON_EXTRACT(r.jsondte, '$.identificacion.numeroControl'))) AS numero_control_final
+    FROM respuestadte r
+    WHERE YEAR(JSON_UNQUOTE(JSON_EXTRACT(r.jsondte, '$.identificacion.fecEmi'))) = $anioFiltro
+      AND MONTH(JSON_UNQUOTE(JSON_EXTRACT(r.jsondte, '$.identificacion.fecEmi'))) = $mesFiltro
+      $condicionComprobante
+";
+$resultadoDetalle = $conexion->query($sqlDetalle);
+$detalle = $resultadoDetalle->fetch_assoc();
 ?>
 
 <div class="container-fluid mt-4">
@@ -69,7 +82,6 @@ if ($filtroc != "0") {
         <div class="col-md-2">
             <label for="filtroc" class="form-label">Tipo de Comprobante</label>
             <select class="form-control" name="filtroc" id="filtroc">
-                <option value="0" <?= ($filtroc == '0') ? 'selected' : '' ?>>Todos</option>
                 <option value="01" <?= ($filtroc == '01') ? 'selected' : '' ?>>Facturas Consumidor Final</option>
                 <option value="03" <?= ($filtroc == '03') ? 'selected' : '' ?>>Comprobante de Crédito Fiscal</option>
             </select>
@@ -95,134 +107,63 @@ if ($filtroc != "0") {
                 </div>
             </div>
         </div>
-
     </form>
-    <br />
-    <table class="table table-bordered table-responsive" id="tablaDocumentos">
+
+    <!-- DETALLE DE REGISTROS -->
+    <div class="alert alert-info">
+        <strong>Detalle del filtro:</strong><br>
+        Total de registros: <?= $detalle['total_registros'] ?><br>
+        Número de control inicial: <?= $detalle['numero_control_inicial'] ?: 'N/A' ?><br>
+        Número de control final: <?= $detalle['numero_control_final'] ?: 'N/A' ?>
+    </div>
+
+    <!-- TABLA DE DOCUMENTOS -->
+    <table id="tablaDocumentos" class="table table-bordered table-striped">
         <thead>
             <tr>
-                <th>FECHA DE EMISIÓN</th>
-                <th>CLASE DOC</th>
-                <th>TIPO DOC</th>
-                <th>N° RESOLUCIÓN</th>
-                <th>SERIE DOC</th>
-                <th>N° CONTROL INTERNO (DEL)</th>
-                <th>N° CONTROL INTERNO (AL)</th>
-                <th>N° DOC (DEL)</th>
-                <th>N° DOC (AL)</th>
-                <th>N° MÁQUINA</th>
-                <th>VENTAS EXENTAS</th>
-                <th>VENTAS EXENTAS NO SUJ.</th>
-                <th>VENTAS NO SUJETAS</th>
-                <th>VENTAS GRAVADAS</th>
-                <th>EXPORT. C.A.</th>
-                <th>EXPORT. FUERA C.A.</th>
-                <th>EXPORT. SERVICIOS</th>
-                <th>VENTAS ZONA FRANCA</th>
-                <th>VENTAS A TERCEROS</th>
-                <th>TOTAL VENTAS</th>
-                <th>TIPO OPE. (Renta)</th>
-                <th>TIPO ING. (Renta)</th>
-                <th>N° ANEXO</th>
+                <th>Fecha Emisión</th>
+                <th>Tipo DTE</th>
+                <th>Número Control</th>
+                <th>NIT/Documento</th>
+                <th>Total</th>
             </tr>
         </thead>
         <tbody>
             <?php
-            $sql = "
+            // ==== OBTENER REGISTROS PARA TABLA ====
+            $sqlDocs = "
                 SELECT 
-    r.id,
-    r.jsondte,
-    JSON_UNQUOTE(JSON_EXTRACT(r.jsondte, '$.identificacion.numeroControl')) AS numeroControl,
-    JSON_UNQUOTE(JSON_EXTRACT(r.jsondte, '$.identificacion.codigoGeneracion')) AS codigoGeneracion,
-    (
-        SELECT JSON_UNQUOTE(JSON_EXTRACT(r2.jsondte, '$.identificacion.codigoGeneracion'))
-        FROM respuestadte r2
-        INNER JOIN factura f2 ON f2.id = r2.id_factura
-        WHERE 
-            r2.estado = 'PROCESADO'
-            AND r2.selloRecibido IS NOT NULL
-            AND TRIM(r2.selloRecibido) <> ''
-            AND r2.descripcionMsg = 'RECIBIDO'
-            AND YEAR(f2.fechafactura) = YEAR(f.fechafactura)
-            AND MONTH(f2.fechafactura) = MONTH(f.fechafactura)
-        ORDER BY JSON_UNQUOTE(JSON_EXTRACT(r2.jsondte, '$.identificacion.codigoGeneracion')) ASC
-        LIMIT 1
-    ) AS primer_codigo_generacion,
-    (
-        SELECT JSON_UNQUOTE(JSON_EXTRACT(r3.jsondte, '$.identificacion.codigoGeneracion'))
-        FROM respuestadte r3
-        INNER JOIN factura f3 ON f3.id = r3.id_factura
-        WHERE 
-            r3.estado = 'PROCESADO'
-            AND r3.selloRecibido IS NOT NULL
-            AND TRIM(r3.selloRecibido) <> ''
-            AND r3.descripcionMsg = 'RECIBIDO'
-            AND YEAR(f3.fechafactura) = YEAR(f.fechafactura)
-            AND MONTH(f3.fechafactura) = MONTH(f.fechafactura)
-        ORDER BY JSON_UNQUOTE(JSON_EXTRACT(r3.jsondte, '$.identificacion.codigoGeneracion')) DESC
-        LIMIT 1
-    ) AS ultimo_codigo_generacion
-FROM respuestadte r
-INNER JOIN factura f ON f.id = r.id_factura
-WHERE 
-    r.estado = 'PROCESADO'
-    AND r.selloRecibido IS NOT NULL
-    AND TRIM(r.selloRecibido) <> ''
-    AND r.descripcionMsg = 'RECIBIDO'
-    AND YEAR(f.fechafactura) = $anioFiltro
-    AND MONTH(f.fechafactura) = $mesFiltro
-    $condicionComprobante
-    AND JSON_UNQUOTE(JSON_EXTRACT(r.jsondte, '$.identificacion.codigoGeneracion')) NOT IN (
-        SELECT codigoGeneracion FROM invalidaciones
-    )
-ORDER BY CAST(JSON_UNQUOTE(JSON_EXTRACT(r.jsondte, '$.identificacion.numeroControl')) AS UNSIGNED) ASC;
-
+                    JSON_UNQUOTE(JSON_EXTRACT(r.jsondte, '$.identificacion.fecEmi')) AS fechaEmi,
+                    JSON_UNQUOTE(JSON_EXTRACT(r.jsondte, '$.identificacion.tipoDte')) AS tipoDte,
+                    JSON_UNQUOTE(JSON_EXTRACT(r.jsondte, '$.identificacion.numeroControl')) AS numeroControl,
+                    JSON_UNQUOTE(JSON_EXTRACT(r.jsondte, '$.receptor.nit')) AS nit,
+                    JSON_UNQUOTE(JSON_EXTRACT(r.jsondte, '$.totales.total')) AS total
+                FROM respuestadte r
+                WHERE YEAR(JSON_UNQUOTE(JSON_EXTRACT(r.jsondte, '$.identificacion.fecEmi'))) = $anioFiltro
+                  AND MONTH(JSON_UNQUOTE(JSON_EXTRACT(r.jsondte, '$.identificacion.fecEmi'))) = $mesFiltro
+                  $condicionComprobante
+                ORDER BY fechaEmi ASC
             ";
-
-            $result = $conexion->query($sql);
-
-            if (!$result) {
-                die("<b>Error en la consulta:</b> " . $conexion->error);
-            }
-
-            while ($row = $result->fetch_assoc()):
-                $data = json_decode($row['jsondte'], true);
-                $ident = $data['identificacion'] ?? [];
-                $resumen = $data['resumen'] ?? [];
+            $resultadoDocs = $conexion->query($sqlDocs);
+            while ($doc = $resultadoDocs->fetch_assoc()):
                 ?>
             <tr>
-                <td><?= !empty($ident['fecEmi']) ? date('d/m/Y', strtotime($ident['fecEmi'])) : '' ?></td>
-                <td>4</td>
-                <td><?= htmlspecialchars($ident['tipoDte'] ?? '') ?></td>
-                <td>N/A</td>
-                <td>N/A</td>
-                <td><?= htmlspecialchars($row['primer_codigo_generacion'] ?? '') ?></td>
-                <td><?= htmlspecialchars($row['ultimo_codigo_generacion'] ?? '') ?></td>
-                <td>0.00</td>
-                <td>0.00</td>
-                <td>0.00</td>
-                <td><?= number_format($resumen['ventasExentas'] ?? 0, 2) ?></td>
-                <td>0.00</td>
-                <td>0.00</td>
-                <td><?= number_format($resumen['totalGravada'] ?? 0, 2) ?></td>
-                <td>0.00</td>
-                <td>0.00</td>
-                <td>0.00</td>
-                <td>0.00</td>
-                <td>0.00</td>
-                <td><?= number_format($resumen['totalPagar'] ?? 0, 2) ?></td>
-                <td>1</td>
-                <td>3</td>
-                <td></td>
+                <td><?= $doc['fechaEmi'] ?></td>
+                <td><?= $doc['tipoDte'] ?></td>
+                <td><?= $doc['numeroControl'] ?></td>
+                <td><?= $doc['nit'] ?></td>
+                <td><?= $doc['total'] ?></td>
             </tr>
             <?php endwhile; ?>
         </tbody>
     </table>
 </div>
-</div>
 
 <script>
-$('#tablaDocumentos').dataTable();
+$(document).ready(function() {
+    $('#tablaDocumentos').DataTable();
+});
+$('#tablaDocumentos').DataTable();
 
 function redirigirFiltro() {
     var anio = document.getElementById('anio').value;
