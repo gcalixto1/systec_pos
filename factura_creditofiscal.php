@@ -138,15 +138,45 @@ $pdf->SetFont('Arial', '', 8);
 $contador = 1;
 
 foreach ($data['cuerpoDocumento'] as $item) {
-    $pdf->Cell(10, 5, $contador++, 1, 0, 'C');
-    $pdf->Cell(55, 5, substr($item['descripcion'] ?? '', 0, 40), 1);
-    $pdf->Cell(15, 5, $item['cantidad'] ?? '', 1, 0, 'C');
-    $pdf->Cell(10, 5, $item['uniMedida'] ?? '', 1, 0, 'C');
-    $pdf->Cell(20, 5, '$' . number_format($item['precioUni'] ?? 0, 4), 1, 0, 'R');
-    $pdf->Cell(20, 5, '$' . number_format($item['montoDescu'] ?? 0, 3), 1, 0, 'R');
-    $pdf->Cell(20, 5, '$' . number_format($item['ventaNoSuj'] ?? 0, 2), 1, 0, 'R');
-    $pdf->Cell(20, 5, '$' . number_format($item['ventaExenta'] ?? 0, 2), 1, 0, 'R');
-    $pdf->Cell(20, 5, '$' . number_format($item['ventaGravada'] ?? 0, 2), 1, 1, 'R');
+    $descripcion = utf8_decode($item['descripcion'] ?? '');
+
+    // --- Guardar posición inicial
+    $x = $pdf->GetX();
+    $y = $pdf->GetY();
+
+    // --- Anchos de las columnas
+    $w = [10, 55, 15, 10, 20, 20, 20, 20, 20];
+
+    // --- Altura base
+    $h = 5;
+
+    // --- Calcular altura de la descripción con MultiCell
+    $pdf->SetXY($x + $w[0], $y); // movernos a columna descripción
+    $pdf->MultiCell($w[1], $h, $descripcion, 0, 'L');
+    $heightDescripcion = $pdf->GetY() - $y; // altura usada por la descripcion
+
+    // --- Calcular la altura máxima de la fila
+    $rowHeight = max($h, $heightDescripcion);
+
+    // --- Dibujar todas las celdas manualmente ---
+    $pdf->SetXY($x, $y);
+    $pdf->Cell($w[0], $rowHeight, $contador++, 1, 0, 'C');
+
+    $pdf->SetXY($x + $w[0], $y);
+    $pdf->MultiCell($w[1], $h, $descripcion, 1, 'L');
+
+    $pdf->SetXY($x + $w[0] + $w[1], $y);
+    $pdf->Cell($w[2], $rowHeight, $item['cantidad'] ?? '', 1, 0, 'C');
+
+    $pdf->Cell($w[3], $rowHeight, $item['uniMedida'] ?? '', 1, 0, 'C');
+    $pdf->Cell($w[4], $rowHeight, '$' . number_format($item['precioUni'] ?? 0, 4), 1, 0, 'R');
+    $pdf->Cell($w[5], $rowHeight, '$' . number_format($item['montoDescu'] ?? 0, 3), 1, 0, 'R');
+    $pdf->Cell($w[6], $rowHeight, '$' . number_format($item['ventaNoSuj'] ?? 0, 2), 1, 0, 'R');
+    $pdf->Cell($w[7], $rowHeight, '$' . number_format($item['ventaExenta'] ?? 0, 2), 1, 0, 'R');
+    $pdf->Cell($w[8], $rowHeight, '$' . number_format($item['ventaGravada'] ?? 0, 2), 1, 0, 'R');
+
+    // --- Pasar a la siguiente fila ---
+    $pdf->Ln($rowHeight);
 }
 
 // Totales

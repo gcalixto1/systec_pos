@@ -16,37 +16,11 @@ if ($filtroc != "0") {
 
 $sql = "
 SELECT 
-    r.jsondte,
-    JSON_UNQUOTE(JSON_EXTRACT(r.jsondte, '$.identificacion.numeroControl')) AS numeroControl,
-    JSON_UNQUOTE(JSON_EXTRACT(r.jsondte, '$.identificacion.codigoGeneracion')) AS codigoGeneracion,
-    (
-        SELECT codigoGeneracion
-        FROM respuestadte r2
-        INNER JOIN factura f2 ON f2.id = r2.id_factura
-        WHERE 
-            r2.estado = 'PROCESADO'
-            AND r2.selloRecibido IS NOT NULL
-            AND TRIM(r2.selloRecibido) <> ''
-            AND r2.descripcionMsg = 'RECIBIDO'
-            AND YEAR(f2.fechafactura) = YEAR(f.fechafactura)
-            AND MONTH(f2.fechafactura) = MONTH(f.fechafactura)
-        ORDER BY CAST(JSON_UNQUOTE(JSON_EXTRACT(r2.jsondte, '$.identificacion.codigoGeneracion')) AS UNSIGNED) ASC
-        LIMIT 1
-    ) AS primer_codigo_generacion,
-    (
-        SELECT codigoGeneracion
-        FROM respuestadte r3
-        INNER JOIN factura f3 ON f3.id = r3.id_factura
-        WHERE 
-            r3.estado = 'PROCESADO'
-            AND r3.selloRecibido IS NOT NULL
-            AND TRIM(r3.selloRecibido) <> ''
-            AND r3.descripcionMsg = 'RECIBIDO'
-            AND YEAR(f3.fechafactura) = YEAR(f.fechafactura)
-            AND MONTH(f3.fechafactura) = MONTH(f.fechafactura)
-        ORDER BY CAST(JSON_UNQUOTE(JSON_EXTRACT(r3.jsondte, '$.identificacion.codigoGeneracion')) AS UNSIGNED) DESC
-        LIMIT 1
-    ) AS ultimo_codigo_generacion
+    DATE(f.fechafactura) AS fechaEmision,
+    MIN(CAST(JSON_UNQUOTE(JSON_EXTRACT(r.jsondte, '$.identificacion.codigoGeneracion')) AS CHAR)) AS primer_codigo_generacion,
+    MAX(CAST(JSON_UNQUOTE(JSON_EXTRACT(r.jsondte, '$.identificacion.codigoGeneracion')) AS CHAR)) AS ultimo_codigo_generacion,
+    SUM(CAST(JSON_UNQUOTE(JSON_EXTRACT(r.jsondte, '$.resumen.totalGravada')) AS DECIMAL(18,2))) AS totalGravada,
+    SUM(CAST(JSON_UNQUOTE(JSON_EXTRACT(r.jsondte, '$.resumen.totalPagar')) AS DECIMAL(18,2))) AS totalPagar
 FROM 
     respuestadte r
 INNER JOIN 
@@ -59,8 +33,10 @@ WHERE
     AND YEAR(f.fechafactura) = $anio
     AND MONTH(f.fechafactura) = $mes
     $condicionComprobante
+GROUP BY 
+    DATE(f.fechafactura)
 ORDER BY 
-    CAST(JSON_UNQUOTE(JSON_EXTRACT(r.jsondte, '$.identificacion.numeroControl')) AS UNSIGNED) ASC
+    DATE(f.fechafactura) ASC
 ";
 
 $result = $conexion->query($sql);
@@ -97,12 +73,8 @@ echo "<tr>
 </tr>";
 
 while ($row = $result->fetch_assoc()) {
-    $data = json_decode($row['jsondte'], true);
-    $ident = $data['identificacion'] ?? [];
-    $resumen = $data['resumen'] ?? [];
-
     echo "<tr>";
-    echo "<td>" . (!empty($ident['fecEmi']) ? date('d/m/Y', strtotime($ident['fecEmi'])) : '') . "</td>";
+    echo "<td>" . date('d/m/Y', strtotime($row['fechaEmision'])) . "</td>";
     echo "<td>4</td>";
     echo "<td>01</td>";
     echo "<td>N/A</td>";
@@ -115,13 +87,13 @@ while ($row = $result->fetch_assoc()) {
     echo "<td>0.00</td>";
     echo "<td>0.00</td>";
     echo "<td>0.00</td>";
-    echo "<td>" . number_format($resumen['totalGravada'] ?? 0, 2) . "</td>";
+    echo "<td>" . number_format($row['totalGravada'] ?? 0, 2) . "</td>";
     echo "<td>0.00</td>";
     echo "<td>0.00</td>";
     echo "<td>0.00</td>";
     echo "<td>0.00</td>";
     echo "<td>0.00</td>";
-    echo "<td>" . number_format($resumen['totalPagar'] ?? 0, 2) . "</td>";
+    echo "<td>" . number_format($row['totalPagar'] ?? 0, 2) . "</td>";
     echo "<td>1</td>";
     echo "<td>3</td>";
     echo "<td></td>";

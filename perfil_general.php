@@ -212,34 +212,55 @@ $giroSeleccionado = isset($meta['giro']) ? $meta['giro'] : '';
                                 value="<?php echo isset($meta['claveAPI']) ? htmlspecialchars($meta['claveAPI']) : ''; ?>"
                                 required>
                         </div>
+                        <div class="form-group col-md-3">
+                            <label class="form-label">Servidor SMTP</label>
+                            <input type="text" name="smtp_host" class="form-control" value="<?= $meta['smtp_host'] ?>"
+                                required>
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label class="form-label">Contraseña SMTP</label>
+                            <input type="password" name="smtp_pass" class="form-control"
+                                value="<?= $meta['smtp_pass'] ?>" required>
+                        </div>
+
+                        <div class="form-group col-md-3">
+                            <label class="form-label">Seguridad</label>
+                            <select name="smtp_secure" class="form-control" required>
+                                <option value="tls" <?= $meta['smtp_secure'] == 'tls' ? 'selected' : '' ?>>TLS
+                                </option>
+                                <option value="ssl" <?= $meta['smtp_secure'] == 'ssl' ? 'selected' : '' ?>>SSL
+                                </option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-3">
+                            <label class="form-label">Puerto</label>
+                            <input type="number" name="smtp_port" class="form-control" value="<?= $meta['smtp_port'] ?>"
+                                required>
+                        </div>
                     </div>
-                    <div class="row">
-                        <div class="col-md-3">
-                            <div class="fileinput fileinput-new" data-provides="fileinput">
-                                <div class="fileinput-preview thumbnail" data-trigger="fileinput"
-                                    style="width: 210px; height: 110px;">
-                                    <?php
+                    <div class="col-md-3">
+                        <div class="fileinput fileinput-new" data-provides="fileinput">
+                            <div class="fileinput-preview thumbnail" data-trigger="fileinput"
+                                style="width: 210px; height: 110px;">
+                                <?php
                                     $logoPrincipal = file_exists("img/logo.png") ? "img/logo.png" : "img/ninguna.png";
                                     echo "<img id='logoPreview' src='$logoPrincipal' class='img-rounded' border='0' width='210' height='110' title='Logo' data-rel='tooltip'>";
                                     ?>
-                                </div>
-                                <div>
-                                    <label for="imagen" class="btn btn-success">
-                                        <span class="fileinput-exists"><i class="fa fa-paint-brush"></i> Logo
-                                            Principal</span>
-                                    </label>
-                                    <input type="file" size="10" accept=".png"
-                                        data-original-title="Subir Logo Principal" data-rel="tooltip"
-                                        placeholder="Suba su Logo Principal" name="imagen" id="imagen"
-                                        style="display: none;"
-                                        onchange="previewImage(event, 'logoPreview', 'imagen')" />
-                                    <small>
-                                        <p>Para Subir el Logo Principal debe tener en cuenta:
-                                            <br> * La Imagen debe ser extension.png<br> * La imagen no debe ser mayor de
-                                            200 KB
-                                        </p>
-                                    </small>
-                                </div>
+                            </div>
+                            <div>
+                                <label for="imagen" class="btn btn-success">
+                                    <span class="fileinput-exists"><i class="fa fa-paint-brush"></i> Logo
+                                        Principal</span>
+                                </label>
+                                <input type="file" size="10" accept=".png" data-original-title="Subir Logo Principal"
+                                    data-rel="tooltip" placeholder="Suba su Logo Principal" name="imagen" id="imagen"
+                                    style="display: none;" onchange="previewImage(event, 'logoPreview', 'imagen')" />
+                                <small>
+                                    <p>Para Subir el Logo Principal debe tener en cuenta:
+                                        <br> * La Imagen debe ser extension.png<br> * La imagen no debe ser mayor de
+                                        200 KB
+                                    </p>
+                                </small>
                             </div>
                         </div>
                         <div class="col-md-3">
